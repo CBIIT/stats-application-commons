@@ -9,7 +9,7 @@ import gov.nih.nci.caintegrator.exceptions.AnalysisServerException;
 import gov.nih.nci.caintegrator.service.findings.AnalysisFinding;
 import gov.nih.nci.caintegrator.service.findings.ClassComparisonFinding;
 import gov.nih.nci.caintegrator.application.cache.BusinessTierCache;
-import gov.nih.nci.caintegrator.application.service.annotation.GeneExprAnnotationServiceI;
+import gov.nih.nci.caintegrator.application.service.annotation.GeneExprAnnotationService;
 import gov.nih.nci.caintegrator.application.service.annotation.ReporterResultset;
 import gov.nih.nci.caintegrator.application.util.ApplicationContext;
 //import gov.nih.nci.rembrandt.web.factory.ApplicationFactory;
@@ -306,7 +306,7 @@ public class AnalysisServerClientManager implements MessageListener, ExceptionLi
 					}
 				}
 		        try {
-		        	GeneExprAnnotationServiceI geneExpAnnotationService = (GeneExprAnnotationServiceI)ApplicationContext.getApplicationService("GENE_EXPRESSION_ANNOTATION_SERVICE");
+		        	GeneExprAnnotationService geneExpAnnotationService = (GeneExprAnnotationService)ApplicationContext.getApplicationService("GENE_EXPRESSION_ANNOTATION_SERVICE");
 		        	reporterResultsetMap = geneExpAnnotationService.getAnnotationsMapForReporters(reporterIds);
 		        	((ClassComparisonFinding) finding).setReporterAnnotationsMap(reporterResultsetMap);
 		        }

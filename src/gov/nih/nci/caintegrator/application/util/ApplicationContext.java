@@ -1,7 +1,8 @@
 package gov.nih.nci.caintegrator.application.util;
 
 import gov.nih.nci.caintegrator.application.analysis.AnalysisServerClientManager;
-//import gov.nih.nci.rembrandt.queryservice.queryprocessing.QueryHandler;
+import gov.nih.nci.caintegrator.application.service.ApplicationService;
+
 
 import java.io.InputStream;
 import java.util.HashMap;
@@ -122,6 +123,8 @@ public class ApplicationContext{
       //Start the JMS Lister
         try {
 		@SuppressWarnings("unused") AnalysisServerClientManager analysisServerClientManager = AnalysisServerClientManager.getInstance();
+		//Also need to create GeneExpressionAnnotationService
+		
 		} catch (NamingException e) {
 	        logger.error(new IllegalStateException("Error getting an instance of AnalysisServerClientManager" ));
 			logger.error(e.getMessage());
@@ -137,4 +140,8 @@ public class ApplicationContext{
 		}
 
     }
+	public static ApplicationService getApplicationService(String serviceName) {
+		// TODO Auto-generated method stub
+		return null;
+	}
 }
