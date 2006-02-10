@@ -11,7 +11,7 @@ import java.util.Map;
  *
  */
 
-public abstract class GeneExprAnnotationService extends ApplicationService {
+public abstract class GeneExprAnnotationService implements ApplicationService {
 
 	public abstract GeneExprAnnotationService getInstance();
 	
