@@ -1,10 +1,12 @@
 package gov.nih.nci.caintegrator.application.service;
 
-public abstract class ApplicationService {
+/**
+ * All services available for an application will implement this interface
+ * @author harrismic
+ *
+ */
+public interface ApplicationService {
 
-	public ApplicationService() {
-		super();
-		// TODO Auto-generated constructor stub
-	}
+	public ApplicationService getInstance();
 
 }
