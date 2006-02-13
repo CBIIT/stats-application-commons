@@ -7,6 +7,6 @@ package gov.nih.nci.caintegrator.application.service;
  */
 public interface ApplicationService {
 
-	public ApplicationService getInstance();
+	public ApplicationService getInstance() throws Exception;
 
 }
