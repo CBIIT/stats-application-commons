@@ -12,6 +12,7 @@ import gov.nih.nci.caintegrator.application.cache.BusinessTierCache;
 import gov.nih.nci.caintegrator.application.service.annotation.GeneExprAnnotationService;
 import gov.nih.nci.caintegrator.application.service.annotation.ReporterResultset;
 import gov.nih.nci.caintegrator.application.util.ApplicationContext;
+import gov.nih.nci.caintegrator.application.service.ApplicationService;
 //import gov.nih.nci.rembrandt.web.factory.ApplicationFactory;
 
 import java.util.ArrayList;
@@ -107,7 +108,7 @@ import org.apache.log4j.Logger;
 * 
 */
 
-public class AnalysisServerClientManager implements MessageListener, ExceptionListener, AnalysisRequestSender{
+public class AnalysisServerClientManager implements ApplicationService, MessageListener, ExceptionListener, AnalysisRequestSender{
 	private static Logger logger = Logger.getLogger(AnalysisServerClientManager.class);
 	
 	private BusinessTierCache _cacheManager = (BusinessTierCache)ApplicationContext.getApplicationService("BUSINESS_TIER_CACHE");
@@ -357,7 +358,7 @@ public class AnalysisServerClientManager implements MessageListener, ExceptionLi
 	/**
 	 * @return Returns the instance.
 	 */
-	public static AnalysisServerClientManager getInstance()  throws NamingException, JMSException{
+	public  AnalysisServerClientManager getInstance()  throws NamingException, JMSException{
 		//first time
 		if(instance == null){
 			try {
