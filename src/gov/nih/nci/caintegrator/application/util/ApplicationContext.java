@@ -122,18 +122,20 @@ public class ApplicationContext{
 //	      }
       //Start the JMS Lister
         try {
-		@SuppressWarnings("unused") AnalysisServerClientManager analysisServerClientManager = AnalysisServerClientManager.getInstance();
+		//@SuppressWarnings("unused") AnalysisServerClientManager analysisServerClientManager = getApplicationService("ANALYSIS_SEVER_CLIENT_MGR").getInstance();
 		//Also need to create GeneExpressionAnnotationService
 		
-		} catch (NamingException e) {
-	        logger.error(new IllegalStateException("Error getting an instance of AnalysisServerClientManager" ));
-			logger.error(e.getMessage());
-			logger.error(e);
-		} catch (JMSException e) {
-	        logger.error(new IllegalStateException("Error getting an instance of AnalysisServerClientManager" ));
-			logger.error(e.getMessage());
-			logger.error(e);
-		} catch(Throwable t) {
+//		} catch (NamingException e) {
+//	        logger.error(new IllegalStateException("Error getting an instance of AnalysisServerClientManager" ));
+//			logger.error(e.getMessage());
+//			logger.error(e);
+//		} catch (JMSException e) {
+//	        logger.error(new IllegalStateException("Error getting an instance of AnalysisServerClientManager" ));
+//			logger.error(e.getMessage());
+//			logger.error(e);
+//		} 
+        }
+        catch(Throwable t) {
 			logger.error(new IllegalStateException("Error getting an instance of AnalysisServerClientManager" ));
 			logger.error(t.getMessage());
 			logger.error(t);
