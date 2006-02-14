@@ -13,7 +13,7 @@ import java.util.Map;
 
 public abstract class GeneExprAnnotationService implements ApplicationService {
 
-	public abstract GeneExprAnnotationService getInstance();
+	public static GeneExprAnnotationService getInstance() { return null; }
 	
 	public abstract Map <String,ReporterResultset> getAnnotationsMapForReporters(List<String> reporterIDs) throws Exception;
 	
