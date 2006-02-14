@@ -80,7 +80,7 @@ import org.apache.log4j.Logger;
 public class BusinessCacheManager implements BusinessTierCache{
 	
     //This value must match the name of the cache in the configuration xml file
-	private static final String REMBRANDT_CACHE = "applicationCache"; 
+	private static final String BUSINESS_TIER_CACHE = "businessTierCache"; 
     private static transient List cacheListeners;
     private static Logger logger = Logger.getLogger(BusinessCacheManager.class);
     private static CacheManager manager = null;
@@ -102,7 +102,7 @@ public class BusinessCacheManager implements BusinessTierCache{
    
     private Cache getApplicationCache() {
         Cache applicationCache = null;
-    	if(manager!=null && !manager.cacheExists(BusinessCacheManager.REMBRANDT_CACHE)) {
+    	if(manager!=null && !manager.cacheExists(BusinessCacheManager.BUSINESS_TIER_CACHE)) {
     		/**
         	 * Here are the parameters that we are using for creating the business
         	 * tier Application Cache
@@ -114,7 +114,7 @@ public class BusinessCacheManager implements BusinessTierCache{
         	 *  	Elements time to idle in seconds = 0 (Special setting which means never check);
         	 *  
         	 */
-        	applicationCache = new Cache(BusinessCacheManager.REMBRANDT_CACHE, 100, false, true, 0, 0);
+        	applicationCache = new Cache(BusinessCacheManager.BUSINESS_TIER_CACHE, 100, false, true, 0, 0);
             logger.debug("New ApplicationCache created");
             try {
             	manager.addCache(applicationCache);
@@ -126,14 +126,14 @@ public class BusinessCacheManager implements BusinessTierCache{
                 logger.error(ce);
             }
         }else if(manager!=null){
-        	applicationCache = manager.getCache(BusinessCacheManager.REMBRANDT_CACHE);
+        	applicationCache = manager.getCache(BusinessCacheManager.BUSINESS_TIER_CACHE);
         }
       
     	return applicationCache;
     }
-  	/* (non-Javadoc)
-	 * @see gov.nih.nci.rembrandt.cache.BusinessTierCache#getSessionCache(java.lang.String)
-	 */
+  	/**
+  	 * 
+  	 */
     public Cache getSessionCache(String sessionId) {
         Cache sessionCache = null; 
         if( manager!=null && !manager.cacheExists(sessionId) ) {
@@ -169,9 +169,9 @@ public class BusinessCacheManager implements BusinessTierCache{
         return sessionCache;
     }
 
-    /* (non-Javadoc)
-	 * @see gov.nih.nci.rembrandt.cache.BusinessTierCache#getObjectFromSessionCache(java.lang.String, java.lang.String)
-	 */
+    /**
+     * 
+     */
     public Object getObjectFromSessionCache(String sessionId, String key) {
     	Cache sessionCache = getSessionCache(sessionId);
     	Object returnObject = null;
@@ -186,9 +186,9 @@ public class BusinessCacheManager implements BusinessTierCache{
     	return returnObject;
     }
     
-    /* (non-Javadoc)
-	 * @see gov.nih.nci.rembrandt.cache.BusinessTierCache#removeSessionCache(java.lang.String)
-	 */
+    /**
+     * 
+     */
     public boolean removeSessionCache(String sessionId) {
     	if(manager!=null && manager.cacheExists(sessionId)) {
     		manager.removeCache(sessionId);
@@ -203,15 +203,18 @@ public class BusinessCacheManager implements BusinessTierCache{
         }
     }
     
-     /* (non-Javadoc)
-	 * @see gov.nih.nci.rembrandt.cache.BusinessTierCache#getCacheList()
-	 */
+    /**
+     * 
+     */
     public String[] getCacheList() {
     	manager.getCacheNames();
         return manager.getCacheNames();
     }
     
-    
+    /**
+     * 
+     * @param cacheId
+     */
     static private void fireCacheAddEvent(String cacheId) {
         if(cacheListeners!=null && !cacheListeners.isEmpty()) {
             logger.debug("Fire cacheAddEvent");
@@ -222,6 +225,10 @@ public class BusinessCacheManager implements BusinessTierCache{
         }
     }
    
+    /**
+     * 
+     * @param cacheId
+     */
     static private void fireCacheRemoveEvent(String cacheId) {
         if(cacheListeners!=null && !cacheListeners.isEmpty()) {
             logger.debug("Fire cacheRemoveEvent");
@@ -231,9 +238,9 @@ public class BusinessCacheManager implements BusinessTierCache{
         }
     }
 
-    /* (non-Javadoc)
-	 * @see gov.nih.nci.rembrandt.cache.BusinessTierCache#addCacheListener(gov.nih.nci.rembrandt.cache.CacheListener)
-	 */
+    /**
+     * 
+     */
     @SuppressWarnings("unchecked")
 	public void addCacheListener(CacheListener cacheListener) {
         if(cacheListeners==null) {
@@ -243,9 +250,9 @@ public class BusinessCacheManager implements BusinessTierCache{
         cacheListeners.add(cacheListener);
     }
 
-    /* (non-Javadoc)
-	 * @see gov.nih.nci.rembrandt.cache.BusinessTierCache#removeCacheListener(gov.nih.nci.rembrandt.cache.CacheListener)
-	 */
+    /**
+     * 
+     */
     public void removeCacheListener(CacheListener cacheListener) {
         if(cacheListener!=null) {
             logger.debug("CacheListener removed");
@@ -257,9 +264,10 @@ public class BusinessCacheManager implements BusinessTierCache{
         }
     }
  
-	/* (non-Javadoc)
-	 * @see gov.nih.nci.rembrandt.cache.BusinessTierCache#addToSessionCache(java.lang.String, java.io.Serializable, java.io.Serializable)
-	 */
+
+    /**
+     * 
+     */
 	public void addToSessionCache(String sessionId, Serializable key, Serializable value) {
 		Cache sessionCache = getSessionCache(sessionId);
 		Element element = new Element(key, value);
@@ -274,8 +282,8 @@ public class BusinessCacheManager implements BusinessTierCache{
 		}
 	}
  
-	/* (non-Javadoc)
-	 * @see gov.nih.nci.rembrandt.cache.BusinessTierCache#addToApplicationCache(java.io.Serializable, java.io.Serializable)
+	/**
+	 * 
 	 */
 	public void addToApplicationCache(Serializable key, Serializable value) {
 		Cache applicationCache = getApplicationCache();
@@ -312,8 +320,8 @@ public class BusinessCacheManager implements BusinessTierCache{
 		return beans;
 	}
 	
-	/* (non-Javadoc)
-	 * @see gov.nih.nci.rembrandt.cache.BusinessTierCache#getSessionFinding(java.lang.String, java.lang.String)
+	/**
+	 * 
 	 */
 	public Finding getSessionFinding(String sessionId, String taskId){
 		Finding finding = null;
