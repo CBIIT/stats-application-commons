@@ -5,6 +5,7 @@
  * Window - Preferences - Java - Code Style - Code Templates
  */
 package gov.nih.nci.caintegrator.application.service.annotation;
+
 import gov.nih.nci.caintegrator.dto.de.BasePairPositionDE;
 import gov.nih.nci.caintegrator.dto.de.DatumDE;
 
@@ -164,25 +165,25 @@ public class ReporterResultset {
 	/**
 	 * @return Returns the assiciatedGeneSymbols.
 	 */
-	public Collection getAssiciatedGeneSymbols() {
+	public Collection getAssociatedGeneSymbols() {
 		return assiciatedGeneSymbols;
 	}
 	/**
 	 * @param assiciatedGeneSymbols The assiciatedGeneSymbols to set.
 	 */
-	public void setAssiciatedGeneSymbols(Collection assiciatedGeneSymbols) {
+	public void setAssociatedGeneSymbols(Collection assiciatedGeneSymbols) {
 		this.assiciatedGeneSymbols = assiciatedGeneSymbols;
 	}
 	/**
 	 * @return Returns the assiciatedLocusLinkIDs.
 	 */
-	public Collection getAssiciatedLocusLinkIDs() {
+	public Collection getAssociatedLocusLinkIDs() {
 		return assiciatedLocusLinkIDs;
 	}
 	/**
 	 * @param assiciatedLocusLinkIDs The assiciatedLocusLinkIDs to set.
 	 */
-	public void setAssiciatedLocusLinkIDs(Collection assiciatedLocusLinkIDs) {
+	public void setAssociatedLocusLinkIDs(Collection assiciatedLocusLinkIDs) {
 		this.assiciatedLocusLinkIDs = assiciatedLocusLinkIDs;
 	}
     public BasePairPositionDE.StartPosition getStartPhysicalLocation() {
