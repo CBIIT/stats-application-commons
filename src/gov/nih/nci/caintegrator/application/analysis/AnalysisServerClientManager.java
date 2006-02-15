@@ -358,7 +358,7 @@ public class AnalysisServerClientManager implements ApplicationService, MessageL
 	/**
 	 * @return Returns the instance.
 	 */
-	public  AnalysisServerClientManager getInstance()  throws NamingException, JMSException{
+	public static AnalysisServerClientManager getInstance()  throws NamingException, JMSException{
 		//first time
 		if(instance == null){
 			try {
