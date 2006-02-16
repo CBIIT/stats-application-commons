@@ -1,6 +1,7 @@
 package gov.nih.nci.caintegrator.application.util;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 public class StringUtils {
@@ -22,6 +23,19 @@ public class StringUtils {
 	    }
 	  }
 	  return tokenList;
+	}
+	
+	public static String concatinateStrings(List<String> strList, String delim) {
+	  StringBuffer sb = new StringBuffer();
+	  for (Iterator i=strList.iterator(); i.hasNext(); ) {
+	     sb.append(i.next());
+	     if (i.hasNext()) sb.append(delim);
+	  }
+	  return sb.toString();
+	}
+	
+	public static boolean isEmptyStr(String str) {
+	  return ((str==null)||(str.trim().length()==0));
 	}
 
 }
