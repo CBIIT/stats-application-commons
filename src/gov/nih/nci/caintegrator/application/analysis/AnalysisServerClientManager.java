@@ -11,9 +11,9 @@ import gov.nih.nci.caintegrator.service.findings.ClassComparisonFinding;
 import gov.nih.nci.caintegrator.application.cache.BusinessTierCache;
 import gov.nih.nci.caintegrator.application.service.annotation.GeneExprAnnotationService;
 import gov.nih.nci.caintegrator.application.service.annotation.ReporterResultset;
-import gov.nih.nci.caintegrator.application.util.ApplicationContext;
+//import gov.nih.nci.caintegrator.application.util.ApplicationContext;
 import gov.nih.nci.caintegrator.application.service.ApplicationService;
-//import gov.nih.nci.rembrandt.web.factory.ApplicationFactory;
+//import gov.nih.nci.ispy.web.factory.ApplicationFactory;
 
 import java.util.ArrayList;
 import java.util.Hashtable;
@@ -111,7 +111,8 @@ import org.apache.log4j.Logger;
 public class AnalysisServerClientManager implements ApplicationService, MessageListener, ExceptionListener, AnalysisRequestSender{
 	private static Logger logger = Logger.getLogger(AnalysisServerClientManager.class);
 	
-	private BusinessTierCache _cacheManager = (BusinessTierCache)ApplicationContext.getApplicationService("BUSINESS_TIER_CACHE");
+	//private BusinessTierCache _cacheManager = (BusinessTierCache)ApplicationContext.getApplicationService("BUSINESS_TIER_CACHE");
+	private BusinessTierCache _cacheManager = null; 
 	
     //private Properties messagingProps;
 	private QueueSession queueSession;
@@ -124,6 +125,9 @@ public class AnalysisServerClientManager implements ApplicationService, MessageL
 	private QueueConnection queueConnection;
     private static AnalysisServerClientManager instance = null;
     private static final long reconnectWaitTimeMS = 5000L;
+    private Properties messagingProps = null;
+    private GeneExprAnnotationService gxAnnotService = null;
+    
 	/**
 	 * @param properties
 	 * @throws NamingException 
@@ -134,7 +138,7 @@ public class AnalysisServerClientManager implements ApplicationService, MessageL
 		 try {
 			logger.debug("AnalysisServerClientManager constructor start");
 			
-			establishQueueConnection();
+			//establishQueueConnection();
 			
 			logger.debug("AnalysisServerClientManager constructor finished successfully");
 	    }catch(Throwable t) {
@@ -144,17 +148,30 @@ public class AnalysisServerClientManager implements ApplicationService, MessageL
 	}
 	
 	
+	public void setCache(BusinessTierCache cache) {
+	  this._cacheManager = cache;
+	}
+	
+	public void setMessagingProperties(Properties messagingProperties) {
+	  this.messagingProps = messagingProperties;
+	}
+	
+	public void setGeneExprAnnotationService(GeneExprAnnotationService annotationService) {
+	  this.gxAnnotService = annotationService;
+	}
+	
+	
 	/**
 	 * Establish a connection to the JMS queues.  If it is not possible
 	 * to connect then this method will sleep for reconnectWaitTimeMS milliseconds and
 	 * then try to connect again.  
 	 *
 	 */
-	private void establishQueueConnection() {
+	public void establishQueueConnection() {
         
 		boolean connected = false;
 		int numConnectAttempts = 0;
-		Properties messagingProps = ApplicationContext.getJMSProperties();
+		//Properties messagingProps = ApplicationContext.getJMSProperties();
 		
 		while (!connected) {
 		
@@ -196,8 +213,8 @@ public class AnalysisServerClientManager implements ApplicationService, MessageL
 						Session.AUTO_ACKNOWLEDGE);
 			
 				// Look up the destination
-				requestQueue = (Queue) context.lookup("queue/AnalysisRequest");
-				resultQueue = (Queue) context.lookup("queue/AnalysisResponse");
+				requestQueue = (Queue) context.lookup(messagingProps.getProperty("ANALYSIS_REQUEST_QUEUE"));
+				resultQueue = (Queue) context.lookup(messagingProps.getProperty("ANALYSIS_RESPONSE_QUEUE"));
 			
 				// Create a publisher
 				resultReceiver = queueSession.createReceiver(resultQueue);
@@ -307,9 +324,11 @@ public class AnalysisServerClientManager implements ApplicationService, MessageL
 					}
 				}
 		        try {
-		        	GeneExprAnnotationService geneExpAnnotationService = (GeneExprAnnotationService)ApplicationContext.getApplicationService("GENE_EXPRESSION_ANNOTATION_SERVICE");
-		        	reporterResultsetMap = geneExpAnnotationService.getAnnotationsMapForReporters(reporterIds);
-		        	((ClassComparisonFinding) finding).setReporterAnnotationsMap(reporterResultsetMap);
+		        	//GeneExprAnnotationService geneExpAnnotationService = (GeneExprAnnotationService)ApplicationContext.getApplicationService("GENE_EXPRESSION_ANNOTATION_SERVICE");
+		        	if (gxAnnotService != null) {
+		        	  reporterResultsetMap = gxAnnotService.getAnnotationsMapForReporters(reporterIds);
+		        	  ((ClassComparisonFinding) finding).setReporterAnnotationsMap(reporterResultsetMap);
+		        	}
 		        }
 		        catch(Exception e){
 		          logger.error("Caught exception trying to get annotations for reporters sessionId=" + sessionId + " taskId=" + taskId);
