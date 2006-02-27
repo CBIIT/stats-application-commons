@@ -71,58 +71,25 @@ import java.util.List;
 
 public interface PresentationTierCache {
 
-//	public void putSessionCriteriaBag(String sessionId,
-//			SessionCriteriaBag theBag);
+	//items to be persisted...must be serializable
+	public void addPersistableToSessionCache(String sessionId, Serializable key, Serializable object);
+	public Object getPersistableObjectFromSessionCache(String sessionId, String key);
 
-//	public SessionCriteriaBag getSessionCriteriaBag(String sessionId);
+	//items that will NOT be persisted..  Can be used similar to the HTTPSession
+	//these things still need to implement serializable though
+	public void addNonPersistableToSessionCache(String sessionId, Serializable key, Serializable object);
+	public Object getNonPersistableObjectFromSessionCache(String sessionId, String key);
 
-	public void addSessionGraphingData(String sessionId,
-			CachableGraphData graphData);
-
-	public CachableGraphData getSessionGraphingData(String sessionId,
-			String graphId);
-
-	public void addSessionTempFolderPath(String sessionId,
-			String sessionTempFolderPath);
-
-	public String getSessionTempFolderPath(String sessionId);
+	//remove single objects
+	public void removeObjectFromPersistableSessionCache(String id, String key);
+	public void removeObjectFromNonPersistableSessionCache(String id, String key);
 	
-//	public Collection<ReportBean> getAllReportBeans(String sessionId);
+	//remove all
+	public void removePersistableSessionCache(String sessionId);
+	public void removeNonPersistableSessionCache(String sessionId);
 
-	public Collection getAllSampleSetReportBeans(String sessionId);
-
-//	public SessionQueryBag getSessionQueryBag(String sessionId);
-
-//	public ReportBean getReportBean(String sessionId, String queryName,
-//			View view);
-
-//	public ReportBean getReportBean(String sessionId, String queryName);
-
-	public Object getObjectFromSessionCache(String sessionId, String key);
-
-	public String getTempReportName(String sessionId);
-
-	public Collection checkLookupCache(String lookupType);
-
+	//will clear all session cache, persistable and non-persistable
 	public boolean removeSessionCache(String sessionId);
-
-//	public void putSessionQueryBag(String sessionId, SessionQueryBag theBag);
-
-	public void addToPresentationCache(Serializable key, Serializable value);
-
-//	public CompoundQuery getQuery(String sessionId, String queryName);
-
-	public List getSampleSetNames(String sessionId);
-
-	public String[] getCacheList();
-	
-	public void addToSessionCache(String sessionId, Serializable key, Serializable object);
-
-	public void persistUserSession(String userName, String sessionId);
-
-	public boolean reloadSessionCache(String userName, String sessionId);
-
-	public void deleteSessionCache(String id);
 }
 
 	

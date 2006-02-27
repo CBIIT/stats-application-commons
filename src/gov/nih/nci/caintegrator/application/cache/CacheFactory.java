@@ -60,17 +60,7 @@ package gov.nih.nci.caintegrator.application.cache;
 
 public class CacheFactory{
 
-//	public static QueryDTO newQueryDTO(QueryType queryType) {
-//		if (queryType == QueryType.CLASS_COMPARISON_QUERY) {              
-//            return new ClassComparisonQueryDTOImpl();
-//        }else if (queryType == QueryType.PCA_QUERY) {              
-//            return new PrincipalComponentAnalysisQueryDTOImpl();
-//        }else if (queryType == QueryType.HC_QUERY) {              
-//            return new HierarchicalClusteringQueryDTOImpl();
-//        }else {
-//        	return null;
-//        }
-//	}
+
 	public static PresentationTierCache getPresentationTierCache() {
 		return PresentationCacheManager.getInstance();
 	}
@@ -79,8 +69,6 @@ public class CacheFactory{
 		return BusinessCacheManager.getInstance();
 	}
 	
-//	public static FindingsFactory getFindingsFactory() {
-//		return new RembrandtFindingsFactory();
-//	}
+
 
 }
