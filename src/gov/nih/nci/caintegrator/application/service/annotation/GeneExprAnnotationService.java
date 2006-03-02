@@ -15,8 +15,8 @@ public abstract class GeneExprAnnotationService implements ApplicationService {
 
 	public static GeneExprAnnotationService getInstance() { return null; }
 	
-	public abstract Map <String,ReporterResultset> getAnnotationsMapForReporters(List<String> reporterIDs) throws Exception;
+	public abstract Map <String,ReporterAnnotation> getAnnotationsMapForReporters(List<String> reporterIDs) throws Exception;
 
-	public abstract List <ReporterResultset> getAnnotationsListForReporters(List<String> reporterIDs) throws Exception;
+	public abstract List <ReporterAnnotation> getAnnotationsListForReporters(List<String> reporterIDs) throws Exception;
 
 }
