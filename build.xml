@@ -27,13 +27,6 @@
 		</javac>
 		<jar jarfile="caintegrator-application-commons.jar">
 			<fileset dir="${build.classes.dir}"/>
-			<fileset dir="${build.deploy.lib.dir}">
-				<include name="*.jar"/>
-			</fileset>
-			<fileset dir="${anthill.dependency.artifacts.dir}">
-				<include name="caintegrator-analysis-commons.jar"/>
-				<include name="caintegrator-spec.jar"/>
-			</fileset>
 		</jar>
 	</target>
 	<target name="jar_check">
