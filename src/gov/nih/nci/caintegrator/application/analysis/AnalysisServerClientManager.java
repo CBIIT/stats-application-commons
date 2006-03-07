@@ -4,18 +4,14 @@ import gov.nih.nci.caintegrator.analysis.messaging.AnalysisRequest;
 import gov.nih.nci.caintegrator.analysis.messaging.AnalysisRequestSender;
 import gov.nih.nci.caintegrator.analysis.messaging.AnalysisResult;
 import gov.nih.nci.caintegrator.analysis.messaging.ClassComparisonResultEntry;
+import gov.nih.nci.caintegrator.application.cache.BusinessTierCache;
+import gov.nih.nci.caintegrator.application.service.ApplicationService;
+import gov.nih.nci.caintegrator.application.service.annotation.GeneExprAnnotationService;
+import gov.nih.nci.caintegrator.application.service.annotation.ReporterAnnotation;
 import gov.nih.nci.caintegrator.enumeration.FindingStatus;
 import gov.nih.nci.caintegrator.exceptions.AnalysisServerException;
 import gov.nih.nci.caintegrator.service.findings.AnalysisFinding;
 import gov.nih.nci.caintegrator.service.findings.ClassComparisonFinding;
-import gov.nih.nci.caintegrator.application.cache.BusinessTierCache;
-import gov.nih.nci.caintegrator.application.service.annotation.GeneExprAnnotationService;
-import gov.nih.nci.caintegrator.application.service.annotation.ReporterAnnotation;
-
-import gov.nih.nci.caintegrator.application.service.annotation.ReporterResultset;
-//import gov.nih.nci.caintegrator.application.util.ApplicationContext;
-import gov.nih.nci.caintegrator.application.service.ApplicationService;
-//import gov.nih.nci.ispy.web.factory.ApplicationFactory;
 
 import java.util.ArrayList;
 import java.util.Hashtable;
