@@ -1,9 +1,14 @@
 package gov.nih.nci.caintegrator.application.service.annotation;
 
+import java.io.Serializable;
 import java.util.List;
 
-public class ReporterAnnotation {
+public class ReporterAnnotation implements Serializable {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	private String reporterId;
 	private List<String> geneSymbols = null;
 	private List<String> genbankAccs = null;
