@@ -224,6 +224,8 @@ public class AnalysisServerClientManager implements ApplicationService, MessageL
 			    numConnectAttempts = 0;
 			  
 			    logger.info("  successfully established queue connection with provider=" + messagingProps.getProperty("JBOSS_URL"));
+			    logger.info("  successfully found request queue=" + messagingProps.getProperty("ANALYSIS_REQUEST_QUEUE"));
+			    logger.info("  successfully found response queue=" + messagingProps.getProperty("ANALYSIS_RESPONSE_QUEUE"));
 			    logger.info("Now listening for requests...");
 			}
 			catch (Exception ex) {
