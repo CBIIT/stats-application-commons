@@ -37,5 +37,18 @@ public class StringUtils {
 	public static boolean isEmptyStr(String str) {
 	  return ((str==null)||(str.trim().length()==0));
 	}
+	
+	/**
+	 * This method will get the double represented by the specified string
+	 * If the input string is empty or null then null will be returned.
+	 * @param doubleStr
+	 * @return
+	 */
+	public static Double getDouble(String doubleStr) {
+	  if (!StringUtils.isEmptyStr(doubleStr)) {
+	    return Double.valueOf(doubleStr);
+	  }
+	  return null;
+	}
 
 }
