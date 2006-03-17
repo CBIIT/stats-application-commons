@@ -1,9 +1,8 @@
 package gov.nih.nci.caintegrator.application.inbox;
 
 import gov.nih.nci.caintegrator.service.findings.Finding;
-import gov.nih.nci.caintegrator.application.cache.BusinessTierCache;
-import gov.nih.nci.caintegrator.application.cache.PresentationTierCache;
 import gov.nih.nci.caintegrator.application.cache.*;
+import gov.nih.nci.caintegrator.exceptions.AnalysisServerException;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -130,7 +129,10 @@ public class QueryInbox {
 			fdata.put("time", String.valueOf(f.getElapsedTime()));
 			fdata.put("status", tmp);
 			if(f.getStatus()!=null && f.getStatus().getComment()!=null)	{
-				fdata.put("comments", StringEscapeUtils.escapeJavaScript(f.getStatus().getComment()));
+				AnalysisServerException ase = (AnalysisServerException) btc.getObjectFromSessionCache(session.getId(), f.getTaskId()+"_analysisServerException");
+				String comments = ase.getMessage() != null ? ase.getMessage() : "Unspecified Error";
+				fdata.put("comments", StringEscapeUtils.escapeJavaScript(comments));
+//				fdata.put("comments", StringEscapeUtils.escapeJavaScript(f.getStatus().getComment()));
 			}
 			currentStatuses.put(f.getTaskId(), fdata);
 		}
