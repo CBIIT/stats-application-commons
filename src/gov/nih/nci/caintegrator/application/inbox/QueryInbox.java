@@ -130,7 +130,7 @@ public class QueryInbox {
 			fdata.put("status", tmp);
 			if(f.getStatus()!=null && f.getStatus().getComment()!=null)	{
 				AnalysisServerException ase = (AnalysisServerException) btc.getObjectFromSessionCache(session.getId(), f.getTaskId()+"_analysisServerException");
-				String comments = ase.getMessage() != null ? ase.getMessage() : "Unspecified Error";
+				String comments = ase!=null && ase.getMessage() != null ? ase.getMessage() : "Unspecified Error";
 				fdata.put("comments", StringEscapeUtils.escapeJavaScript(comments));
 //				fdata.put("comments", StringEscapeUtils.escapeJavaScript(f.getStatus().getComment()));
 			}
