@@ -364,6 +364,7 @@ public class AnalysisServerClientManager implements ApplicationService, MessageL
 		AnalysisFinding finding = (AnalysisFinding)_cacheManager.getSessionFinding(sessionId, taskId);
 		if(finding != null){
 			FindingStatus newStatus = FindingStatus.Error;
+			//the below actually causes an error/caching effect since this is static
 			newStatus.setComment(analysisServerException.getMessage());
 			finding.setStatus(newStatus);
 			logger.debug("Retreiving finding for session: "+sessionId+" & task: "+taskId+" from cache");
