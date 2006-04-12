@@ -13,7 +13,7 @@ import java.io.File;
  */
 public class ListGenerator {
 
-    public UserList createList(ListType listType, File formFile){
+    public UserList createList(ListType listType, File formFile, String name){
         return new UserList();
     }
 

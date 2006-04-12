@@ -10,7 +10,7 @@ package gov.nih.nci.caintegrator.application.lists;
  *
  */
 public interface ListValidator {
-    public UserList getValidList(UserList unvalidatedList);
+    public UserList getValidList(ListType listType, UserList unvalidatedList);
     
     public UserList getInvalidList();
 }
