@@ -13,11 +13,9 @@ import java.util.Map;
  */
 public interface UploadManager {
     
-    public void createList(Enum listType, String listName, File formFile);
+    public UserList createList(ListType listType, String listName, File formFile);
     
-    public UserList validate(UserList unvalidatedList);
-    
-    public void putInUserListBean(UserList validatedList);
+    public UserList validate(UserList unvalidatedList, ListType listType);
     
     public Map getParams(UserList userList);
     

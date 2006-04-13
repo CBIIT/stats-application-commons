@@ -7,6 +7,8 @@ import java.util.List;
 
 import org.w3c.dom.Document;
 
+
+
 /**
  * @author rossok
  *
@@ -21,7 +23,7 @@ public interface UserListBeanHelper {
     
     public void removeItemFromList(String listName, String listItem);
     
-    public Document getDetailsFromList(String listName);
+    public Object getDetailsFromList(String listName);
     
     public List<UserList> getLists(ListType listType);
 
