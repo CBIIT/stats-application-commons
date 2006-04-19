@@ -4,7 +4,7 @@
  */
 package gov.nih.nci.caintegrator.application.lists;
 
-import java.io.File;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -13,9 +13,9 @@ import java.util.Map;
  */
 public interface UploadManager {
     
-    public UserList createList(ListType listType, String listName, File formFile);
+    public UserList createList(ListType listType, String listName, List<String> undefinedList);
     
-    public UserList validate(UserList unvalidatedList, ListType listType);
+    public List<String> validate(List<String> unvalidatedList, ListType listType);
     
     public Map getParams(UserList userList);
     

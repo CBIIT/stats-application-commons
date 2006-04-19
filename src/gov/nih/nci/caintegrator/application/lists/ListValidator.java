@@ -5,12 +5,14 @@
  */
 package gov.nih.nci.caintegrator.application.lists;
 
+import java.util.List;
+
 /**
  * @author rossok
  *
  */
 public interface ListValidator {
-    public UserList getValidList(ListType listType, UserList unvalidatedList);
+    public List getValidList(ListType listType, List<String> unvalidatedList);
     
-    public UserList getInvalidList();
+    public List getInvalidList();
 }

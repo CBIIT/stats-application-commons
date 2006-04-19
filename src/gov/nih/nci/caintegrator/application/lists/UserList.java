@@ -4,18 +4,51 @@
  */
 package gov.nih.nci.caintegrator.application.lists;
 
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 /**
  * @author rossok
  *
  */
 public class UserList { 
-    String name = "";
-    ListType listType;
-    List<String> list = new ArrayList<String>();
+    private String name = "";
+    private ListType listType;
+    private List<String> list = new ArrayList<String>();
+    private Date dateCreated;
+    private int itemCount = 0;
+   
     
+    /**
+     * @return Returns the dateCreated.
+     */
+    public Date getDateCreated() {
+        return dateCreated;
+    }
+    /**
+     * @param dateCreated The dateCreated to set.
+     * @throws ParseException 
+     */
+    public void setDateCreated(Date dateCreated) throws ParseException {
+        this.dateCreated = dateCreated;
+    }
+    /**
+     * @return Returns the itemCount.
+     */
+    public int getItemCount() {
+        return itemCount;
+    }
+    /**
+     * @param itemCount The itemCount to set.
+     */
+    public void setItemCount(int itemCount) {
+        this.itemCount = itemCount;
+    }
     /**
      * @return Returns the list.
      */
