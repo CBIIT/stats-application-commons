@@ -26,5 +26,7 @@ public interface UserListBeanHelper {
     public Object getDetailsFromList(String listName);
     
     public List<UserList> getLists(ListType listType);
+    
+    public List<UserList> getAllLists();
 
 }

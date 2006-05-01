@@ -16,11 +16,23 @@ public class UserListBean {
     List<UserList> userLists = new ArrayList<UserList>();
     
     public void addList(UserList userList){
+        for(UserList list: userLists){        
+            if(list.getName().equals(userList.getName())){
+            userLists.remove(list);
+            break;
+           }
+         }        
         userLists.add(userList);
     }
     
-    public void removeList(String listName){
-        userLists.remove(listName);
+    public void removeList(String listName){       
+        for(UserList list: userLists){        
+           if(list.getName().equals(listName)){
+           userLists.remove(list);
+           break;
+          }
+        }
+       
     }
     
     public List<UserList> getEntireList(){
