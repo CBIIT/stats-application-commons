@@ -11,7 +11,7 @@ import java.util.Map;
  * @author rossok
  * 
  */
-public interface UploadManager {
+public interface ListManager {
     
     public UserList createList(ListType listType, String listName, List<String> undefinedList);
     
