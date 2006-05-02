@@ -412,6 +412,9 @@ public class AnalysisServerClientManager implements ApplicationService, MessageL
 			
 		    // Create a message
 			msg = requestSession.createObjectMessage(request);
+			
+			msg.setJMSReplyTo(resultQueue);
+			
 			QueueSender requestSender = requestSession.createSender(requestQueue);
 			// Send the message
 		    requestSender.send(msg, DeliveryMode.NON_PERSISTENT, Message.DEFAULT_PRIORITY, Message.DEFAULT_TIME_TO_LIVE);
