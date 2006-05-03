@@ -1,5 +1,7 @@
 package gov.nih.nci.caintegrator.application.service.annotation;
 
+import gov.nih.nci.caintegrator.enumeration.ArrayPlatformType;
+
 import java.io.Serializable;
 import java.util.List;
 
@@ -15,10 +17,12 @@ public class ReporterAnnotation implements Serializable {
 	private List<String> locusLinkIds = null;
 	private List<String> pathwayIds = null;
 	private List<String> goIds = null;
+	private ArrayPlatformType arrayPlatform = null;
 	
 	
-	public ReporterAnnotation(String reporterId) {
+	public ReporterAnnotation(String reporterId, ArrayPlatformType arrayPlatform) {
 		this.reporterId = reporterId;
+		this.arrayPlatform = arrayPlatform;
 	}
 
 
@@ -74,6 +78,11 @@ public class ReporterAnnotation implements Serializable {
 
 	public void setGenbankAccessions(List<String> genbankAccs) {
 		this.genbankAccs = genbankAccs;
+	}
+
+
+	public ArrayPlatformType getArrayPlatform() {
+		return arrayPlatform;
 	}
 
 }
