@@ -14,5 +14,5 @@ import java.util.List;
 public interface ListValidator {
     public List getValidList(ListType listType, List<String> unvalidatedList);
     
-    public List getInvalidList();
+    public List getInvalidList(ListType listType, List<String> unvalidatedList);
 }

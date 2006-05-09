@@ -17,6 +17,7 @@ public class UserList {
     private String name = "";
     private ListType listType;
     private List<String> list = new ArrayList<String>();
+    private List<String> invalidList = new ArrayList<String>();
     private Date dateCreated;
     private int itemCount = 0;
    
@@ -85,5 +86,17 @@ public class UserList {
     
     public String toString() {
         return name;
+    }
+    /**
+     * @return Returns the invalidList.
+     */
+    public List<String> getInvalidList() {
+        return invalidList;
+    }
+    /**
+     * @param invalidList The invalidList to set.
+     */
+    public void setInvalidList(List<String> invalidList) {
+        this.invalidList = invalidList;
     }
 }
