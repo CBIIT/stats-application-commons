@@ -7,6 +7,9 @@ package gov.nih.nci.caintegrator.application.lists;
 
 import java.io.BufferedReader;
 import java.io.EOFException;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -25,7 +28,7 @@ public class UserListGenerator {
     private static Logger logger = Logger
             .getLogger(UserListGenerator.class);
 
-    public List generateList(FileItem formFile) throws IOException {
+    public static List<String> generateList(FileItem formFile) throws IOException {
 
         List<String> tempList = new ArrayList<String>();
 
@@ -68,6 +71,42 @@ public class UserListGenerator {
 
         return tempList;
 
+    }
+    
+    public static List<String> generateList(File file){
+        List<String> tempList = new ArrayList<String>();
+        if (file != null && (file.getName().endsWith(".txt") || file.getName().endsWith(".TXT"))){
+            try {
+                BufferedReader in = new BufferedReader(new FileReader(file));
+                String inputLine = null;
+                do {
+                    inputLine = in.readLine();
+
+                    if (inputLine != null) {
+                        if (isAscii(inputLine)) { // make sure all data is ASCII                                                        
+                            tempList.add(inputLine);
+                        }
+                    } else {
+                        System.out.println("null line");
+                        while (tempList.contains("")) {
+                            tempList.remove("");
+                        }
+                        in.close();
+                        break;
+                    }
+
+                } while (true);
+            } catch (EOFException eof) {
+                logger.error("Errors when reading empty lines in file:" + eof.getMessage());
+            } catch (IOException ex) {
+                logger.error("Errors when uploading file:" + ex.getMessage());
+            } 
+        
+        
+    }
+
+    return tempList;
+        
     }
 
     /**

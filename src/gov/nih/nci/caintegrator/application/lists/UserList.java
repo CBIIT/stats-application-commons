@@ -21,7 +21,15 @@ public class UserList {
     private Date dateCreated;
     private int itemCount = 0;
    
+    public UserList(){}
     
+    public UserList(String name, ListType listType, List<String> list, List<String> invalidList, Date dateCreated){
+        this.name = name;
+        this.listType = listType;
+        this.list = list;
+        this.invalidList = invalidList;
+        this.dateCreated = dateCreated;
+    }
     /**
      * @return Returns the dateCreated.
      */
