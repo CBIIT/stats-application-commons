@@ -29,6 +29,8 @@ public interface UserListBeanHelper {
     
     public List<UserList> getAllLists();
     
+    public UserList getUserList(String listName);
+    
     public List getItemsFromList(String listName);
 
 }
