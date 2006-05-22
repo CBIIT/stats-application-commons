@@ -1,17 +1,7 @@
 package gov.nih.nci.caintegrator.application.lists;
 
-import gov.nih.nci.caintegrator.application.cache.ApplicationContextListener;
-import gov.nih.nci.caintegrator.application.lists.ListManager;
-import gov.nih.nci.caintegrator.application.lists.ListType;
-import gov.nih.nci.caintegrator.application.lists.ListValidator;
-import gov.nih.nci.caintegrator.application.lists.UserList;
-import gov.nih.nci.caintegrator.application.lists.UserListBean;
-import gov.nih.nci.caintegrator.application.lists.UserListGenerator;
-
 import java.io.File;
 import java.util.List;
-
-import javax.servlet.ServletContextListener;
 
 import org.apache.log4j.Logger;
 

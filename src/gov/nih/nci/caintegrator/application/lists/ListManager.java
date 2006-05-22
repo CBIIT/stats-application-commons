@@ -38,7 +38,7 @@ private static ListManager instance = null;
     public UserList createList(ListType listType, String listName, List<String> undefinedList, ListValidator validator) {
         UserList userList = new UserList();
         if(undefinedList!=null){
-            List<String> validItems = validate(undefinedList, listType, validator);
+           List<String> validItems = validate(undefinedList, listType, validator);
            userList.setList(validItems);
             //set the name
             userList.setName(listName);

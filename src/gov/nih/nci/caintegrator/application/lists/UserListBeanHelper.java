@@ -32,5 +32,9 @@ public interface UserListBeanHelper {
     public UserList getUserList(String listName);
     
     public List getItemsFromList(String listName);
+    
+    public void uniteLists(List<String> listNames, String newListName, ListType listType);
+    
+    public void intersectLists(List<String> listNames, String newListName, ListType listType);
 
 }
