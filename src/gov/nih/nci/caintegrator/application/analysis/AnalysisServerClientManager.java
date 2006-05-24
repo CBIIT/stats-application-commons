@@ -123,7 +123,7 @@ public class AnalysisServerClientManager implements ApplicationService, MessageL
 	private QueueConnection queueConnection;
     private static AnalysisServerClientManager instance = null;
     private static final long reconnectWaitTimeMS = 5000L;
-    private Properties messagingProps = null;
+    //private Properties messagingProps = null;
     private GeneExprAnnotationService gxAnnotService = null;
     
 	/**
@@ -150,9 +150,9 @@ public class AnalysisServerClientManager implements ApplicationService, MessageL
 	  this._cacheManager = cache;
 	}
 	
-	public void setMessagingProperties(Properties messagingProperties) {
-	  this.messagingProps = messagingProperties;
-	}
+//	public void setMessagingProperties(Properties messagingProperties) {
+//	  this.messagingProps = messagingProperties;
+//	}
 	
 	public void setGeneExprAnnotationService(GeneExprAnnotationService annotationService) {
 	  this.gxAnnotService = annotationService;
