@@ -126,6 +126,12 @@ public class AnalysisServerClientManager implements ApplicationService, MessageL
     //private Properties messagingProps = null;
     private GeneExprAnnotationService gxAnnotService = null;
     
+    private String jmsProviderURL = null;
+    private String requestQueueName = null;
+    private String responseQueueName = null;
+    private String jndiFactoryName = null;
+    private boolean jmsParamsSet = false;
+    
 	/**
 	 * @param properties
 	 * @throws NamingException 
@@ -150,9 +156,13 @@ public class AnalysisServerClientManager implements ApplicationService, MessageL
 	  this._cacheManager = cache;
 	}
 	
-//	public void setMessagingProperties(Properties messagingProperties) {
-//	  this.messagingProps = messagingProperties;
-//	}
+	public void setJMSparameters(String jmsProviderURL, String jndiFactoryName, String requestQueueName, String responseQueueName) {
+	  this.jmsProviderURL = jmsProviderURL;
+	  this.jndiFactoryName = jndiFactoryName;
+	  this.requestQueueName = requestQueueName;
+	  this.responseQueueName = responseQueueName;
+	  this.jmsParamsSet = true;
+	}
 	
 	public void setGeneExprAnnotationService(GeneExprAnnotationService annotationService) {
 	  this.gxAnnotService = annotationService;
@@ -169,8 +179,14 @@ public class AnalysisServerClientManager implements ApplicationService, MessageL
         
 		boolean connected = false;
 		int numConnectAttempts = 0;
+		
+		if (!jmsParamsSet) {
+		  logger.error("Attempted to establish queue connection with unset JMS parameters.  Must first call setJMSparameters method.");
+		  throw new IllegalStateException("Attempted to establish queue connection with unset JMS parameters.  Must first call setJMSparameters method.");
+		}
+		
 		//Properties messagingProps = ApplicationContext.getJMSProperties();
-		String jbossURL = System.getProperty("gov.nih.nci.ispyportal.jms.jboss_url");
+		//String jbossURL = System.getProperty("gov.nih.nci.caintegrator.analysis.jms.jboss_url");
 		
 		
 		while (!connected) {
@@ -180,13 +196,13 @@ public class AnalysisServerClientManager implements ApplicationService, MessageL
 				//logger.debug("AnalysisServerClientManager constructor start");
 				//Properties messagingProps = ApplicationContext.getJMSProperties();
 				
-				logger.info("Attempting to establish queue connection with provider: " + jbossURL);
+				logger.info("Attempting to establish queue connection with provider: " + jmsProviderURL);
 				
 				// Populate with needed properties
 				Hashtable props = new Hashtable();
 				props.put(Context.INITIAL_CONTEXT_FACTORY,
 						"org.jnp.interfaces.NamingContextFactory");
-				props.put(Context.PROVIDER_URL, jbossURL);
+				props.put(Context.PROVIDER_URL, jmsProviderURL);
 				props.put("java.naming.rmi.security.manager", "yes");
 				props.put(Context.URL_PKG_PREFIXES, "org.jboss.naming");
 			
@@ -195,10 +211,10 @@ public class AnalysisServerClientManager implements ApplicationService, MessageL
 			
 				// Get the connection factory
 			
-			    String factoryJNDI = System.getProperty("gov.nih.nci.ispyportal.jms.factory_jndi");
+			    //String factoryJNDI = System.getProperty("gov.nih.nci.caintegrator.analysis.jms.factory_jndi");
 				
 				QueueConnectionFactory queueConnectionFactory = (QueueConnectionFactory) context
-						.lookup(factoryJNDI);
+						.lookup(jndiFactoryName);
 			
 				// Create the connection
 			
@@ -214,9 +230,9 @@ public class AnalysisServerClientManager implements ApplicationService, MessageL
 						Session.AUTO_ACKNOWLEDGE);
 			
 				// Look up the destination
-				String requestQueueName = System.getProperty("gov.nih.nci.ispyportal.jms.analysis_request_queue");
+				//String requestQueueName = System.getProperty("gov.nih.nci.caintegrator.analysis.jms.analysis_request_queue");
 				
-				String responseQueueName = System.getProperty("gov.nih.nci.ispyportal.jms.analysis_response_queue");
+				//String responseQueueName = System.getProperty("gov.nih.nci.caintegrator.analysis.jms.analysis_response_queue");
 				
 				requestQueue = (Queue) context.lookup(requestQueueName);
 				resultQueue = (Queue) context.lookup(responseQueueName);
@@ -230,7 +246,7 @@ public class AnalysisServerClientManager implements ApplicationService, MessageL
 			    connected = true;
 			    numConnectAttempts = 0;
 			  
-			    logger.info("  successfully established queue connection with provider=" + jbossURL);
+			    logger.info("  successfully established queue connection with provider=" + jmsProviderURL);
 			    logger.info("  successfully found request queue=" + requestQueueName);
 			    logger.info("  successfully found response queue=" + responseQueueName);
 			    logger.info("Now listening for requests...");
@@ -239,7 +255,7 @@ public class AnalysisServerClientManager implements ApplicationService, MessageL
 			    numConnectAttempts++;
 			  
 			    if (numConnectAttempts <= 10) {
-			      logger.warn("  could not establish connection with provider=" + jbossURL + " after numAttempts=" + numConnectAttempts + "  Will try again in  " + Long.toString(reconnectWaitTimeMS/1000L) + " seconds...");
+			      logger.warn("  could not establish connection with provider=" + jmsProviderURL + " after numAttempts=" + numConnectAttempts + "  Will try again in  " + Long.toString(reconnectWaitTimeMS/1000L) + " seconds...");
 			      if (numConnectAttempts == 10) {
 			        logger.warn("  Will only print connection attempts every 600 atttempts to reduce log size.");
 			      }
