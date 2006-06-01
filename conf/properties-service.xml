@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE server>
-<!-- $Id: properties-service.xml,v 1.1 2006-05-30 14:37:37 harrismic Exp $ -->
+<!-- $Id: properties-service.xml,v 1.2 2006-06-01 15:30:14 harrismic Exp $ -->
 
 <server>
 
@@ -68,7 +68,7 @@
 
     <!--   Properties for the ISPY portal project -->
     <attribute name="Properties">
-      gov.nih.nci.ispyportal.id_mapping_file=C:/jboss-4.0.2/server/default/data/ispyportal/ID_Mapping_5-4-06.txt
+      gov.nih.nci.ispyportal.id_mapping_file=C:/jboss-4.0.2/server/default/data/ispyportal/ID_Mapping_6-1-06.txt
       gov.nih.nci.ispyportal.gx_annotation_file=C:/jboss-4.0.2/server/default/data/ispyportal/ispy_gx_annotations_5-19-06.txt
       gov.nih.nci.ispyportal.patient_data=C:/jboss-4.0.2/server/default/data/ispyportal/ispy_patient_data_5_11.txt
       gov.nih.nci.ispyportal.agilent_data_matrix=ISPY_DataMatrix_10MARCH06.Rda
