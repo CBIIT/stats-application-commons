@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE server>
-<!-- $Id: properties-service.xml,v 1.2 2006-06-01 15:30:14 harrismic Exp $ -->
+<!-- $Id: properties-service.xml,v 1.3 2006-06-01 15:31:48 harrismic Exp $ -->
 
 <server>
 
@@ -72,7 +72,7 @@
       gov.nih.nci.ispyportal.gx_annotation_file=C:/jboss-4.0.2/server/default/data/ispyportal/ispy_gx_annotations_5-19-06.txt
       gov.nih.nci.ispyportal.patient_data=C:/jboss-4.0.2/server/default/data/ispyportal/ispy_patient_data_5_11.txt
       gov.nih.nci.ispyportal.agilent_data_matrix=ISPY_DataMatrix_10MARCH06.Rda
-      gov.nih.nci.ispyportal.cdna_data_matrix=ISPY.cDNA.dataMatrix_5-5-06.Rda
+      gov.nih.nci.ispyportal.cdna_data_matrix=ISPY.cDNA.dataMatrix_6-1-06.Rda
       gov.nih.nci.ispyportal.jms.jboss_url=localhost:1099
       gov.nih.nci.ispyportal.jms.factory_jndi=ConnectionFactory
       gov.nih.nci.ispyportal.jms.analysis_request_queue=queue/SharedAnalysisRequest
