@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE server>
-<!-- $Id: properties-service.xml,v 1.6 2006-06-06 15:45:26 harrismic Exp $ -->
+<!-- $Id: properties-service.xml,v 1.7 2006-06-06 21:30:29 harrismic Exp $ -->
 
 <server>
 
@@ -68,13 +68,14 @@
 
     <!--   Properties for the ISPY portal project -->
     <attribute name="Properties">
-      gov.nih.nci.ispyportal.jboss_data_directory=/usr/local/jboss-4.0.2/server/default/data/ispyportal/
+      gov.nih.nci.ispyportal.jboss_data_directory=/usr/local/jboss-4.0.2/server/ncicb-app/data/ispyportal/
       gov.nih.nci.ispyportal.id_mapping_file=ID_Mapping_6-1-06.txt
       gov.nih.nci.ispyportal.gx_annotation_file=ispy_gx_annotations_5-19-06.txt
       gov.nih.nci.ispyportal.patient_data=ispy_patient_data_5_11.txt
       gov.nih.nci.ispyportal.agilent_data_matrix=ISPY_DataMatrix_10MARCH06.Rda
       gov.nih.nci.ispyportal.cdna_data_matrix=ISPY.cDNA.dataMatrix_6-1-06.Rda
-      gov.nih.nci.ispyportal.jms.jboss_url=localhost:1099
+      gov.nih.nci.ispyportal.jms.jboss_url=localhost:41199
+      <!-- Note this should be set to localhost:1099 for local installation -->
       gov.nih.nci.ispyportal.jms.factory_jndi=ConnectionFactory
       gov.nih.nci.ispyportal.jms.analysis_request_queue=queue/SharedAnalysisRequest
       gov.nih.nci.ispyportal.jms.analysis_response_queue=queue/ISPYanalysisResponse
