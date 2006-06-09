@@ -157,6 +157,9 @@ public final class CacheConstants {
     public static final String UNKNOWN = "UNKNOWN";
 	public static final String ALL = "ALL";
     
+    public static final String USER_LISTS = "userLists";
+    
+    
 	public static final String REPORTER_SELECTION_AFFY = "Affymetrix";
     public static final String REPORTER_SELECTION_UNI = "Unified Gene";
 	public static final String SESSION_TEMP_FOLDER_PATH = "SessionTempFolderPath";

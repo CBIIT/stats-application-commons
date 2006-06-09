@@ -9,7 +9,6 @@ public class ListLoader {
     private static Logger logger = Logger.getLogger(ListLoader.class);
     
     /**
-     * this method assumes for now, that there is a directory called data_files in the project where
      * preloaded lists are to be stored and referenced from some "master" file upon successful login.
      * The method parses this "master" text file that describes each of the files to be preloaded. It decides what type
      * the list needs to be and creates appropriate userlist objects accordingly. If this is

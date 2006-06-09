@@ -38,6 +38,17 @@ private static ListManager instance = null;
     public UserList createList(ListType listType, String listName, List<String> undefinedList, ListValidator validator) {
         UserList userList = new UserList();
         if(undefinedList!=null){
+           //general cleanup of list and listname 
+           if(undefinedList.contains("")){
+               undefinedList.remove("");
+           }
+           if(listName.contains("/")){
+               listName = listName.replace("/","_");
+           }
+           if(listName.contains("\\")){
+               listName = listName.replace("\\","_");
+           }
+           
            List<String> validItems = validate(undefinedList, listType, validator);
            userList.setList(validItems);
             //set the name
