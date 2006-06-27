@@ -80,6 +80,12 @@ public class UserListBeanHelper{
     	return userListBean.getList(listName);    	
     }
     
+    
+    public ListType getUserListType(String listName){
+        UserList myList = userListBean.getList(listName); 
+        return myList.getListType();
+    }
+    
     public String getDetailsFromList(String listName) {
         UserList userList = userListBean.getList(listName);
         

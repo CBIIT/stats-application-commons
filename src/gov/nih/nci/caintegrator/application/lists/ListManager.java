@@ -34,7 +34,14 @@ private static ListManager instance = null;
           return instance;
     }
    
-    
+    /**
+     * list manager creates a userlist
+     * @param listType
+     * @param listName
+     * @param undefinedList
+     * @param validator - the project specific validator class
+     * @return
+     */
     public UserList createList(ListType listType, String listName, List<String> undefinedList, ListValidator validator) {
         UserList userList = new UserList();
         if(undefinedList!=null){
