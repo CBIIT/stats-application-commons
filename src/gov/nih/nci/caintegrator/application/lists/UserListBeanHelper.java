@@ -24,6 +24,8 @@ import org.apache.log4j.Logger;
 import org.dom4j.Document;
 import org.dom4j.DocumentHelper;
 import org.dom4j.Element;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
 
 import uk.ltd.getahead.dwr.ExecutionContext;
 
@@ -78,28 +80,41 @@ public class UserListBeanHelper{
     	return userListBean.getList(listName);    	
     }
     
-    public Document getDetailsFromList(String listName) {
+    public String getDetailsFromList(String listName) {
         UserList userList = userListBean.getList(listName);
         
+        JSONObject listDetails = new JSONObject();
+        listDetails.put("listName",userList.getName());
+        listDetails.put("listType",userList.getListType().toString());
+        
+        /*
         Document document =  DocumentHelper.createDocument();
         Element list = document.addElement("list");
         Element type = list.addAttribute("type", userList.getListType().toString());
         Element name = list.addAttribute("name", userList.getName());
-        
+        */
         if(userList.getList()!=null && !userList.getList().isEmpty()){
+        	JSONArray item = new JSONArray();
             for(String i : userList.getList()){
-            Element item = list.addElement("item");
-            item.addText(i);
+            	//Element item = list.addElement("item");
+            	//item.addText(i);
+            	item.add(i);
             }
-        }
-        if(userList.getInvalidList()!=null && !userList.getInvalidList().isEmpty()){
-            for(String v : userList.getInvalidList()){
-                Element item = list.addElement("invalidItem");
-                item.addText(v);
-            }
+            listDetails.put("validItems", item );
         }
         
-        return document;
+        
+        if(userList.getInvalidList()!=null && !userList.getInvalidList().isEmpty()){
+        	JSONArray item = new JSONArray();
+            for(String v : userList.getInvalidList()){
+                //Element item = list.addElement("invalidItem");
+                //item.addText(v);
+            	item.add(v);
+            }
+            listDetails.put("invalidItems", item );
+        }
+        
+        return listDetails.toString();
     }
     
     public List<UserList> getLists(ListType listType) {
