@@ -1,15 +1,7 @@
 package gov.nih.nci.caintegrator.application.cache;
 
-import gov.nih.nci.caintegrator.dto.view.View;
-import gov.nih.nci.caintegrator.ui.graphing.data.CachableGraphData;
-//import gov.nih.nci.rembrandt.dto.query.CompoundQuery;
-//import gov.nih.nci.rembrandt.web.bean.ReportBean;
-//import gov.nih.nci.rembrandt.web.bean.SessionCriteriaBag;
-//import gov.nih.nci.rembrandt.web.bean.SessionQueryBag;
-
 import java.io.Serializable;
 import java.util.Collection;
-import java.util.List;
 
 
 /**
@@ -79,7 +71,11 @@ public interface PresentationTierCache {
 	//these things still need to implement serializable though
 	public void addNonPersistableToSessionCache(String sessionId, Serializable key, Serializable object);
 	public Object getNonPersistableObjectFromSessionCache(String sessionId, String key);
-
+	
+	//items that will be application cache..  Can be used similar to the HTTPSession
+	//these things still need to implement serializable though
+	public void addToApplicationCache(Serializable key, Serializable value);
+	public Collection checkApplicationCache(String lookupType);
 	//remove single objects
 	public void removeObjectFromPersistableSessionCache(String id, String key);
 	public void removeObjectFromNonPersistableSessionCache(String id, String key);

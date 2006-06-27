@@ -2,33 +2,17 @@ package gov.nih.nci.caintegrator.application.cache;
 
 import java.io.File;
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Set;
-
-import org.apache.log4j.Logger;
 
 import net.sf.ehcache.Cache;
 import net.sf.ehcache.CacheException;
 import net.sf.ehcache.CacheManager;
 import net.sf.ehcache.Element;
 import net.sf.ehcache.ObjectExistsException;
-import gov.nih.nci.caintegrator.dto.view.View;
-import gov.nih.nci.caintegrator.dto.view.ViewFactory;
-import gov.nih.nci.caintegrator.dto.view.ViewType;
-import gov.nih.nci.caintegrator.ui.graphing.data.CachableGraphData;
-/*
-import gov.nih.nci.rembrandt.dto.query.CompoundQuery;
-import gov.nih.nci.rembrandt.dto.query.Queriable;
-import gov.nih.nci.rembrandt.util.RembrandtConstants;
-import gov.nih.nci.rembrandt.web.bean.ReportBean;
-import gov.nih.nci.rembrandt.web.bean.SessionCriteriaBag;
-import gov.nih.nci.rembrandt.web.bean.SessionQueryBag;
-import gov.nih.nci.rembrandt.web.helper.SessionTempReportCounter;
-*/
+
+import org.apache.log4j.Logger;
+
 /**
  * PresentationCacheManager was written to provide a cache written specifically
  * for the Presentation tier.  At the time of writing, methods have been removed
@@ -104,7 +88,7 @@ public class PresentationCacheManager implements PresentationTierCache{
 	private static final String PRESENTATION_CACHE = "PresentationTierCache";
 	//DO NOT change PERSISTED_SESSIONS_CACHE value without modifying ehcache.xml
 	private static final String PERSISTED_SESSIONS_CACHE = "persistedSessionsCache";
-	private static final String PERSISTED_SUFFIX = "__p"; //flag persisted items with this internal suffix
+	protected final String PERSISTED_SUFFIX = "__p"; //flag persisted items with this internal suffix
 	private static Logger logger = Logger.getLogger(PresentationCacheManager.class);
 	private static PresentationTierCache myInstance;
 	static private CacheManager manager = null;
@@ -123,7 +107,7 @@ public class PresentationCacheManager implements PresentationTierCache{
             throw new ExceptionInInitializerError(t);
         }
  	}
-	private PresentationCacheManager() {}
+	protected PresentationCacheManager() {}
 	
 	/**
 	 * This method is the workhorse of the PresentationCacheManager, almost
@@ -134,7 +118,7 @@ public class PresentationCacheManager implements PresentationTierCache{
 	 * @param createTempCounter 
 	 * @return
 	 */
-    private Cache getSessionCache(String sessionId) {
+    protected Cache getSessionCache(String sessionId) {
         Cache sessionCache = null;
         /*
          * Process the sessionId to make sure that we have a unique sessionName for
@@ -290,7 +274,7 @@ public class PresentationCacheManager implements PresentationTierCache{
 	 * @param givenSessionId
 	 * @return
 	 */
-	private String processSessionId(String givenSessionId) {
+	protected String processSessionId(String givenSessionId) {
 		String returnedSessionId = givenSessionId+"_presentation";
 		return returnedSessionId;
 	}
@@ -421,7 +405,7 @@ public class PresentationCacheManager implements PresentationTierCache{
 	/*
 	 * remove the temp folder if the folder exist
 	 */
-	private void deleteAllFiles(String filePath){
+	protected void deleteAllFiles(String filePath){
 		if(filePath != null){
 			File dir = new File(filePath);
 			File[] list = dir.listFiles();
@@ -431,5 +415,89 @@ public class PresentationCacheManager implements PresentationTierCache{
 			dir.delete();
 		}
 	}
+	/**
+	 * This method will simply add the key/value pair to the Presentation Tier's Application 
+	 * cache making it accessable by anyone in the presentation tier.
+	 * 
+	 * @param key
+	 * @param value
+	 */
+	public void addToApplicationCache(Serializable key, Serializable value) {
+		Cache applicationCache = getApplicationCache();
+		try {
+			Element element = new Element(key, value);
+			applicationCache.put(element);
+		}catch(IllegalStateException ise) {
+			logger.error("Checking applicationCache threw IllegalStateException");
+			logger.error(ise);
+		}catch(ClassCastException cce) {
+			logger.error("CacheElement was not a Collection");
+			logger.error(cce);
+		}
+	}
+	/**
+	 * Returns the Cache that is intended to be used to store application scoped
+	 * variables 
+	 * @return
+	 */
+	private Cache getApplicationCache() {
+        Cache applicationCache = null;
+    	if(manager!=null && !manager.cacheExists(PresentationCacheManager.PRESENTATION_CACHE)) {
+    		/**
+        	 * Here are the parameters that we are using for creating the presentation
+        	 * tier Application Cache
+        	 *  	CacheName = PRESENTATION_CACHE;
+        	 *  	Max Elements in Memory = 100;
+        	 *  	Overflow to disk = false;
+        	 *  	Make the cache eternal = true;
+        	 *  	Elements time to live in seconds = 12000 (200 minutes, this not eternal in case the data changes);
+        	 *  	Elements time to idle in seconds = 0 (Special setting which means never check);
+         	 */
+    		presentationCache = new Cache(PresentationCacheManager.PRESENTATION_CACHE, 100, false, true, 0, 0);
+            logger.debug("New ApplicationCache created");
+            try {
+            	manager.addCache(presentationCache);
+            }catch(ObjectExistsException oee) {
+                logger.error("ApplicationCache creation failed.");
+                logger.error(oee);
+            }catch(CacheException ce) {
+                logger.error("ApplicationCache creation failed.");
+                logger.error(ce);
+            }
+        }else if(manager!=null){
+        	presentationCache = manager.getCache(PresentationCacheManager.PRESENTATION_CACHE);
+        }
+      
+    	return presentationCache;
+    }
 
+	
+	/**
+	 * This should be the only place that the PresentationCache delegates the
+	 * work to the _businessTier
+	 * 
+	 * @return
+	 */
+	public Collection checkApplicationCache(String lookupType) {
+		Cache applicationCache = this.getApplicationCache();
+		Collection lookpCollection = null;
+		try {
+			Element element = applicationCache.get(lookupType);
+			if(element!=null) {
+				if(element.getValue() instanceof Collection)
+					lookpCollection = (Collection)element.getValue();
+			}
+		}catch(IllegalStateException ise) {
+			logger.error("Getting the Lookup Collection  from cache threw IllegalStateException");
+			logger.error(ise);
+		}catch(CacheException ce) {
+			logger.error("Getting the Lookup Collection  from cache threw a new CacheException");
+			logger.error(ce);
+		}catch(ClassCastException cce) {
+			logger.error("CacheElement was not a Lookup Collection ");
+			logger.error(cce);
+		}
+		return lookpCollection;
+	}
+	
 }
