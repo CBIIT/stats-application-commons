@@ -16,6 +16,10 @@ import java.util.List;
 public class UserList { 
     private String name = "";
     private ListType listType;
+    //a list can actually have several sub-types
+    private List<ListSubType> listSubTypes;
+    //user attached notes for a list
+    private String notes;
     private List<String> list = new ArrayList<String>();
     private List<String> invalidList = new ArrayList<String>();
     private Date dateCreated;
@@ -23,6 +27,7 @@ public class UserList {
    
     public UserList(){}
     
+    //base constructor: no subtype, no notes
     public UserList(String name, ListType listType, List<String> list, List<String> invalidList, Date dateCreated){
         this.name = name;
         this.listType = listType;
@@ -30,6 +35,20 @@ public class UserList {
         this.invalidList = invalidList;
         this.dateCreated = dateCreated;
     }
+    
+    //full constructor
+    public UserList(String name, ListType listType, List<ListSubType> listSubTypes, List<String> list, List<String> invalidList, Date dateCreated, String notes)	{
+        new UserList(name, listType, listSubTypes, list, invalidList, dateCreated);
+        this.notes = notes;
+    }
+    
+    //Base constructor plus listSubType
+    public UserList(String name, ListType listType, List<ListSubType> listSubTypes, List<String> list, List<String> invalidList, Date dateCreated)	{
+        new UserList(name,listType,list,invalidList,dateCreated);
+        this.listSubTypes = listSubTypes;
+    }
+
+    
     /**
      * @return Returns the dateCreated.
      */
@@ -107,4 +126,39 @@ public class UserList {
     public void setInvalidList(List<String> invalidList) {
         this.invalidList = invalidList;
     }
+
+	public List<ListSubType> getListSubType() {
+		return listSubTypes;
+	}
+
+	public void setListSubType(List<ListSubType> listSubTypes) {
+		this.listSubTypes = listSubTypes;
+	}
+	
+	//conv. in case you only want to add one
+	public void setListSubType(ListSubType listSubType){
+		//if(this.listSubTypes.isEmpty())	{
+			ArrayList<ListSubType> st = new ArrayList();
+			st.add(listSubType);
+			setListSubType(st);
+	//	}
+	//	else if(!this.listSubTypes.contains(listSubType))	{
+	//		this.listSubTypes.add(listSubType);
+	//	}
+	}
+	
+	public boolean hasSubType(ListSubType listSubType)	{
+		if(listSubTypes.contains(listSubType))	{
+			return true;
+		}
+		return false;
+	}
+
+	public String getNotes() {
+		return notes;
+	}
+
+	public void setNotes(String notes) {
+		this.notes = notes;
+	}
 }

@@ -56,7 +56,8 @@ public class ListLoader {
                     
                     //now I have a listype and the list of string I want, create a userList from this                    
                     UserList myUserList = listManager.createList(myType, "default"+myType.toString()+(count+1), myTextList, listValidator);
-                    
+                    //flag all these that are auto loaded as default
+                    myUserList.setListSubType(ListSubType.Default);
                     //place the list in the userListBean
                     count++;
                     if(myUserList!=null){

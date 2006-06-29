@@ -136,6 +136,30 @@ public class UserListBeanHelper{
         return typeList;
     }
     
+    //needs some work
+    public List<UserList> getLists(ListType listType, List<ListSubType> listSubTypes)	{
+    	List<UserList> ul = this.getLists(listType);
+    	for(UserList u : ul){
+    		for(ListSubType lst : u.getListSubType())	{
+    			if(listSubTypes.contains(lst))	{
+    				ul.remove(u);
+    				break;
+    			}
+    		}
+    	}
+    	return ul;
+    }
+    
+    public List<UserList> getLists(ListType listType, ListSubType listSubType){
+    	List<ListSubType> lst = new ArrayList();
+    	lst.add(listSubType);
+    	return getLists(listType, lst);
+    }
+    
+    public List<UserList> getListsBySubType(List<ListSubType> listSubTypes){
+    	return new ArrayList();
+    }
+    
     public List<UserList> getAllLists() {
         List<UserList> allList = new ArrayList<UserList>();
     
@@ -176,15 +200,17 @@ public class UserListBeanHelper{
         return geneIdentifierDECollection;
     }
     
+    
     public Collection getDefaultPatientListNames(){ 
         Collection<UserList> patientSetList = new ArrayList<UserList>();
-        patientSetList = getLists(ListType.DefaultPatientDID);  
+        patientSetList = getLists(ListType.PatientDID, ListSubType.Default);  
         Collection patientSetListNames = new ArrayList();
         for(UserList userListName : patientSetList){
             patientSetListNames.add(userListName.toString());
         }
         return patientSetListNames;
     }
+    
     
     public Collection getPatientListNames(){ 
         Collection<UserList> patientSetList = new ArrayList<UserList>();
@@ -210,6 +236,7 @@ public class UserListBeanHelper{
         items.clear();
         items.addAll(unitedSet);
         UserList newList = new UserList(newListName,listType,items,new ArrayList<String>(),new Date());
+        newList.setListSubType(ListSubType.Custom);
         userListBean.addList(newList);
     }
 
@@ -230,6 +257,7 @@ public class UserListBeanHelper{
         items.clear();
         items.addAll(intersectedList);
         UserList newList = new UserList(newListName,listType,items,new ArrayList<String>(),new Date());
+        newList.setListSubType(ListSubType.Custom);
         userListBean.addList(newList);
     }
     

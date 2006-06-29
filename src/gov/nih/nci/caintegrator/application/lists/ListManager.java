@@ -33,7 +33,7 @@ private static ListManager instance = null;
           }
           return instance;
     }
-   
+ 
     /**
      * list manager creates a userlist
      * @param listType
