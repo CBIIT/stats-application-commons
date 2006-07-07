@@ -105,48 +105,45 @@ public class CommonListFunctions {
 	}
 
 
-	public static String getAllLists(String listType){
+	public static String getAllLists(List<String> listTypeList){
         
         UserListBeanHelper helper = new UserListBeanHelper();
-        
-        Collection<String> myLists = new ArrayList<String>();
-        
-        JSONObject listContainer = new JSONObject();
-       
-        JSONArray myJSONLists = new JSONArray();
-        
-        listContainer.put("listType", listType);
-        //which do we want to display differently in the UI
-        listContainer.put("highlightType", ListSubType.Default.toString());
-        
-        if(listType.equals(ListType.PatientDID.toString()))  {
-            myLists = helper.getPatientListNames();
+        JSONArray listContainerArray = new JSONArray();
+        for(String listType : listTypeList)	{
+	        Collection<String> myLists = new ArrayList<String>();
+	        
+	        JSONObject listContainer = new JSONObject();
+	       
+	        JSONArray myJSONLists = new JSONArray();
+	        
+	        listContainer.put("listType", listType);
+	        //which do we want to display differently in the UI
+	        listContainer.put("highlightType", ListSubType.Default.toString());
+	        
+	        myLists = helper.getGenericistNames(ListType.valueOf(listType));
+	        
+	        for(String listName : myLists) {
+	            UserList ul = helper.getUserList(listName);
+	            DateFormat dateFormat = new SimpleDateFormat("MM/dd/yyyy hh:mm aaa", Locale.US);
+	            if(ul!=null)  {
+	            	JSONArray listSubTypes = new JSONArray();
+	            	for(ListSubType lst : ul.getListSubType()){
+	            		listSubTypes.add(lst.toString());
+	            	}
+	                JSONObject jsonListName = new JSONObject();
+	                jsonListName.put("listSubTypes", listSubTypes);
+	                jsonListName.put("listName", ul.getName());
+	                jsonListName.put("listDate", dateFormat.format(ul.getDateCreated()).toString());
+	                jsonListName.put("itemCount", String.valueOf(ul.getItemCount()));
+	                jsonListName.put("invalidItems", String.valueOf(ul.getInvalidList().size()));
+	                myJSONLists.add(jsonListName);
+	            }
+	            
+	        }
+	        listContainer.put("listItems",myJSONLists);
+	        listContainerArray.add(listContainer);
         }
-        else if(listType.equals(ListType.GeneSymbol.toString())) {
-            myLists = helper.getGeneSymbolListNames();     
-        }
-
-        for(String listName : myLists) {
-            UserList ul = helper.getUserList(listName);
-            DateFormat dateFormat = new SimpleDateFormat("MM/dd/yyyy hh:mm aaa", Locale.US);
-            if(ul!=null)  {
-            	JSONArray listSubTypes = new JSONArray();
-            	for(ListSubType lst : ul.getListSubType()){
-            		listSubTypes.add(lst.toString());
-            	}
-                JSONObject jsonListName = new JSONObject();
-                jsonListName.put("listSubTypes", listSubTypes);
-                jsonListName.put("listName", ul.getName());
-                jsonListName.put("listDate", dateFormat.format(ul.getDateCreated()).toString());
-                jsonListName.put("itemCount", String.valueOf(ul.getItemCount()));
-                jsonListName.put("invalidItems", String.valueOf(ul.getInvalidList().size()));
-                myJSONLists.add(jsonListName);
-            }
-            
-        }
-        listContainer.put("listItems",myJSONLists);
-        
-        return listContainer.toString();
+        return listContainerArray.toString();
      }
 	
 	public static String uniteLists(String[] sLists, String groupName, String groupType, String action)	{

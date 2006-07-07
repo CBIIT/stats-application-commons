@@ -175,7 +175,7 @@ public class UserListBeanHelper{
         return items;
     }
    
-    
+    /*
     public List<String> getGeneSymbolListNames(){ 
         Collection<UserList> geneSetList = new ArrayList<UserList>();
         geneSetList = getLists(ListType.GeneSymbol);  
@@ -185,6 +185,7 @@ public class UserListBeanHelper{
         }
         return geneSetListNames;
     }
+    */
     
     /**
      * @NOTE : DE may change in future.
@@ -200,7 +201,7 @@ public class UserListBeanHelper{
         return geneIdentifierDECollection;
     }
     
-    
+    /*
     public Collection getDefaultPatientListNames(){ 
         Collection<UserList> patientSetList = new ArrayList<UserList>();
         patientSetList = getLists(ListType.PatientDID, ListSubType.Default);  
@@ -210,7 +211,7 @@ public class UserListBeanHelper{
         }
         return patientSetListNames;
     }
-    
+    */
     
     public Collection getPatientListNames(){ 
         Collection<UserList> patientSetList = new ArrayList<UserList>();
@@ -222,7 +223,16 @@ public class UserListBeanHelper{
         return patientSetListNames;
     }
      
-    
+    public Collection getGenericistNames(ListType listType){ 
+        Collection<UserList> setList = new ArrayList<UserList>();
+        setList = getLists(listType);  
+        Collection setListNames = new ArrayList();
+        for(UserList userListName : setList){
+            setListNames.add(userListName.toString());
+        }
+        return setListNames;
+    }
+     
 
     public void uniteLists(List<String> listNames, String newListName, ListType listType) {
         List<String> items = new ArrayList<String>();
