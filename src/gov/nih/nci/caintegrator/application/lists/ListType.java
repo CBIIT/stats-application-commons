@@ -8,5 +8,5 @@ package gov.nih.nci.caintegrator.application.lists;
  *
  */
 public enum ListType {
-    PatientDID, GeneSymbol;
+    PatientDID, GeneSymbol, Reporter;
 }
