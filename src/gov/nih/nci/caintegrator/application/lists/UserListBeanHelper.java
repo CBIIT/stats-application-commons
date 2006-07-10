@@ -223,7 +223,7 @@ public class UserListBeanHelper{
         return patientSetListNames;
     }
      
-    public Collection getGenericistNames(ListType listType){ 
+    public Collection getGenericListNames(ListType listType){ 
         Collection<UserList> setList = new ArrayList<UserList>();
         setList = getLists(listType);  
         Collection setListNames = new ArrayList();
