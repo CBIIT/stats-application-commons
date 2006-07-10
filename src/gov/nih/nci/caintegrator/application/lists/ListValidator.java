@@ -15,4 +15,9 @@ public interface ListValidator {
     public List getValidList(ListType listType, List<String> unvalidatedList);
     
     public List getInvalidList(ListType listType, List<String> unvalidatedList);
+    
+    public List getValidList();
+    
+    public List getInvalidList();
+    
 }
