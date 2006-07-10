@@ -222,7 +222,11 @@ public class UserListBeanHelper{
         }
         return patientSetListNames;
     }
-     
+    
+    public Collection getGenericListNamesFromString(String listType){ 
+    	return getGenericListNames(ListType.valueOf(listType));
+    }
+    
     public Collection getGenericListNames(ListType listType){ 
         Collection<UserList> setList = new ArrayList<UserList>();
         setList = getLists(listType);  

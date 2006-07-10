@@ -120,7 +120,7 @@ public class CommonListFunctions {
 	        //which do we want to display differently in the UI
 	        listContainer.put("highlightType", ListSubType.Default.toString());
 	        
-	        myLists = helper.getGenericistNames(ListType.valueOf(listType));
+	        myLists = helper.getGenericListNames(ListType.valueOf(listType));
 	        
 	        for(String listName : myLists) {
 	            UserList ul = helper.getUserList(listName);
