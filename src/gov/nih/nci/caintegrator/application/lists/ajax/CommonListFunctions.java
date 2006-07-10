@@ -70,11 +70,12 @@ public class CommonListFunctions {
 	}
 	*/
 	
-	public static String createGenericList(ListType type, String[] list, String name, ListValidator lv)	{
+	//doesnt accept ListSubTypes (see below), just sets as ListSubType.Custom
+	public static String createGenericList(ListType type, List<String> list, String name, ListValidator lv)	{
 		//no duplicates
 		HashSet<String> h = new HashSet<String>();
-		for (int i = 0; i < list.length; i++)
-			h.add(list[i].trim());
+		for (int i = 0; i < list.size(); i++)
+			h.add(list.get(i).trim());
 		List<String> cleanList = new ArrayList<String>();
 		for(String n : h)	{
 			cleanList.add(n);
@@ -87,12 +88,43 @@ public class CommonListFunctions {
 			//set the sub-type to custom 
 			mylist.setListSubType(ListSubType.Custom);
 			UserListBeanHelper ulbh = new UserListBeanHelper();
-			ulbh.addList(mylist);
-			success = "pass";
+			if(ulbh!=null)	{
+				ulbh.addList(mylist);
+				success = "pass";
+			}
 		}
 		catch (Exception e) {
 			// TODO: handle exception
 		}
+		return success;
+	}
+	
+	//takes a list of ListSubTypes, also appends ListSubType.Custom
+	public static String createGenericList(ListType type, List<ListSubType> listSubTypes, List<String> list, String name, ListValidator lv)	{
+		//no duplicates
+		HashSet<String> h = new HashSet<String>();
+		for (int i = 0; i < list.size(); i++)
+			h.add(list.get(i).trim());
+		List<String> cleanList = new ArrayList<String>();
+		for(String n : h)	{
+			cleanList.add(n);
+		}
+		String success = "fail";
+		ListManager um = ListManager.getInstance();
+		try	{
+			UserList mylist = um.createList(type, name, cleanList, lv);
+			if(listSubTypes!=null && listSubTypes.size()>0){
+				listSubTypes.add(ListSubType.Custom);
+				mylist.setListSubType(listSubTypes);
+			}
+			else	{
+				mylist.setListSubType(ListSubType.Custom);
+			}
+			UserListBeanHelper ulbh = new UserListBeanHelper();
+			ulbh.addList(mylist);
+			success = "pass";
+		}
+		catch (Exception e) {}
 		return success;
 	}
 	
@@ -172,5 +204,9 @@ public class CommonListFunctions {
 		res.put("action", action);
 		
 		return res.toString();
+	}
+	
+	public static String[] parseListType(String combined)	{
+		return StringUtils.split(combined, "|");
 	}
 }
