@@ -168,6 +168,9 @@ public class CommonListFunctions {
 	                jsonListName.put("listDate", dateFormat.format(ul.getDateCreated()).toString());
 	                jsonListName.put("itemCount", String.valueOf(ul.getItemCount()));
 	                jsonListName.put("invalidItems", String.valueOf(ul.getInvalidList().size()));
+	                
+	                String commas = StringUtils.join(ul.getList().toArray(), ", ");
+	                jsonListName.put("listItems", commas);
 	                myJSONLists.add(jsonListName);
 	            }
 	            
