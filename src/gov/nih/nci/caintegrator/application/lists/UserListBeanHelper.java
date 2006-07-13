@@ -9,7 +9,6 @@ package gov.nih.nci.caintegrator.application.lists;
 
 
 import gov.nih.nci.caintegrator.application.cache.CacheConstants;
-import gov.nih.nci.caintegrator.dto.de.CloneIdentifierDE;
 import gov.nih.nci.caintegrator.dto.de.GeneIdentifierDE;
 
 import java.util.ArrayList;
@@ -21,6 +20,7 @@ import java.util.Set;
 
 import javax.servlet.http.HttpSession;
 
+import org.apache.commons.collections.ListUtils;
 import org.apache.log4j.Logger;
 import org.dom4j.Document;
 import org.dom4j.DocumentHelper;
@@ -140,13 +140,21 @@ public class UserListBeanHelper{
     //needs some work
     public List<UserList> getLists(ListType listType, List<ListSubType> listSubTypes)	{
     	List<UserList> ul = this.getLists(listType);
+    	List<UserList> matches = new ArrayList<UserList>();
     	for(UserList u : ul){
+    		List hits = ListUtils.intersection(listSubTypes, u.getListSubType());
+    		if(hits.isEmpty() || hits.size() < 1){
+    			//ul.remove(u);
+    			matches.add(u);
+    		}
+    		/*
     		for(ListSubType lst : u.getListSubType())	{
     			if(listSubTypes.contains(lst))	{
     				ul.remove(u);
     				break;
     			}
     		}
+    		*/
     	}
     	return ul;
     }
@@ -188,16 +196,6 @@ public class UserListBeanHelper{
     }
     */
     
-    public List<String> getReporterListNames(){ 
-        Collection<UserList> reporterSetList = new ArrayList<UserList>();
-        reporterSetList = getLists(ListType.Reporter);  
-        List<String> reporterListNames = new ArrayList<String>();
-        for(UserList userListName : reporterSetList){
-            reporterListNames.add(userListName.toString());
-        }
-        return reporterListNames;
-    }
-    
     /**
      * @NOTE : DE may change in future.
      */
@@ -207,18 +205,9 @@ public class UserListBeanHelper{
         Collection<GeneIdentifierDE> geneIdentifierDECollection = new ArrayList<GeneIdentifierDE>();
         for(String item : geneSetList.getList()){
             GeneIdentifierDE.GeneSymbol gs = new GeneIdentifierDE.GeneSymbol(item);
-            geneIdentifierDECollection.add(gs);            
+            geneIdentifierDECollection.add(gs);
         }
         return geneIdentifierDECollection;
-    }
-    public Collection<CloneIdentifierDE> getCloneIdentifierDEforList(String listName){
-        UserList probeSetList = userListBean.getList(listName);
-        Collection<CloneIdentifierDE> cloneIdentifierDECollection = new ArrayList<CloneIdentifierDE>();
-        for(String item : probeSetList.getList()){
-            CloneIdentifierDE.ProbesetID gs = new CloneIdentifierDE.ProbesetID(item);
-            cloneIdentifierDECollection.add(gs);            
-        }
-        return cloneIdentifierDECollection;
     }
     
     /*
