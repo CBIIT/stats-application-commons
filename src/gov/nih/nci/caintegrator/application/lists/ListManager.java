@@ -60,7 +60,7 @@ private static ListManager instance = null;
                listName = listName.replace("\\","_");
            }
            
-           List<String> validItems = validate(undefinedList, listType, validator);
+           List<String> validItems = validate(undefinedList, validator);
            userList.setList(validItems);
             //set the name
             userList.setName(listName);
@@ -76,7 +76,7 @@ private static ListManager instance = null;
             userList.setItemCount(userList.getList().size());
             
             //get the invalid items
-            List<String> invalidItems = getInvalid(undefinedList, listType, validator);
+            List<String> invalidItems = getInvalid(undefinedList, validator);
             userList.setInvalidList(invalidItems);
         }
         
@@ -106,7 +106,27 @@ private static ListManager instance = null;
 		}
         return myList;
     }
-
+    @SuppressWarnings("unchecked")
+    public List<String> validate(List<String> myList, ListValidator listValidator) {
+        try {
+			myList = listValidator.getValidList();
+		} catch (OperationNotSupportedException e) {
+			logger.error("Error in validate method");
+			logger.error(e.getMessage());
+		}
+        return myList;
+    }
+    
+    @SuppressWarnings("unchecked")
+    public List<String> getInvalid(List<String> myList, ListValidator listValidator) {
+        try {
+			myList = listValidator.getInvalidList();
+		} catch (OperationNotSupportedException e) {
+			logger.error("Error in invalidate method");
+			logger.error(e.getMessage());
+		}
+        return myList;
+    }
     public Map<String,String> getParams(UserList userList) {        
         Map<String, String> listParams = new HashMap<String,String>();
         DateFormat dateFormat = new SimpleDateFormat("MM/dd/yyyy hh:mm aaa", Locale.US);
