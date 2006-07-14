@@ -7,17 +7,23 @@ package gov.nih.nci.caintegrator.application.lists;
 
 import java.util.List;
 
+import javax.naming.OperationNotSupportedException;
+
 /**
  * @author rossok
  *
  */
 public interface ListValidator {
-    public List getValidList(ListType listType, List<String> unvalidatedList);
+    public List getValidList(ListType listType, List<String> unvalidatedList) throws OperationNotSupportedException;
     
-    public List getInvalidList(ListType listType, List<String> unvalidatedList);
+    public List getInvalidList(ListType listType, List<String> unvalidatedList) throws OperationNotSupportedException;
     
-    public List getValidList();
+    public List getValidList(ListType listType, ListSubType listSubType, List<String> unvalidatedList) throws OperationNotSupportedException ;
     
-    public List getInvalidList();
+    public List getInvalidList(ListType listType, ListSubType listSubType, List<String> unvalidatedList) throws OperationNotSupportedException ;
+
+    public List getValidList() throws OperationNotSupportedException;
+    
+    public List getInvalidList() throws OperationNotSupportedException;
     
 }

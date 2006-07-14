@@ -13,12 +13,16 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
+import javax.naming.OperationNotSupportedException;
+
+import org.apache.log4j.Logger;
+
 /**
  * @author rossok
  * 
  */
 public class ListManager {
-    
+private static Logger logger = Logger.getLogger(ListManager.class);
 private static ListManager instance = null;
     
     public ListManager(){
@@ -81,13 +85,23 @@ private static ListManager instance = null;
 
     @SuppressWarnings("unchecked")
     public List<String> validate(List<String> myList, ListType listType, ListValidator listValidator) {
-        myList = listValidator.getValidList(listType,myList);
+        try {
+			myList = listValidator.getValidList(listType,myList);
+		} catch (OperationNotSupportedException e) {
+			logger.error("Error in validate method");
+			logger.error(e.getMessage());
+		}
         return myList;
     }
     
     @SuppressWarnings("unchecked")
     public List<String> getInvalid(List<String> myList, ListType listType, ListValidator listValidator) {
-        myList = listValidator.getInvalidList(listType,myList);
+        try {
+			myList = listValidator.getInvalidList(listType,myList);
+		} catch (OperationNotSupportedException e) {
+			logger.error("Error in invalidate method");
+			logger.error(e.getMessage());
+		}
         return myList;
     }
 
