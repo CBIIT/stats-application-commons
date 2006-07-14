@@ -86,7 +86,8 @@ private static ListManager instance = null;
     @SuppressWarnings("unchecked")
     public List<String> validate(List<String> myList, ListType listType, ListValidator listValidator) {
         try {
-			myList = listValidator.getValidList(listType,myList);
+			//myList = listValidator.getValidList(listType,myList);
+			myList = listValidator.getValidList();
 		} catch (OperationNotSupportedException e) {
 			logger.error("Error in validate method");
 			logger.error(e.getMessage());
@@ -97,7 +98,8 @@ private static ListManager instance = null;
     @SuppressWarnings("unchecked")
     public List<String> getInvalid(List<String> myList, ListType listType, ListValidator listValidator) {
         try {
-			myList = listValidator.getInvalidList(listType,myList);
+			//myList = listValidator.getInvalidList(listType,myList);
+			myList = listValidator.getInvalidList();
 		} catch (OperationNotSupportedException e) {
 			logger.error("Error in invalidate method");
 			logger.error(e.getMessage());
