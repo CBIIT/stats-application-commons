@@ -83,6 +83,7 @@ public class CommonListFunctions {
 		
 		String success = "fail";
 		ListManager um = ListManager.getInstance();
+        
 		try	{
 			UserList mylist = um.createList(type, name, cleanList, lv);
 			//set the sub-type to custom 

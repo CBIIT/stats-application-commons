@@ -5,6 +5,7 @@
  */
 package gov.nih.nci.caintegrator.application.lists;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.naming.OperationNotSupportedException;
@@ -13,17 +14,37 @@ import javax.naming.OperationNotSupportedException;
  * @author rossok
  *
  */
-public interface ListValidator {
-    public List getValidList(ListType listType, List<String> unvalidatedList) throws OperationNotSupportedException;
+public abstract class ListValidator {
+    protected List<String> validList = new ArrayList<String>();
+    protected List<String> invalidList = new ArrayList<String>();
     
-    public List getInvalidList(ListType listType, List<String> unvalidatedList) throws OperationNotSupportedException;
+    public ListValidator() {}    
     
-    public List getValidList(ListType listType, ListSubType listSubType, List<String> unvalidatedList) throws OperationNotSupportedException ;
-    
-    public List getInvalidList(ListType listType, ListSubType listSubType, List<String> unvalidatedList) throws OperationNotSupportedException ;
 
-    public List getValidList() throws OperationNotSupportedException;
+    public ListValidator(ListType listType, List<String> unvalidatedList) throws OperationNotSupportedException{
+        validate( listType,  unvalidatedList);        
+    }
     
-    public List getInvalidList() throws OperationNotSupportedException;
+    public ListValidator(ListType listType, ListSubType listSubType, List<String> unvalidatedList) throws OperationNotSupportedException{
+        validate( listType,  listSubType, unvalidatedList);        
+    }
+    /**
+     * @return Returns the invalidList.
+     */
+    public List<String> getInvalidList() {
+          return invalidList;
+    }
+
+    /**
+     * @return Returns the validList.
+     */
+    public List<String> getValidList() {
+        return validList;
+    };
+    
+
+    public abstract void validate (ListType listType, List<String> unvalidatedList) throws OperationNotSupportedException;
+ 
+    public  abstract void validate (ListType listType, ListSubType listSubType, List<String> unvalidatedList) throws OperationNotSupportedException;
     
 }

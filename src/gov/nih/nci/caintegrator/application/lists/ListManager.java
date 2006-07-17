@@ -4,6 +4,8 @@
  */
 package gov.nih.nci.caintegrator.application.lists;
 
+import gov.nih.nci.caintegrator.application.util.ClassHelper;
+
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -48,6 +50,7 @@ private static ListManager instance = null;
      */
     public UserList createList(ListType listType, String listName, List<String> undefinedList, ListValidator validator) {
         UserList userList = new UserList();
+        
         if(undefinedList!=null){
            //general cleanup of list and listname 
            if(undefinedList.contains("")){
@@ -60,7 +63,7 @@ private static ListManager instance = null;
                listName = listName.replace("\\","_");
            }
            
-           List<String> validItems = validate(undefinedList, validator);
+           List<String> validItems = validator.getValidList();
            userList.setList(validItems);
             //set the name
             userList.setName(listName);
@@ -76,57 +79,14 @@ private static ListManager instance = null;
             userList.setItemCount(userList.getList().size());
             
             //get the invalid items
-            List<String> invalidItems = getInvalid(undefinedList, validator);
+            List<String> invalidItems = validator.getInvalidList();
             userList.setInvalidList(invalidItems);
         }
         
         return userList;
     }
 
-    @SuppressWarnings("unchecked")
-    public List<String> validate(List<String> myList, ListType listType, ListValidator listValidator) {
-        try {
-			//myList = listValidator.getValidList(listType,myList);
-			myList = listValidator.getValidList();
-		} catch (OperationNotSupportedException e) {
-			logger.error("Error in validate method");
-			logger.error(e.getMessage());
-		}
-        return myList;
-    }
-    
-    @SuppressWarnings("unchecked")
-    public List<String> getInvalid(List<String> myList, ListType listType, ListValidator listValidator) {
-        try {
-			//myList = listValidator.getInvalidList(listType,myList);
-			myList = listValidator.getInvalidList();
-		} catch (OperationNotSupportedException e) {
-			logger.error("Error in invalidate method");
-			logger.error(e.getMessage());
-		}
-        return myList;
-    }
-    @SuppressWarnings("unchecked")
-    public List<String> validate(List<String> myList, ListValidator listValidator) {
-        try {
-			myList = listValidator.getValidList();
-		} catch (OperationNotSupportedException e) {
-			logger.error("Error in validate method");
-			logger.error(e.getMessage());
-		}
-        return myList;
-    }
-    
-    @SuppressWarnings("unchecked")
-    public List<String> getInvalid(List<String> myList, ListValidator listValidator) {
-        try {
-			myList = listValidator.getInvalidList();
-		} catch (OperationNotSupportedException e) {
-			logger.error("Error in invalidate method");
-			logger.error(e.getMessage());
-		}
-        return myList;
-    }
+   
     public Map<String,String> getParams(UserList userList) {        
         Map<String, String> listParams = new HashMap<String,String>();
         DateFormat dateFormat = new SimpleDateFormat("MM/dd/yyyy hh:mm aaa", Locale.US);

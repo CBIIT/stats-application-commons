@@ -3,6 +3,8 @@ package gov.nih.nci.caintegrator.application.lists;
 import java.io.File;
 import java.util.List;
 
+import javax.naming.OperationNotSupportedException;
+
 import org.apache.log4j.Logger;
 
 public class ListLoader {
@@ -19,9 +21,10 @@ public class ListLoader {
      * @param listValidator
      * @return
      * @author KR
+     * @throws OperationNotSupportedException 
      */
    
-    public static UserListBean loadLists(UserListBean userListBean, String fileName, String dataFilePath, ListValidator listValidator) {
+    public static UserListBean loadLists(UserListBean userListBean, String fileName, String dataFilePath, ListValidator listValidator) throws OperationNotSupportedException {
         String masterFilePath = dataFilePath + File.separatorChar + fileName;
         logger.info("Initializing "+ fileName);
         File masterUserFile = new File(masterFilePath);        
@@ -35,7 +38,7 @@ public class ListLoader {
         /*
          * go through the master file, read in the names and types of lists to be created,
          * then, one by one, parse through the list and create appropriate UserLists and place in the
-         * UserListBean. 
+         * UserListBean. Curently, we assume, there are no subtypes for text files, so we make it default.
          */
         if(!allLists.isEmpty()){
             for(String f : allLists){
@@ -54,7 +57,8 @@ public class ListLoader {
                     File userTextFile = new File(textFileName);
                     List<String> myTextList = UserListGenerator.generateList(userTextFile);
                     
-                    //now I have a listype and the list of string I want, create a userList from this                    
+                    //now I have a listype and the list of string I want, create a userList from this  
+                    listValidator.validate(myType, myTextList);
                     UserList myUserList = listManager.createList(myType, "default"+myType.toString()+(count+1), myTextList, listValidator);
                     //flag all these that are auto loaded as default
                     myUserList.setListSubType(ListSubType.Default);
@@ -65,6 +69,9 @@ public class ListLoader {
                     }
                 }catch(NullPointerException e){
                     logger.error("file was not found. " + e);               
+                } catch (OperationNotSupportedException e) {
+                    logger.error("Error:" + e);    
+                    throw new OperationNotSupportedException();
                 }
             }
         }
