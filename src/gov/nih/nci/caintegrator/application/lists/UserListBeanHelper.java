@@ -137,30 +137,21 @@ public class UserListBeanHelper{
         return typeList;
     }
     
-    //needs some work
+    
     public List<UserList> getLists(ListType listType, List<ListSubType> listSubTypes)	{
     	List<UserList> ul = this.getLists(listType);
-    	List<UserList> matches = new ArrayList<UserList>();
+    	List<UserList> matches = new ArrayList<UserList>();        
     	for(UserList u : ul){
-    		List hits = ListUtils.intersection(listSubTypes, u.getListSubType());
-    		if(hits.isEmpty() || hits.size() < 1){
-    			//ul.remove(u);
-    			matches.add(u);
-    		}
-    		/*
-    		for(ListSubType lst : u.getListSubType())	{
-    			if(listSubTypes.contains(lst))	{
-    				ul.remove(u);
-    				break;
-    			}
-    		}
-    		*/
+            List<ListSubType> lst = u.getListSubType();
+            if(lst.containsAll(listSubTypes)){
+                matches.add(u);
+            }            
     	}
-    	return ul;
+    	return matches;
     }
     
     public List<UserList> getLists(ListType listType, ListSubType listSubType){
-    	List<ListSubType> lst = new ArrayList();
+    	List<ListSubType> lst = new ArrayList<ListSubType>();
     	lst.add(listSubType);
     	return getLists(listType, lst);
     }
