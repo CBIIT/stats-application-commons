@@ -88,6 +88,7 @@ public class CommonListFunctions {
 			UserList mylist = um.createList(type, name, cleanList, lv);
 			//set the sub-type to custom 
 			mylist.setListSubType(ListSubType.Custom);
+			//only works thru DWR
 			UserListBeanHelper ulbh = new UserListBeanHelper();
 			if(ulbh!=null)	{
 				ulbh.addList(mylist);
