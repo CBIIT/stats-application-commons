@@ -70,11 +70,13 @@ public class UserListBeanHelper{
     public void addItemToList(String listName, String listItem) {
         UserList userList =  userListBean.getList(listName);
         userList.getList().add(listItem);
+    	userList.setItemCount(userList.getItemCount()+1); 
     }
     
     public void removeItemFromList(String listName, String listItem) {        
         UserList userList =  userListBean.getList(listName);
         userList.getList().remove(listItem);
+       	userList.setItemCount(userList.getItemCount()-1);        	
     }
     
     public UserList getUserList(String listName){
