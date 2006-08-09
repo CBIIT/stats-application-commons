@@ -13,6 +13,7 @@ import gov.nih.nci.caintegrator.dto.de.GeneIdentifierDE;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
@@ -251,8 +252,10 @@ public class UserListBeanHelper{
         Set<String> unitedSet = new HashSet<String>(items);
         items.clear();
         items.addAll(unitedSet);
+        Collections.sort(items, String.CASE_INSENSITIVE_ORDER);
         UserList newList = new UserList(newListName,listType,items,new ArrayList<String>(),new Date());
         newList.setListSubType(ListSubType.Custom);
+        newList.setItemCount(items.size());
         userListBean.addList(newList);
     }
 
@@ -272,8 +275,10 @@ public class UserListBeanHelper{
         }
         items.clear();
         items.addAll(intersectedList);
+        Collections.sort(items, String.CASE_INSENSITIVE_ORDER);
         UserList newList = new UserList(newListName,listType,items,new ArrayList<String>(),new Date());
         newList.setListSubType(ListSubType.Custom);
+        newList.setItemCount(items.size());
         userListBean.addList(newList);
     }
     
