@@ -35,7 +35,7 @@ public class UserListBean {
     	int i = 0;
     	 for(UserList list: userLists){
     		 
-    		 if(list.getName().equals(cleanName)){
+    		 if(list.getName().equalsIgnoreCase(cleanName)){
     			 //hit
     			 if(cleanName.indexOf(iKey)!= -1)	{
     				 String c = cleanName.substring(cleanName.indexOf(iKey)+iKey.length());
