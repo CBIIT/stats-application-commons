@@ -6,6 +6,7 @@ package gov.nih.nci.caintegrator.application.lists;
 
 import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
@@ -31,21 +32,23 @@ public class UserList {
     public UserList(String name, ListType listType, List<String> list, List<String> invalidList, Date dateCreated){
         this.name = name;
         this.listType = listType;
+        Collections.sort(list, String.CASE_INSENSITIVE_ORDER);
         this.list = list;
         this.invalidList = invalidList;
         this.dateCreated = dateCreated;
+        this.itemCount = list.size();
     }
     
     //full constructor
     public UserList(String name, ListType listType, List<ListSubType> listSubTypes, List<String> list, List<String> invalidList, Date dateCreated, String notes)	{
         new UserList(name, listType, listSubTypes, list, invalidList, dateCreated);
-        this.notes = notes;
+        this.notes = notes;        
     }
     
     //Base constructor plus listSubType
     public UserList(String name, ListType listType, List<ListSubType> listSubTypes, List<String> list, List<String> invalidList, Date dateCreated)	{
         new UserList(name,listType,list,invalidList,dateCreated);
-        this.listSubTypes = listSubTypes;
+        this.listSubTypes = listSubTypes;        
     }
 
     

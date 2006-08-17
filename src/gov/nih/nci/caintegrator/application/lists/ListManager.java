@@ -49,6 +49,7 @@ private static ListManager instance = null;
      * @return
      */
     public UserList createList(ListType listType, String listName, List<String> undefinedList, ListValidator validator) {
+        Date date = new Date();
         UserList userList = new UserList();
         
         if(undefinedList!=null){
@@ -64,23 +65,22 @@ private static ListManager instance = null;
            }
            
            List<String> validItems = validator.getValidList();
-           userList.setList(validItems);
+           //userList.setList(validItems);
             //set the name
-            userList.setName(listName);
+           // userList.setName(listName);
             //set the list type
-            userList.setListType(listType);
-            try {
-                Date date = new Date();                
-                userList.setDateCreated(date);
-            } catch (ParseException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            }
-            userList.setItemCount(userList.getList().size());
+          //  userList.setListType(listType);
+            
+                                
+          //      userList.setDateCreated(date);
+            
+         //   userList.setItemCount(userList.getList().size());
             
             //get the invalid items
             List<String> invalidItems = validator.getInvalidList();
-            userList.setInvalidList(invalidItems);
+         //   userList.setInvalidList(invalidItems);
+            userList = new UserList(listName, listType, validItems, invalidItems, date);
+            
         }
         
         return userList;
