@@ -1,6 +1,7 @@
 package gov.nih.nci.caintegrator.application.test;
 
 import gov.nih.nci.caintegrator.analysis.messaging.CorrelationRequest;
+import gov.nih.nci.caintegrator.analysis.messaging.DoubleVector;
 import gov.nih.nci.caintegrator.application.analysis.AnalysisServerClientManager;
 import gov.nih.nci.caintegrator.application.cache.CacheFactory;
 import gov.nih.nci.caintegrator.enumeration.CorrelationType;
@@ -134,8 +135,12 @@ public class TestCorrelationAnalysisRequest {
 	      gx2List.add(gx2[j]);
 	    }
 
-		corrRequest.setVector1("GX1", gx1List);
-		corrRequest.setVector2("GX2", gx2List);
+	    DoubleVector v1 = new DoubleVector("GX1", gx1List);
+	    DoubleVector v2 = new DoubleVector("GX2", gx2List);
+	    
+	    
+		corrRequest.setVector1(v1);
+		corrRequest.setVector2(v2);
 		
 		corrRequest.setCorrelationType(CorrelationType.PEARSON);
 		
