@@ -240,7 +240,50 @@ public class UserListBeanHelper{
         return setListNames;
     }
      
+    public void differenceLists(List<String> listNames, String newListName, ListType listType)	{
+    	
+    	//we're only expecting 2 lists here
+    	if(listNames.size()!=2)	{
+    		return;
+    	}
+    	UserList ulist = userListBean.getList(listNames.get(0));
+    	List<String> s1 = ulist.getList();
+    	ulist = userListBean.getList(listNames.get(1));
+    	List<String> s2 = ulist.getList();
+    	
 
+    	//transforms s1 into the (asymmetric) set difference of s1 and s2. 
+    	//(For example, the set difference of s1 minus s2 is the set containing all 
+    	//the elements found in s1 but not in s2.)
+
+    	Set<String> difference = new HashSet<String>(s1);
+    	difference.removeAll(s2);
+    	UserList newList = null;
+    	if(difference.size()>0){
+	    	List dList = new ArrayList();
+	    	dList.addAll(difference);
+	    	Collections.sort(dList, String.CASE_INSENSITIVE_ORDER);
+	    	
+	        newList = new UserList(newListName+"_"+listNames.get(0)+"-"+listNames.get(1),listType,dList,new ArrayList<String>(),new Date());
+	        newList.setListSubType(ListSubType.Custom);
+	        newList.setItemCount(dList.size());
+	        userListBean.addList(newList);
+    	}
+    	Set<String> difference2 = new HashSet<String>(s2);
+    	difference2.removeAll(s1);
+    	if(difference2.size()>0)	{
+	    	List dList2 = new ArrayList();
+	    	dList2.addAll(difference2);
+	    	Collections.sort(dList2, String.CASE_INSENSITIVE_ORDER);
+	    	newList = null;
+	        newList = new UserList(newListName+"_"+listNames.get(1)+"-"+listNames.get(0),listType,dList2,new ArrayList<String>(),new Date());
+	        newList.setListSubType(ListSubType.Custom);
+	        newList.setItemCount(dList2.size());
+	        userListBean.addList(newList);
+    	}
+    	
+    }
+    
     public void uniteLists(List<String> listNames, String newListName, ListType listType) {
         List<String> items = new ArrayList<String>();
         for(String listName: listNames){

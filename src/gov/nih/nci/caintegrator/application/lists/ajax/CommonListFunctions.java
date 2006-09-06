@@ -194,6 +194,9 @@ public class CommonListFunctions {
 			if(action.equals("join"))	{
 				helper.uniteLists(al, groupName, ListType.valueOf(groupType));
 			}
+			else if(action.equalsIgnoreCase("difference"))	{
+				helper.differenceLists(al, groupName, ListType.valueOf(groupType));
+			}
 			else	{
                 if(helper.isIntersection(al)){
                     helper.intersectLists(al, groupName, ListType.valueOf(groupType));
