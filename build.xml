@@ -1,4 +1,4 @@
-<project name="caintegrator-spec" default="build_jar_anthill" basedir=".">
+<project name="caintegrator-application-commons" default="build_jar_anthill" basedir=".">
 	<property file="basic_build.properties"/>
 	<!--
 	TARGET: COMPILE
