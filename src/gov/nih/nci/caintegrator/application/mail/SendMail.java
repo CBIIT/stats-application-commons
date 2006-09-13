@@ -27,10 +27,13 @@ public class SendMail {
 	public SendMail(){
 	}
 	
-	public  synchronized void sendMail(String mailTo, String mailBody, String subject ) throws ValidationException {
-	try{
-		if(mailTo != null && EmailValidator.getInstance().isValid(mailTo)){
-	
+	public synchronized void sendMail(String mailTo, String mailCC, String mailBody, String subject )
+		throws ValidationException
+	{
+		try
+		{
+			if(mailTo != null && EmailValidator.getInstance().isValid(mailTo))
+			{
 				//get system properties
 				Properties props = System.getProperties();
 				
@@ -46,22 +49,25 @@ public class SendMail {
 				MimeMessage message = new MimeMessage(session);
 				message.setFrom(new InternetAddress(MailManager.formatFromAddress()));
 				message.addRecipient(Message.RecipientType.TO, new InternetAddress(to));
+				if ((mailCC != null) && EmailValidator.getInstance().isValid(mailCC))
+					message.addRecipient(Message.RecipientType.CC, new InternetAddress(mailCC));
 				message.setSubject(subject);
 			    message.setText(mailBody);
-			     
 			    
 				//Send Message
 				
 				Transport.send(message);
+			}
+			else
+			{
+				throw new ValidationException("Invalid Email Address");
+			}
 		}
-		else{
-			throw new ValidationException("Invalid Email Address");
-		}
-	} catch (Exception e) {
-		logger.error("Send Mail error", e);
-	}	//catch
+		catch (Exception e)
+		{
+			logger.error("Send Mail error", e);
+		}	//catch
 	}//send mail
-	
 	
 }//Sendmail
 

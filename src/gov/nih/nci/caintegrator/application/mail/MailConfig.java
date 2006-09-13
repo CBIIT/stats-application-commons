@@ -151,4 +151,10 @@ public class MailConfig
 	public static String getTechSupportURL() {
 		return mailProperties.getProperty("techSupportURL");
 	}
+	/**
+	 * @return Returns the techSupportMail.
+	 */
+	public static String getTechSupportMail() {
+		return mailProperties.getProperty("techSupportMail");
+	}
  }

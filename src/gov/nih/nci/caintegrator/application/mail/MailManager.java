@@ -17,8 +17,6 @@ public class MailManager {
 	
 	private static Logger logger = Logger.getLogger(MailManager.class);
 
-
-
 	/**
 	 * Sends an email notifying user that their files are ready for download
 	 * via FTP
@@ -27,10 +25,11 @@ public class MailManager {
 	 * @param fileName - filename
 	 * @throws Exception
 	 */
-	public static void sendFTPMail(String mailTo, List<String> fileNames)  throws Exception{
-		
-		try {		
-	    			
+	public static void sendFTPMail(String mailTo, boolean notifyHelpDesk, List<String> fileNames)
+		throws Exception
+	{
+		try
+		{				
 		    // Part 1 is always included  
 		    String message = new MessageFormat(MailConfig.getFtpUnformattedBody1()).format(new String[] {MailConfig.getFileRetentionPeriodInDays(),MailConfig.getProject(),MailConfig.getAcronym()});		  
 			
@@ -49,7 +48,11 @@ public class MailManager {
 		    message += new MessageFormat(MailConfig.getFtpUnformattedBody4()).format(new String[] {MailConfig.getAppSupportNumber(), MailConfig.getTechSupportStartTime(), MailConfig.getTechSupportEndTime(),MailConfig.getAcronym(),MailConfig.getTechSupportURL()});
 		    
 	        // Send the message
-	        new SendMail().sendMail(mailTo, message,formatFTPSubject());		
+		    String mailCC = null;
+		    if (notifyHelpDesk)
+		    	mailCC = MailConfig.getTechSupportMail();
+		    
+	        new SendMail().sendMail(mailTo, mailCC, message,formatFTPSubject());		
 		} catch (Exception e) {
 			logger.error("Send FTP mail error", e);
 		} catch (ValidationException e) {
@@ -73,7 +76,7 @@ public class MailManager {
 	        MessageFormat formatter = new MessageFormat(MailConfig.getRegisterUnformattedBody());
 	        String formattedBody = formatter.format(params);		  
 				   
-	        new SendMail().sendMail(mailTo, formattedBody, formatFTPSubject());
+	        new SendMail().sendMail(mailTo, null, formattedBody, formatFTPSubject());
 		} catch (Exception e) {
 			logger.error("Send confirmation mail error", e);
 		} catch (ValidationException e) {
