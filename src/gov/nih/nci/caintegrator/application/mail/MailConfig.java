@@ -157,4 +157,22 @@ public class MailConfig
 	public static String getTechSupportMail() {
 		return mailProperties.getProperty("techSupportMail");
 	}
+	/**
+	 * @return Returns the ftpSubject.
+	 */
+	public static String getFtpErrorSubject() {
+		return mailProperties.getProperty("ftp.error.Subject");
+	}
+	/**
+	 * @return Returns the ftpUnformattedBody1.
+	 */
+	public static String getFtpUnformattedErrorBody1() {
+		return mailProperties.getProperty("ftp.error.Body1");
+	}
+	/**
+	 * @return Returns the ftpUnformattedBody2.
+	 */
+	public static String getFtpUnformattedErrorBody2() {
+		return mailProperties.getProperty("ftp.error.Body2");
+	}
  }

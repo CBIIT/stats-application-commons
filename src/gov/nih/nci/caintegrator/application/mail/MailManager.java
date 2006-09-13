@@ -25,8 +25,7 @@ public class MailManager {
 	 * @param fileName - filename
 	 * @throws Exception
 	 */
-	public static void sendFTPMail(String mailTo, boolean notifyHelpDesk, List<String> fileNames)
-		throws Exception
+	public static void sendFTPMail(String mailTo, List<String> fileNames)
 	{
 		try
 		{				
@@ -48,9 +47,26 @@ public class MailManager {
 		    message += new MessageFormat(MailConfig.getFtpUnformattedBody4()).format(new String[] {MailConfig.getAppSupportNumber(), MailConfig.getTechSupportStartTime(), MailConfig.getTechSupportEndTime(),MailConfig.getAcronym(),MailConfig.getTechSupportURL()});
 		    
 	        // Send the message
-		    String mailCC = null;
-		    if (notifyHelpDesk)
-		    	mailCC = MailConfig.getTechSupportMail();
+	        new SendMail().sendMail(mailTo, null, message,formatFTPSubject());		
+		} catch (Exception e) {
+			logger.error("Send FTP mail error", e);
+		} catch (ValidationException e) {
+			logger.error("Send FTP mail error", e);
+		}
+	 }
+	
+	public static void sendFTPErrorMail(String mailTo)
+	{
+		try
+		{				
+		    // Part 1 is always included  
+		    String message = new MessageFormat(MailConfig.getFtpUnformattedErrorBody1()).format(new String[] {MailConfig.getFileRetentionPeriodInDays(),MailConfig.getProject(),MailConfig.getAcronym()});		  
+		    
+		    // Part 2 always appears  
+		    message += new MessageFormat(MailConfig.getFtpUnformattedErrorBody2()).format(new String[] {MailConfig.getAppSupportNumber(), MailConfig.getTechSupportStartTime(), MailConfig.getTechSupportEndTime(),MailConfig.getAcronym(),MailConfig.getTechSupportURL()});
+		    
+	        // Send the message
+		    String mailCC = MailConfig.getTechSupportMail();
 		    
 	        new SendMail().sendMail(mailTo, mailCC, message,formatFTPSubject());		
 		} catch (Exception e) {
