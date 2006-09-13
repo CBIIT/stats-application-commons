@@ -27,7 +27,7 @@ public class MailTest extends TestCase {
 			 
              ArrayList<String> al = new ArrayList<String>();
              al.add("test.zip");
-			 MailManager.sendFTPMail("sahnih@mail.nih.gov",al);
+			 MailManager.sendFTPMail("sahnih@mail.nih.gov", false, al);
 		 } catch (Exception e1) {
             e1.printStackTrace();
         }
