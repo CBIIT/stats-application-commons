@@ -55,6 +55,12 @@ public class MailManager {
 		}
 	 }
 	
+	/**
+	 * sendFTPErrorMail is used to send a message to the user and copy the help desk when
+	 * a query was not able to successfully complete.
+	 * <P>
+	 * @param mailTo The email address of the user to be notified
+	 */
 	public static void sendFTPErrorMail(String mailTo)
 	{
 		try
@@ -68,10 +74,14 @@ public class MailManager {
 	        // Send the message
 		    String mailCC = MailConfig.getTechSupportMail();
 		    
-	        new SendMail().sendMail(mailTo, mailCC, message,formatFTPSubject());		
-		} catch (Exception e) {
+	        new SendMail().sendMail(mailTo, mailCC, message,formatFTPErrorSubject());		
+		}
+		catch (Exception e)
+		{
 			logger.error("Send FTP mail error", e);
-		} catch (ValidationException e) {
+		}
+		catch (ValidationException e)
+		{
 			logger.error("Send FTP mail error", e);
 		}
 	 }
@@ -125,6 +135,10 @@ public class MailManager {
 	}
 	public static String formatFTPSubject(){
 		 String ftpSubject = new MessageFormat(MailConfig.getFtpSubject()).format(new String[] {MailConfig.getProject(),MailConfig.getAcronym()});
+		 return ftpSubject;
+	}
+	public static String formatFTPErrorSubject(){
+		 String ftpSubject = new MessageFormat(MailConfig.getFtpErrorSubject()).format(new String[] {MailConfig.getProject(),MailConfig.getAcronym()});
 		 return ftpSubject;
 	}
 
