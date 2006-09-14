@@ -188,10 +188,12 @@ public class AnalysisServerClientManager implements ApplicationService, MessageL
 		//Properties messagingProps = ApplicationContext.getJMSProperties();
 		//String jbossURL = System.getProperty("gov.nih.nci.caintegrator.analysis.jms.jboss_url");
 		
+		try {
+			
 		
-		while (!connected) {
+			while (!connected) {
 		
-			try {
+			  try {
 					
 				//logger.debug("AnalysisServerClientManager constructor start");
 				//Properties messagingProps = ApplicationContext.getJMSProperties();
@@ -250,8 +252,8 @@ public class AnalysisServerClientManager implements ApplicationService, MessageL
 			    logger.info("  successfully found request queue=" + requestQueueName);
 			    logger.info("  successfully found response queue=" + responseQueueName);
 			    logger.info("Now listening for requests...");
-			}
-			catch (Exception ex) {
+			  }
+			  catch (JMSException ex) {
 			    numConnectAttempts++;
 			  
 			    if (numConnectAttempts <= 10) {
@@ -274,6 +276,11 @@ public class AnalysisServerClientManager implements ApplicationService, MessageL
 			      return;
 			    }
 		    }
+		  }	
+		}
+		catch (Exception ex) {
+			  logger.error("Caught exception when trying to establish connection.");
+			  logger.error(ex);
 		}
 	}
 	
