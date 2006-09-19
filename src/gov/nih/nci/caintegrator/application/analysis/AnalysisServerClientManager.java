@@ -12,6 +12,8 @@ import gov.nih.nci.caintegrator.enumeration.FindingStatus;
 import gov.nih.nci.caintegrator.exceptions.AnalysisServerException;
 import gov.nih.nci.caintegrator.service.findings.AnalysisFinding;
 import gov.nih.nci.caintegrator.service.findings.ClassComparisonFinding;
+import gov.nih.nci.caintegrator.service.findings.ReporterBasedFinding;
+import gov.nih.nci.caintegrator.service.findings.FTestFinding;
 
 import java.util.ArrayList;
 import java.util.Hashtable;
@@ -343,21 +345,17 @@ public class AnalysisServerClientManager implements ApplicationService, MessageL
 		AnalysisFinding finding = (AnalysisFinding)_cacheManager.getSessionFinding(sessionId, taskId);
 		if(finding != null){
 			finding.setAnalysisResult(analysisResult);
-			if(finding instanceof ClassComparisonFinding){
+			if (finding instanceof ReporterBasedFinding)  {
 				//generate the annotations
-				List<ClassComparisonResultEntry> classComparisonResultEntrys = ((ClassComparisonFinding) finding).getResultEntries();
-				List<String> reporterIds = new ArrayList<String>();
+				ReporterBasedFinding rf = (ReporterBasedFinding) finding;
+				List<String> reporterIds = rf.getReporterIds();
+					
 				Map<String,ReporterAnnotation> reporterAnnotationMap = null;
-				for (ClassComparisonResultEntry classComparisonResultEntry: classComparisonResultEntrys){
-					if(classComparisonResultEntry.getReporterId() != null){
-						reporterIds.add(classComparisonResultEntry.getReporterId());
-					}
-				}
-		        try {
-		        	//GeneExprAnnotationService geneExpAnnotationService = (GeneExprAnnotationService)ApplicationContext.getApplicationService("GENE_EXPRESSION_ANNOTATION_SERVICE");
+			
+		        try {		        	
 		        	if (gxAnnotService != null) {
 		        	  reporterAnnotationMap = gxAnnotService.getAnnotationsMapForReporters(reporterIds);
-		        	  ((ClassComparisonFinding) finding).setReporterAnnotationsMap(reporterAnnotationMap);
+		        	  rf.setReporterAnnotationsMap(reporterAnnotationMap);
 		        	}
 		        }
 		        catch(Exception e){
