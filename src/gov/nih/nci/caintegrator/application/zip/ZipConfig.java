@@ -72,6 +72,27 @@ public class ZipConfig
     {
     	return zipProperties.getProperty("ftp_location");
     }
+    
+    /**
+     * URL for the secure FTP server
+     * 
+     * @return
+     */
+    public static String getSecureFtpUrl()    
+    {
+    	return zipProperties.getProperty("ftp_secure_URL");
+    }
+    
+    /**
+     * URL for the anonymous browse FTP server
+     * 
+     * @return
+     */
+    public static String getAnonymousBrowseFtpUrl()    
+    {
+    	return zipProperties.getProperty("ftp_anonBrowse_URL");
+    }
+    
     /**
      * Support phone number to include in email
      * 
