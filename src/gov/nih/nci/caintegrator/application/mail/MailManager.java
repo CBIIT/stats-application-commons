@@ -25,13 +25,17 @@ public class MailManager {
 	 * @param fileName - filename
 	 * @throws Exception
 	 */
-	public static void sendFTPMail(String mailTo, List<String> fileNames)
+	public static void sendFTPMail(String mailTo, List<String> fileNames, String additionalText)
 	{
 		try
 		{				
 		    // Part 1 is always included  
 		    String message = new MessageFormat(MailConfig.getFtpUnformattedBody1()).format(new String[] {MailConfig.getFileRetentionPeriodInDays(),MailConfig.getProject(),MailConfig.getAcronym()});		  
 			
+		    // If there was additional text passed in then include that here
+		    if (additionalText != null)
+		    	message += additionalText + "\n\n";
+		    
 		    // Part 2 is only included if there are multiple fies
 		    if(fileNames.size() > 1) {
 		    	message += MailConfig.getFtpUnformattedBody2();	
