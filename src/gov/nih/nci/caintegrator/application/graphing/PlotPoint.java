@@ -1,5 +1,11 @@
 package gov.nih.nci.caintegrator.application.graphing;
 
+import java.util.Collection;
+
+import gov.nih.nci.caintegrator.enumeration.AxisType;
+import gov.nih.nci.caintegrator.ui.graphing.data.DataRange;
+import gov.nih.nci.caintegrator.ui.graphing.data.principalComponentAnalysis.PrincipalComponentAnalysisDataPoint;
+
 /**
  * Simple Data point class for handling data of the form id,X,Y,Z
  * @author harrismic
@@ -66,6 +72,39 @@ public class PlotPoint {
 
 	public void setTag(String tag) {
 		this.tag = tag;
+	}
+	
+	public Double getAxisValue(AxisType axis) {
+	  if (axis == AxisType.X_AXIS) {
+	    return getX();
+	  }
+	  else if (axis == AxisType.Y_AXIS) {
+		return getY();
+	  }
+	  else if (axis == AxisType.Z_AXIS) {
+		return getZ();
+	  }
+	  return null;
+	}
+	
+	public static DataRange getDataRange(Collection<PlotPoint> points, AxisType axis) {
+		double maxValue = Double.MIN_VALUE;
+		double minValue = Double.MAX_VALUE;
+		double value;
+		  
+		for (PlotPoint dataPoint: points) {
+			value = dataPoint.getAxisValue(axis);
+			if (value < minValue) {
+			  minValue = value;
+			}
+			
+			if (value > maxValue) {
+			  maxValue = value;
+			}
+		  }
+		  
+		  DataRange range = new DataRange(minValue, maxValue);
+		  return range;
 	}
   
 }
