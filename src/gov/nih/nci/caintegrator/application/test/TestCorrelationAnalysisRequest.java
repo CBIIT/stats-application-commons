@@ -139,8 +139,8 @@ public class TestCorrelationAnalysisRequest {
 	    DoubleVector v2 = new DoubleVector("GX2", gx2List);
 	    
 	    
-		corrRequest.setVector1(v1);
-		corrRequest.setVector2(v2);
+		//corrRequest.setVector1(v1);
+		//corrRequest.setVector2(v2);
 		
 		corrRequest.setCorrelationType(CorrelationType.PEARSON);
 		
