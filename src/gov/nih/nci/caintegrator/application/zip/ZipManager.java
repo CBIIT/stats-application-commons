@@ -3,11 +3,11 @@
  *
  *
  *
- * $Revision: 1.1 $
- * $Date: 2006-09-12 00:49:25 $
- * $Author: sahnih $
+ * $Revision: 1.2 $
+ * $Date: 2006-09-29 18:49:10 $
+ * $Author: mholck $
  * $Name: not supported by cvs2svn $
- * $Id: ZipManager.java,v 1.1 2006-09-12 00:49:25 sahnih Exp $
+ * $Id: ZipManager.java,v 1.2 2006-09-29 18:49:10 mholck Exp $
  */
 package gov.nih.nci.caintegrator.application.zip;
 
@@ -55,6 +55,8 @@ public class ZipManager extends Thread {
     private List<ZipItem> items;
 
     private static Logger logger = Logger.getLogger(ZipManager.class);
+    
+    private static boolean finished = true;
        
     
     /**
@@ -134,6 +136,8 @@ public class ZipManager extends Thread {
      */
     public void run()
      {
+    	finished = false;
+    	
     	try
     	 {
           zip();
@@ -142,6 +146,8 @@ public class ZipManager extends Thread {
     	{
     		logger.error("Unable to complete zipping of file "+destinationFile, e);
     	}
+    	
+    	finished = true;
      }
        
 
@@ -201,6 +207,10 @@ public class ZipManager extends Thread {
 	 */
 	public void setBreakIntoMultipleFileIfLarge(boolean flag) {
 		breakIntoMultipleFileIfLarge = flag;
+	}
+
+	public static boolean isFinished() {
+		return finished;
 	}
 	
 	 
