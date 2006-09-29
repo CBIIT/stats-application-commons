@@ -1,9 +1,12 @@
 package gov.nih.nci.caintegrator.application.zip;
 
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.text.SimpleDateFormat;
 import java.util.Properties;
+
+import org.apache.log4j.Logger;
 
 /**
  * Encapsulates the various ZIP configuration files
@@ -11,33 +14,50 @@ import java.util.Properties;
  */
 public class ZipConfig
  {
+	private static Logger logger = Logger.getLogger(ZipConfig.class);
 	private static String ZIP_PROPERTIES = "zip.properties";	
-	private static Properties zipProperties;	
-	
-    static
-    {
-    	// Handle exceptions
-    	try
-    	 {
-			zipProperties = new Properties();
-			InputStream in = Thread.currentThread().getContextClassLoader()
-								.getResourceAsStream(ZIP_PROPERTIES);
-			zipProperties.load(in);		
-			in.close();
-			
-     	 }
-    	catch(IOException ioe) 
-    	{
-    		ioe.printStackTrace();
-    		throw new RuntimeException("Could not read configuration file");
-    	}
-		
+	private static ZipConfig instance;
+	private Properties zipProperties;	
+
+   
+    private ZipConfig(){
+    	 
+    	    {
+    	    	// Handle exceptions
+    	    	try
+    	    	 {
+//    				Get the application properties from the properties file
+    				  String propertiesFileName = System.getProperty(ZIP_PROPERTIES);
+    				
+    				  //Load the the application properties and set them as system properties
+    				  zipProperties = new Properties();
+    				  
+    				  
+    				  logger.info("Attempting to load application zip properties from file: " + propertiesFileName);
+    				   
+    				  FileInputStream in = new FileInputStream(propertiesFileName);
+    				  zipProperties.load(in);	
+    				   
+    				  if (zipProperties.isEmpty()) {
+    				     logger.error("Error: no properties found when loading properties file: " + propertiesFileName);
+    				  }
+    				  in.close();	    				  
+
+    				
+    	     	 }
+    	    	catch(IOException ioe) 
+    	    	{
+    	    		ioe.printStackTrace();
+    	    		throw new RuntimeException("Could not read configuration file");
+    	    	}
+    			
+    	    }
     }
 	/**
 	 * Size at which any files larger than that size will result in a FTP
 	 * download instead of HTTP
 	 */
-    public static Double getFtpThreshold()
+    public Double getFtpThreshold()
     {
     	return Double.parseDouble(zipProperties.getProperty("ftp_threshold"));
     }
@@ -48,7 +68,7 @@ public class ZipConfig
      * 
      * @return
      */
-    public static String getZipLocation()
+    public String getZipLocation()
     {
     	return zipProperties.getProperty("zip_location");
     }
@@ -58,7 +78,7 @@ public class ZipConfig
      * 
      * @return
      */
-    public static String getMessagingUrl()
+    public String getMessagingUrl()
     {
     	return zipProperties.getProperty("jboss_mq_url");
     }
@@ -68,7 +88,7 @@ public class ZipConfig
      * 
      * @return
      */
-    public static String getFtpLocation()    
+    public String getFtpLocation()    
     {
     	return zipProperties.getProperty("ftp_location");
     }
@@ -78,7 +98,7 @@ public class ZipConfig
      * 
      * @return
      */
-    public static String getSecureFtpUrl()    
+    public String getSecureFtpUrl()    
     {
     	return zipProperties.getProperty("ftp_secure_URL");
     }
@@ -88,7 +108,7 @@ public class ZipConfig
      * 
      * @return
      */
-    public static String getAnonymousBrowseFtpUrl()    
+    public String getAnonymousBrowseFtpUrl()    
     {
     	return zipProperties.getProperty("ftp_anonBrowse_URL");
     }
@@ -98,7 +118,7 @@ public class ZipConfig
      * 
      * @return
      */
-    public static String getSupportPhoneNumber()    
+    public String getSupportPhoneNumber()    
     {
     	return zipProperties.getProperty("support_phone_number");
     }    
@@ -108,7 +128,7 @@ public class ZipConfig
      * 
      * @return
      */
-    public static String getZipCommand()
+    public String getZipCommand()
     {
     	return zipProperties.getProperty("zip_command");
     }    
@@ -118,7 +138,7 @@ public class ZipConfig
      * 
      * @return
      */
-    public static String getZipCommandLocation() 
+    public String getZipCommandLocation() 
     {
         return zipProperties.getProperty("zip_command_location");
     }
@@ -128,7 +148,7 @@ public class ZipConfig
      * 
      * @return
      */
-    public static String getTempZipLocation() 
+    public String getTempZipLocation() 
     {
         return zipProperties.getProperty("zip_temp_location");
     }
@@ -138,7 +158,7 @@ public class ZipConfig
      * 
      * @return
      */
-    public static String getZipStagingCommand()
+    public String getZipStagingCommand()
     {
     	return zipProperties.getProperty("zip_staging_command");
     }
@@ -148,7 +168,7 @@ public class ZipConfig
      * 
      * @return
      */
-    public static String getZipStagingCommandLocation()
+    public String getZipStagingCommandLocation()
     {
     	return zipProperties.getProperty("zip_staging_command_location");
     }
@@ -158,7 +178,7 @@ public class ZipConfig
      * 
      * @return
      */
-    public static int getZipperType()
+    public int getZipperType()
     {
     	return Integer.parseInt(zipProperties.getProperty("zipper_type"));    	
     }
@@ -168,7 +188,7 @@ public class ZipConfig
      * Date format 
      * @return
      */
-    public static SimpleDateFormat getDateFormat()
+    public SimpleDateFormat getDateFormat()
     {
         
        String s = zipProperties.getProperty("date_format");
@@ -181,10 +201,25 @@ public class ZipConfig
      * Location of quarantined files
      * @return
      */
-    public static String getQuarantineLocation()
+    public String getQuarantineLocation()
     {
         return zipProperties.getProperty("quarantine_directory");
     }
+
+
+	/**
+	 * @return Returns the getInstance.
+	 */
+	public static ZipConfig getInstance(String propertyFilename) {
+		if(instance == null  || !(propertyFilename.equals(ZIP_PROPERTIES))){
+    		ZIP_PROPERTIES = propertyFilename;
+			instance = new ZipConfig();
+		}
+		return instance;
+	}
+	public String getFilePrefix() {
+		return zipProperties.getProperty("filePrefix");
+	}
    
     
     

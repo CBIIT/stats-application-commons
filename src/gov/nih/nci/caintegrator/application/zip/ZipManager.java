@@ -3,11 +3,11 @@
  *
  *
  *
- * $Revision: 1.2 $
- * $Date: 2006-09-29 18:49:10 $
- * $Author: mholck $
+ * $Revision: 1.3 $
+ * $Date: 2006-09-29 19:16:52 $
+ * $Author: sahnih $
  * $Name: not supported by cvs2svn $
- * $Id: ZipManager.java,v 1.2 2006-09-29 18:49:10 mholck Exp $
+ * $Id: ZipManager.java,v 1.3 2006-09-29 19:16:52 sahnih Exp $
  */
 package gov.nih.nci.caintegrator.application.zip;
 
@@ -97,13 +97,13 @@ public class ZipManager extends Thread {
      * Actually does the zipping of the files
      *
      */
-    public List<String> zip() throws Exception
+    public List<String> zip(String zipPropertyFilename) throws Exception
     {
 		logger.info("Starting to zip: " + destinationFile);  
     	
         long startTime = System.currentTimeMillis();
         
-       AbstractFileZipper zipit = FileZipperFactory.getInstance();         
+       AbstractFileZipper zipit = FileZipperFactory.getInstance(zipPropertyFilename);         
         
         // Initialize zipper
         try
@@ -134,13 +134,13 @@ public class ZipManager extends Thread {
     /**
      * 
      */
-    public void run()
+    public void run(String zipPropertyFilename)
      {
     	finished = false;
     	
     	try
     	 {
-          zip();
+          zip(zipPropertyFilename);
     	 }
     	catch(Exception e)
     	{

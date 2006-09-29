@@ -19,11 +19,12 @@ public class FileZipperFactory {
      * @return
      * @throws Exception
      */
-    public static synchronized AbstractFileZipper getInstance()
+    public static synchronized AbstractFileZipper getInstance(String zipPropertyFilename)
             throws Exception {
 
         AbstractFileZipper zipper;
-        switch (ZipConfig.getZipperType()) {
+        ZipConfig zipConfig = ZipConfig.getInstance(zipPropertyFilename);
+        switch (zipConfig.getZipperType()) {
             case JAVA_ZIPPER:
                 zipper = new ZipFiles();
                 break;
