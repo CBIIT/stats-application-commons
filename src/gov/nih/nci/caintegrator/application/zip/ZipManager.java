@@ -3,11 +3,11 @@
  *
  *
  *
- * $Revision: 1.3 $
- * $Date: 2006-09-29 19:16:52 $
- * $Author: sahnih $
+ * $Revision: 1.4 $
+ * $Date: 2006-09-30 02:12:04 $
+ * $Author: mholck $
  * $Name: not supported by cvs2svn $
- * $Id: ZipManager.java,v 1.3 2006-09-29 19:16:52 sahnih Exp $
+ * $Id: ZipManager.java,v 1.4 2006-09-30 02:12:04 mholck Exp $
  */
 package gov.nih.nci.caintegrator.application.zip;
 
@@ -49,15 +49,12 @@ public class ZipManager extends Thread {
     // Only applies if breakIntoMultipleFileIfLarge is true
     private static final long MAX_ZIP_FILE_SIZE = 4000000000L;
 
-  
+    private String zipPropertyFilename;
 
     // List of items to be zipped
     private List<ZipItem> items;
 
     private static Logger logger = Logger.getLogger(ZipManager.class);
-    
-    private static boolean finished = true;
-       
     
     /**
      * Compute the percentage of series that have
@@ -97,7 +94,7 @@ public class ZipManager extends Thread {
      * Actually does the zipping of the files
      *
      */
-    public List<String> zip(String zipPropertyFilename) throws Exception
+    public List<String> zip() throws Exception
     {
 		logger.info("Starting to zip: " + destinationFile);  
     	
@@ -134,25 +131,17 @@ public class ZipManager extends Thread {
     /**
      * 
      */
-    public void run(String zipPropertyFilename)
+    public void run()
      {
-    	finished = false;
-    	
     	try
     	 {
-          zip(zipPropertyFilename);
+          zip();
     	 }
     	catch(Exception e)
     	{
     		logger.error("Unable to complete zipping of file "+destinationFile, e);
     	}
-    	
-    	finished = true;
      }
-       
-
-
-    
 
     
 	/**
@@ -209,8 +198,12 @@ public class ZipManager extends Thread {
 		breakIntoMultipleFileIfLarge = flag;
 	}
 
-	public static boolean isFinished() {
-		return finished;
+	public String getZipPropertyFilename() {
+		return zipPropertyFilename;
+	}
+
+	public void setZipPropertyFilename(String zipPropertyFileName) {
+		this.zipPropertyFilename = zipPropertyFileName;
 	}
 	
 	 
