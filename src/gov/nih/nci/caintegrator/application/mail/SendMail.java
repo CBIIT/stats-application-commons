@@ -20,11 +20,11 @@ public class SendMail {
 	
 	private static Logger logger = Logger.getLogger(SendMail.class);
 	
-	public static String MAIL_PROPERTIES = "mail.properties"; 
-	 
+	private String mailProperties; 
 	 
 	
-	public SendMail(){
+	public SendMail(String mailProperties){
+		this.mailProperties = mailProperties;
 	}
 	
 	public synchronized void sendMail(String mailTo, String mailCC, String mailBody, String subject )
@@ -40,14 +40,15 @@ public class SendMail {
 				String to=mailTo;
 				// Set up mail server
 				
-				props.put("mail.smtp.host",MailConfig.getHost());
+				props.put("mail.smtp.host",MailConfig.getInstance(mailProperties).getHost());
 				
 				//Get session
 				Session session = Session.getDefaultInstance(props, null);
 				
 				//Define Message
 				MimeMessage message = new MimeMessage(session);
-				message.setFrom(new InternetAddress(MailManager.formatFromAddress()));
+				MailManager mailManager = new MailManager(mailProperties);
+				message.setFrom(new InternetAddress(mailManager.formatFromAddress()));
 				message.addRecipient(Message.RecipientType.TO, new InternetAddress(to));
 				if ((mailCC != null) && EmailValidator.getInstance().isValid(mailCC))
 					message.addRecipient(Message.RecipientType.CC, new InternetAddress(mailCC));

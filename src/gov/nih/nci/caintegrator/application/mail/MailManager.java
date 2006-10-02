@@ -16,7 +16,10 @@ import org.apache.log4j.Logger;
 public class MailManager {
 	
 	private static Logger logger = Logger.getLogger(MailManager.class);
-
+	private String mailProperties;
+	public MailManager(String mailPropertiesFilename){
+		mailProperties = mailPropertiesFilename;
+	}
 	/**
 	 * Sends an email notifying user that their files are ready for download
 	 * via FTP
@@ -25,12 +28,12 @@ public class MailManager {
 	 * @param fileName - filename
 	 * @throws Exception
 	 */
-	public static void sendFTPMail(String mailTo, List<String> fileNames, String additionalText)
+	public void sendFTPMail(String mailTo, List<String> fileNames, String additionalText)
 	{
 		try
 		{				
 		    // Part 1 is always included  
-		    String message = new MessageFormat(MailConfig.getFtpUnformattedBody1()).format(new String[] {MailConfig.getFileRetentionPeriodInDays(),MailConfig.getProject(),MailConfig.getAcronym()});		  
+		    String message = new MessageFormat(MailConfig.getInstance(mailProperties).getFtpUnformattedBody1()).format(new String[] {MailConfig.getInstance(mailProperties).getFileRetentionPeriodInDays(),MailConfig.getInstance(mailProperties).getProject(),MailConfig.getInstance(mailProperties).getAcronym()});		  
 			
 		    // If there was additional text passed in then include that here
 		    if (additionalText != null)
@@ -38,20 +41,20 @@ public class MailManager {
 		    
 		    // Part 2 is only included if there are multiple fies
 		    if(fileNames.size() > 1) {
-		    	message += MailConfig.getFtpUnformattedBody2();	
+		    	message += MailConfig.getInstance(mailProperties).getFtpUnformattedBody2();	
 		    }
 		    	
 		    // Part 3 appears once for each file
 		    for(String fileName : fileNames)
 		    {    	
-		    	message += new MessageFormat(MailConfig.getFtpUnformattedBody3()).format(new String[] {cleanFileName(fileName), MailConfig.getFtpHostnameAndPort()});	
+		    	message += new MessageFormat(MailConfig.getInstance(mailProperties).getFtpUnformattedBody3()).format(new String[] {cleanFileName(fileName), MailConfig.getInstance(mailProperties).getFtpHostnameAndPort()});	
 		    }
 		    
 		    // Part 4 always appears  
-		    message += new MessageFormat(MailConfig.getFtpUnformattedBody4()).format(new String[] {MailConfig.getAppSupportNumber(), MailConfig.getTechSupportStartTime(), MailConfig.getTechSupportEndTime(),MailConfig.getAcronym(),MailConfig.getTechSupportURL()});
+		    message += new MessageFormat(MailConfig.getInstance(mailProperties).getFtpUnformattedBody4()).format(new String[] {MailConfig.getInstance(mailProperties).getAppSupportNumber(), MailConfig.getInstance(mailProperties).getTechSupportStartTime(), MailConfig.getInstance(mailProperties).getTechSupportEndTime(),MailConfig.getInstance(mailProperties).getAcronym(),MailConfig.getInstance(mailProperties).getTechSupportURL()});
 		    
 	        // Send the message
-	        new SendMail().sendMail(mailTo, null, message,formatFTPSubject());		
+	        new SendMail(mailProperties).sendMail(mailTo, null, message,formatFTPSubject());		
 		} catch (Exception e) {
 			logger.error("Send FTP mail error", e);
 		} catch (ValidationException e) {
@@ -65,20 +68,20 @@ public class MailManager {
 	 * <P>
 	 * @param mailTo The email address of the user to be notified
 	 */
-	public static void sendFTPErrorMail(String mailTo)
+	public void sendFTPErrorMail(String mailTo)
 	{
 		try
 		{				
 		    // Part 1 is always included  
-		    String message = new MessageFormat(MailConfig.getFtpUnformattedErrorBody1()).format(new String[] {MailConfig.getFileRetentionPeriodInDays(),MailConfig.getProject(),MailConfig.getAcronym()});		  
+		    String message = new MessageFormat(MailConfig.getInstance(mailProperties).getFtpUnformattedErrorBody1()).format(new String[] {MailConfig.getInstance(mailProperties).getFileRetentionPeriodInDays(),MailConfig.getInstance(mailProperties).getProject(),MailConfig.getInstance(mailProperties).getAcronym()});		  
 		    
 		    // Part 2 always appears  
-		    message += new MessageFormat(MailConfig.getFtpUnformattedErrorBody2()).format(new String[] {MailConfig.getAppSupportNumber(), MailConfig.getTechSupportStartTime(), MailConfig.getTechSupportEndTime(),MailConfig.getAcronym(),MailConfig.getTechSupportURL()});
+		    message += new MessageFormat(MailConfig.getInstance(mailProperties).getFtpUnformattedErrorBody2()).format(new String[] {MailConfig.getInstance(mailProperties).getAppSupportNumber(), MailConfig.getInstance(mailProperties).getTechSupportStartTime(), MailConfig.getInstance(mailProperties).getTechSupportEndTime(),MailConfig.getInstance(mailProperties).getAcronym(),MailConfig.getInstance(mailProperties).getTechSupportURL()});
 		    
 	        // Send the message
-		    String mailCC = MailConfig.getTechSupportMail();
+		    String mailCC = MailConfig.getInstance(mailProperties).getTechSupportMail();
 		    
-	        new SendMail().sendMail(mailTo, mailCC, message,formatFTPErrorSubject());		
+	        new SendMail(mailProperties).sendMail(mailTo, mailCC, message,formatFTPErrorSubject());		
 		}
 		catch (Exception e)
 		{
@@ -98,15 +101,15 @@ public class MailManager {
 	 * @param userId - user's login ID
 	 * @throws Exception
 	 */
-	public static void sendConfirmationMail(String mailTo, String userId) throws Exception {
+	public void sendConfirmationMail(String mailTo, String userId) throws Exception {
 	
 		try {
-		    String[] params = {userId, MailConfig.getAppSupportNumber(), MailConfig.getTechSupportStartTime(), MailConfig.getTechSupportEndTime(),};
+		    String[] params = {userId, MailConfig.getInstance(mailProperties).getAppSupportNumber(), MailConfig.getInstance(mailProperties).getTechSupportStartTime(), MailConfig.getInstance(mailProperties).getTechSupportEndTime(),};
 			
-	        MessageFormat formatter = new MessageFormat(MailConfig.getRegisterUnformattedBody());
+	        MessageFormat formatter = new MessageFormat(MailConfig.getInstance(mailProperties).getRegisterUnformattedBody());
 	        String formattedBody = formatter.format(params);		  
 				   
-	        new SendMail().sendMail(mailTo, null, formattedBody, formatFTPSubject());
+	        new SendMail(mailProperties).sendMail(mailTo, null, formattedBody, formatFTPSubject());
 		} catch (Exception e) {
 			logger.error("Send confirmation mail error", e);
 		} catch (ValidationException e) {
@@ -121,7 +124,7 @@ public class MailManager {
 	 * @param fileName
 	 * @return
 	 */
-	private static String cleanFileName(String fileName)
+	private String cleanFileName(String fileName)
 	{
 		String nameWithoutPath;
 		if(fileName.lastIndexOf(File.separator)>0){
@@ -133,16 +136,16 @@ public class MailManager {
 		}
 		return (nameWithoutPath.startsWith(File.separator)) ? nameWithoutPath.substring(1) : nameWithoutPath;
 	}
-	public static String formatFromAddress(){
-		 String from = new MessageFormat(MailConfig.getFrom()).format(new String[] {MailConfig.getAcronym()});
+	public String formatFromAddress(){
+		 String from = new MessageFormat(MailConfig.getInstance(mailProperties).getFrom()).format(new String[] {MailConfig.getInstance(mailProperties).getAcronym()});
 		 return from;
 	}
-	public static String formatFTPSubject(){
-		 String ftpSubject = new MessageFormat(MailConfig.getFtpSubject()).format(new String[] {MailConfig.getProject(),MailConfig.getAcronym()});
+	public String formatFTPSubject(){
+		 String ftpSubject = new MessageFormat(MailConfig.getInstance(mailProperties).getFtpSubject()).format(new String[] {MailConfig.getInstance(mailProperties).getProject(),MailConfig.getInstance(mailProperties).getAcronym()});
 		 return ftpSubject;
 	}
-	public static String formatFTPErrorSubject(){
-		 String ftpSubject = new MessageFormat(MailConfig.getFtpErrorSubject()).format(new String[] {MailConfig.getProject(),MailConfig.getAcronym()});
+	public String formatFTPErrorSubject(){
+		 String ftpSubject = new MessageFormat(MailConfig.getInstance(mailProperties).getFtpErrorSubject()).format(new String[] {MailConfig.getInstance(mailProperties).getProject(),MailConfig.getInstance(mailProperties).getAcronym()});
 		 return ftpSubject;
 	}
 
