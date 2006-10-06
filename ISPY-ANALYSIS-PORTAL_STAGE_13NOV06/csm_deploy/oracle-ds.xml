@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- ===================================================================== -->
+<!--                                                                       -->
+<!--  JBoss Server Configuration                                           -->
+<!--                                                                       -->
+<!-- ===================================================================== -->
+
+<!-- $Id: oracle-ds.xml,v 1.1 2006-10-05 14:45:09 rossok Exp $ -->
+<!-- ==================================================================== -->
+<!--  Datasource config for Oracle                                        -->
+<!-- ==================================================================== -->
+<datasources>
+   <local-tx-datasource>
+               <jndi-name>ispycsm</jndi-name>
+               <connection-url>jdbc:oracle:thin:@cbiodb2-d.nci.nih.gov:1521:RBTDEV</connection-url>
+               <user-name>CSM_CAINTEGRATOR</user-name>
+               <password>csm#951</password>
+               <driver-class>oracle.jdbc.driver.OracleDriver</driver-class>
+               <exception-sorter-class-name>org.jboss.resource.adapter.jdbc.vendor.OracleExceptionSorter</exception-sorter-class-name>
+   </local-tx-datasource>
+</datasources>
+
