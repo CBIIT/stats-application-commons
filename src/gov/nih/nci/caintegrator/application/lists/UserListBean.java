@@ -4,6 +4,7 @@
  */
 package gov.nih.nci.caintegrator.application.lists;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -11,7 +12,7 @@ import java.util.List;
  * @author rossok
  *
  */
-public class UserListBean {
+public class UserListBean implements Serializable {
 
     List<UserList> userLists = new ArrayList<UserList>();
     

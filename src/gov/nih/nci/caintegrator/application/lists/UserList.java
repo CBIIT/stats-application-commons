@@ -4,6 +4,7 @@
  */
 package gov.nih.nci.caintegrator.application.lists;
 
+import java.io.Serializable;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -14,7 +15,7 @@ import java.util.List;
  * @author rossok
  *
  */
-public class UserList { 
+public class UserList implements Serializable{ 
     private String name = "";
     private ListType listType;
     //a list can actually have several sub-types
