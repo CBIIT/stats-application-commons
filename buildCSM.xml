@@ -1,4 +1,4 @@
-<project name="csmsetup" default="copyNeededFiles" basedir=".">
+<project name="csmsetup" default="configure_CSM" basedir=".">
 	<property file="buildCSM.properties"/>
 	
 	<!--
@@ -156,7 +156,7 @@
 		</target>
 	
 	<!--addAppSecurityConfig,addOracleDS,addLoginConfig-->
-	<target name="copyNeededFiles" depends="config_common_security_module,addOracleDS,addAppSecurityConfig,addLoginConfig">
+	<target name="configure_CSM" depends="config_common_security_module,addOracleDS,addAppSecurityConfig,addLoginConfig">
 		<!-- Copy new csm.hibernate.cfg.file to Jboss Conf folder -->
 		<echo message="Copy new csm.hibernate.cfg.file into JBOSS"/>
 		<copy file="csm_deploy/${project_name}.hibernate.cfg.xml" todir="${jboss.conf.dir}"/>
