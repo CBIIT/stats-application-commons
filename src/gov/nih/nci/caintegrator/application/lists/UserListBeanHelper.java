@@ -142,13 +142,17 @@ public class UserListBeanHelper{
     
     
     public List<UserList> getLists(ListType listType, List<ListSubType> listSubTypes)	{
+    	//get lists of this type with these subtypes
     	List<UserList> ul = this.getLists(listType);
-    	List<UserList> matches = new ArrayList<UserList>();        
+    	List<UserList> matches = new ArrayList<UserList>(); 
+    	//got all the main type, now see if any of these are of any listsubtypes
     	for(UserList u : ul){
             List<ListSubType> lst = u.getListSubType();
-            if(lst.containsAll(listSubTypes)){
-                matches.add(u);
-            }            
+            for(ListSubType ss : listSubTypes){
+	            if(lst.contains(ss) && !matches.contains(u)){
+	                matches.add(u);
+	            }            
+            }
     	}
     	return matches;
     }
