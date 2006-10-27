@@ -22,6 +22,7 @@ import java.util.Set;
 import javax.servlet.http.HttpSession;
 
 import org.apache.commons.collections.ListUtils;
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.dom4j.Document;
 import org.dom4j.DocumentHelper;
@@ -234,6 +235,18 @@ public class UserListBeanHelper{
     	return getGenericListNames(ListType.valueOf(listType));
     }
     
+    public Collection getGenericListNamesFromStringWithSubs(String listType, String commaSubs){ 
+    	//parse the subs
+    	List<ListSubType> lst = new ArrayList();
+    	String[] sbs = StringUtils.split(commaSubs, ",");
+    	for(String s : sbs)	{
+    		if(ListSubType.valueOf(s.trim())!=null)	{
+    			lst.add(ListSubType.valueOf(s.trim()));
+    		}
+    	}
+    	return getGenericListNamesWithSubTypes(ListType.valueOf(listType), lst);
+    }
+    
     public Collection getGenericListNames(ListType listType){ 
         Collection<UserList> setList = new ArrayList<UserList>();
         setList = getLists(listType);  
@@ -243,7 +256,17 @@ public class UserListBeanHelper{
         }
         return setListNames;
     }
-     
+    
+    public Collection getGenericListNamesWithSubTypes(ListType lt, List<ListSubType> subs)	{
+    	 Collection<UserList> setList = new ArrayList<UserList>();
+         setList = getLists(lt, subs);
+         Collection setListNames = new ArrayList();
+         for(UserList userListName : setList){
+             setListNames.add(userListName.toString());
+         }
+         return setListNames;
+    }
+    
     public void differenceLists(List<String> listNames, String newListName, ListType listType)	{
     	
     	//we're only expecting 2 lists here
