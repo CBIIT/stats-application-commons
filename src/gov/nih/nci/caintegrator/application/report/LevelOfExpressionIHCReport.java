@@ -286,10 +286,11 @@ public class LevelOfExpressionIHCReport{
                 TimepointStringComparator ts = new TimepointStringComparator();
                 Collections.sort(tpHeaders,ts);   
                 Element tpHeaderRow = report.addElement("Row").addAttribute("name", "tpHeaderRow");
-                for(String tpHeader : tpHeaders){                    
-                    cell = tpHeaderRow.addElement("Cell").addAttribute("type", "header").addAttribute("class", "header").addAttribute("group", "tpHeader");
-                        data = cell.addElement("Data").addAttribute("type", "header").addText(tpHeader);
-                        data = null;
+               // for(String tpHeader : tpHeaders){  
+                for(int i=0; i<tpHeaders.size();i++){                    
+                    cell = tpHeaderRow.addElement("Cell").addAttribute("type", "header").addAttribute("class", "firstTP").addAttribute("group", "tpHeader");                        
+                   data = cell.addElement("Data").addAttribute("type", "header").addText(tpHeaders.get(i));                    
+                    data = null;
                     cell = null;
                 }
                 
@@ -341,35 +342,35 @@ public class LevelOfExpressionIHCReport{
                                         //ITERATE OVER THE MAP FOR EACH DATA FIELD WITH ITS CORRESPONDING TIMEPOINT AND BUILD DATA ROWS
                                         for(LevelOfExpressionIHCFindingReportBean reportBean : mySortedMap)	{         		        	      			        
                         			        cell = dataRow.addElement("Cell").addAttribute("type", "data").addAttribute("class", "data").addAttribute("group", "data");
-                        			        	data = cell.addElement("Data").addAttribute("type", "header").addText(reportBean.getPercentPositive());
-                        			        	data = null;
+                                            data = cell.addElement("Data").addAttribute("type", "header").addText(reportBean.getPercentPositive());                                        
+                        			        data = null;
                         			        cell = null;
                                         }
                                         for(LevelOfExpressionIHCFindingReportBean reportBean : mySortedMap)  {
                                             cell = dataRow.addElement("Cell").addAttribute("type", "data").addAttribute("class", "data").addAttribute("group", "data");
-                                                data = cell.addElement("Data").addAttribute("type", "header").addText(reportBean.getStainIntensity());
-                                                data = null;
+                                            data = cell.addElement("Data").addAttribute("type", "header").addText(reportBean.getStainIntensity());
+                                            data = null;
                                             cell = null;
                         			       
                                         }
                                         for(LevelOfExpressionIHCFindingReportBean reportBean : mySortedMap)  {
                                             cell = dataRow.addElement("Cell").addAttribute("type", "data").addAttribute("class", "data").addAttribute("group", "data");
-                                                data = cell.addElement("Data").addAttribute("type", "header").addText(reportBean.getStainLocalization());
-                                                data = null;
+                                            data = cell.addElement("Data").addAttribute("type", "header").addText(reportBean.getStainLocalization());
+                                            data = null;
                                             cell = null;
                                            
                                         }
                                         for(LevelOfExpressionIHCFindingReportBean reportBean : mySortedMap)  {
                                             cell = dataRow.addElement("Cell").addAttribute("type", "data").addAttribute("class", "data").addAttribute("group", "data");
-                                                data = cell.addElement("Data").addAttribute("type", "header").addText(reportBean.getInvasivePresentation());
-                                                data = null;
+                                            data = cell.addElement("Data").addAttribute("type", "header").addText(reportBean.getInvasivePresentation());
+                                            data = null;
                                             cell = null;
                                            
                                         }
                                         for(LevelOfExpressionIHCFindingReportBean reportBean : mySortedMap)  {
                                             cell = dataRow.addElement("Cell").addAttribute("type", "data").addAttribute("class", "data").addAttribute("group", "data");
-                                                data = cell.addElement("Data").addAttribute("type", "header").addText(reportBean.getOverallExpression());
-                                                data = null;
+                                            data = cell.addElement("Data").addAttribute("type", "header").addText(reportBean.getOverallExpression());
+                                            data = null;
                                             cell = null;
                                            
                                         }
