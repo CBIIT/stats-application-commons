@@ -1,24 +1,24 @@
 package gov.nih.nci.caintegrator.application.bean;
 
-import gov.nih.nci.caintegrator.domain.finding.protein.ihc.bean.LevelOfExpressionIHCFinding;
+import gov.nih.nci.caintegrator.domain.finding.protein.ihc.bean.LossOfExpressionIHCFinding;
 import gov.nih.nci.caintegrator.studyQueryService.dto.ihc.LevelOfExpressionIHCFindingCriteria;
+import gov.nih.nci.caintegrator.studyQueryService.dto.ihc.LossOfExpressionIHCFindingCriteria;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashSet;
 import java.util.Set;
 
-public class LevelOfExpressionIHCFindingReportBean implements IHCFindingReportBean{
-    private LevelOfExpressionIHCFinding finding = null;
+public class LossOfExpressionIHCFindingReportBean implements IHCFindingReportBean{
+    private LossOfExpressionIHCFinding finding = null;    
     private DecimalFormat resultFormat = new DecimalFormat("0.0000");
     private DecimalFormat sciFormat = new DecimalFormat("0.00E0");
     private DecimalFormat tmpsciFormat = new DecimalFormat("###0.0000#####################");
     String defaultV = "--";
 
-    public LevelOfExpressionIHCFindingReportBean() {}
+    public LossOfExpressionIHCFindingReportBean() {}
     
-    public LevelOfExpressionIHCFindingReportBean(LevelOfExpressionIHCFinding finding){
+    public LossOfExpressionIHCFindingReportBean(LossOfExpressionIHCFinding finding){
         this.finding = finding;
     }
     
@@ -45,59 +45,55 @@ public class LevelOfExpressionIHCFindingReportBean implements IHCFindingReportBe
         else return defaultV;        
     }
     
-    public String getOverallExpression() {
-        if(finding.getOverallExpression()!=null){
-            return finding.getOverallExpression();
+    public String getBenignPresentValue() {
+        if(finding.getBenignPresentValue()!=null){
+            return finding.getBenignPresentValue();
         }
         else return defaultV;       
     }
     
-    public String getPercentPositive(){
-        String percentPositive = defaultV;
-        if(finding.getPercentPositiveRangeMin()!=null && finding.getPercentPositiveRangeMax()!=null){
-            if(!finding.getPercentPositiveRangeMax().equals(finding.getPercentPositiveRangeMin())){           
-                percentPositive = finding.getPercentPositiveRangeMin().toString();
-                percentPositive += "-";
-                percentPositive += finding.getPercentPositiveRangeMax().toString();                
-            }
-            else percentPositive = finding.getPercentPositiveRangeMin().toString();
+    public String getBenignSum(){
+        String benignSum = defaultV;
+        if(finding.getBenignSum()!=null){
+            benignSum = finding.getBenignSum().toString();
+            return benignSum;
         }
-////        else if(finding.getPercentPositive()!=null){
-////            percentPositive = finding.getPercentPositive().toString();
-////        }
-        return percentPositive;
+        return benignSum;
     }
     
-    public String getStainDistribution() {
-        if(finding.getStainDistribution()!=null){
-            return finding.getStainDistribution();
+    public String getInvasiveSum(){
+        String invasiveSum = defaultV;
+        if(finding.getInvasiveSum()!=null){
+            invasiveSum = finding.getInvasiveSum().toString();
+            return invasiveSum;
+        }
+        return invasiveSum;
+    }
+    
+    public String getInvasiveBenignDiff() {
+        if(finding.getInvasiveBenignDiff()!=null){
+            return finding.getInvasiveBenignDiff().toString();
         }
         else return defaultV;
     }
     
-    public String getStainIntensity() {
-        if(finding.getStainIntensity()!=null){
-            return finding.getStainIntensity();
+    public String getComments() {
+        if(finding.getComments()!=null){
+            return finding.getComments();
         }
         else return defaultV;
     }
     
-    public String getStainLocalization() {
-        if(finding.getStainLocalization()!=null){
-            return finding.getStainLocalization();
+    public String getLossResult() {
+        if(finding.getLossResult()!=null){
+            return finding.getLossResult();
         }
         else return defaultV;
-    }
-    
-    public String getInvasivePresentation() {
-        if(finding.getInvasivePresentation()!=null){
-            return finding.getInvasivePresentation();
-        }
-        else return defaultV;
-    }
+    }    
+   
 
     public ArrayList<String> getHeaders(){
-        String[] myHeaders = {"% Positive", "Intensity", "Localization","Result Code", "Summary"};        
+        String[] myHeaders = {"Benign Present Value", "Invasive Sum", "Benign Sum", "Invasive-Benign Difference","Comments","Result Code"};        
         ArrayList<String> headers = new ArrayList<String>(Arrays.asList(myHeaders));
         return headers;
     }
@@ -108,7 +104,7 @@ public class LevelOfExpressionIHCFindingReportBean implements IHCFindingReportBe
         return headers;
     }
     
-    public ArrayList<String> getTimepointHeaders(LevelOfExpressionIHCFindingCriteria criteria){
+    public ArrayList<String> getTimepointHeaders(LossOfExpressionIHCFindingCriteria criteria){
         Set<String> myTimepoints = criteria.getSpecimenCriteria().getTimeCourseCollection();
         ArrayList<String> timepoints = new ArrayList<String>();
         if(myTimepoints!=null){

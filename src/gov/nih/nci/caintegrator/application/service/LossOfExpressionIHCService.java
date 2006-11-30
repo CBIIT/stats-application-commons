@@ -35,7 +35,7 @@ public class LossOfExpressionIHCService {
      */
     public Collection<? extends gov.nih.nci.caintegrator.domain.finding.bean.Finding> getFindings(LossOfExpressionIHCFindingCriteria criteria){
         LossOfExpressionIHCFindingHandler theHandler = criteria.getHandler();
-        Collection<? extends gov.nih.nci.caintegrator.domain.finding.bean.Finding> theFindings = theHandler.getLevelExpFindings(criteria);
+        Collection<? extends gov.nih.nci.caintegrator.domain.finding.bean.Finding> theFindings = theHandler.getLossExpFindings(criteria);
         return theFindings;
     }
     

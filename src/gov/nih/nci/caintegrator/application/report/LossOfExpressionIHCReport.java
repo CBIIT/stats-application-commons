@@ -1,11 +1,13 @@
 package gov.nih.nci.caintegrator.application.report;
 
 import gov.nih.nci.caintegrator.application.bean.LevelOfExpressionIHCFindingReportBean;
+import gov.nih.nci.caintegrator.application.bean.LossOfExpressionIHCFindingReportBean;
 import gov.nih.nci.caintegrator.application.util.PatientComparator;
 import gov.nih.nci.caintegrator.application.util.TimepointStringComparator;
 import gov.nih.nci.caintegrator.domain.finding.protein.ihc.bean.LevelOfExpressionIHCFinding;
+import gov.nih.nci.caintegrator.domain.finding.protein.ihc.bean.LossOfExpressionIHCFinding;
 import gov.nih.nci.caintegrator.service.findings.Finding;
-import gov.nih.nci.caintegrator.studyQueryService.dto.ihc.LevelOfExpressionIHCFindingCriteria;
+import gov.nih.nci.caintegrator.studyQueryService.dto.ihc.LossOfExpressionIHCFindingCriteria;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -19,7 +21,7 @@ import org.dom4j.Element;
 
 /**
  * @author rossok
- * Sept 2006
+ * Nov 30,2006
  * 
  */
 
@@ -81,12 +83,12 @@ import org.dom4j.Element;
 * 
 */
 
-public class LevelOfExpressionIHCReport{
+public class LossOfExpressionIHCReport{
 
 	/**
 	 * 
 	 */
-	public LevelOfExpressionIHCReport() {}
+	public LossOfExpressionIHCReport() {}
 
 	
 	public static Document getReportXML(Finding finding, Map filterMapParams) {
@@ -98,7 +100,7 @@ public class LevelOfExpressionIHCReport{
 			Element data = null;
 			Element dataRow = null;
 			//ADD BASIC ATTRIBUTED
-	        report.addAttribute("reportType", "IHC Level Of Expression");
+	        report.addAttribute("reportType", "IHC Loss Of Expression");
 	        report.addAttribute("groupBy", "none");
 	        String queryName = finding.getTaskId();	       
 	        report.addAttribute("queryName", queryName);
@@ -112,7 +114,7 @@ public class LevelOfExpressionIHCReport{
              * 
              * *************************************************************************************************             * 
 			 */
-            LevelOfExpressionIHCFindingCriteria criteria = (LevelOfExpressionIHCFindingCriteria)finding.getQueryDTO();
+            LossOfExpressionIHCFindingCriteria criteria = (LossOfExpressionIHCFindingCriteria)finding.getQueryDTO();
             ArrayList<String> queryDetails = new ArrayList();
             if(criteria!=null){
                 String tmp = ""; 
@@ -156,43 +158,31 @@ public class LevelOfExpressionIHCReport{
                 }
                 queryDetails.add("Timepoint(s): " + tmp);
                 tmpCollection.clear();
-                tmp = "";                
-                if(criteria.getStainIntensityCollection()!=null && !criteria.getStainIntensityCollection().isEmpty()){
-                    Set<String> intensity = (Set<String>) criteria.getStainIntensityCollection();                    
-                    tmpCollection = new ArrayList<String>(intensity);
-                    for(String in : tmpCollection){
-                        if(in != tmpCollection.get(0)){
-                            tmp += ", " + in;
-                        }
-                        else{
-                            tmp += in;
-                        }
-                    }
-                   
+                tmp = "";                  
+                if(criteria.getBenignSumOperator()!=null && criteria.getBenignSum()!=null){
+                    tmp = criteria.getBenignSumOperator() + " " + criteria.getBenignSum().toString();
                 }
-                queryDetails.add("Intensity: " + tmp);
-                tmpCollection.clear();
-                tmp = "";    
-                tmp = criteria.getPercentPositiveRangeMin()!=null ? criteria.getPercentPositiveRangeMin().toString() : "";
-                queryDetails.add("% Positive Min: " + tmp);
+                queryDetails.add("Benign Sum: " + tmp);
                 tmp = "";
-                tmp = criteria.getPercentPositiveRangeMax()!=null ? criteria.getPercentPositiveRangeMax().toString() : "";
-                queryDetails.add("% Positive Max: " + tmp);
-                tmp = "";               
-                if(criteria.getStainLocalizationCollection()!=null && !criteria.getStainLocalizationCollection().isEmpty()){
-                    Set<String> locale = (Set<String>) criteria.getStainLocalizationCollection();                    
-                    tmpCollection = new ArrayList<String>(locale);
-                    for(String lc : tmpCollection){
-                        if(lc != tmpCollection.get(0)){
-                            tmp += ", " + lc;
+                if(criteria.getInvasiveSumOperator()!=null && criteria.getInvasiveSum()!=null){
+                    tmp = criteria.getInvasiveSumOperator() + " " + criteria.getInvasiveSum().toString();
+                }
+                queryDetails.add("Invasive Sum: " + tmp);
+                tmp = "";            
+                if(criteria.getResultCodeCollection()!=null && !criteria.getResultCodeCollection().isEmpty()){
+                    Set<String> resultCodes = (Set<String>) criteria.getResultCodeCollection();                    
+                    tmpCollection = new ArrayList<String>(resultCodes);
+                    for(String rc : tmpCollection){
+                        if(rc != tmpCollection.get(0)){
+                            tmp += ", " + rc;
                         }
                         else{
-                            tmp += lc;
+                            tmp += rc;
                         }
                     }
                    
                 }
-                queryDetails.add("Localization: " + tmp); 
+                queryDetails.add("Loss Result: " + tmp); 
                 tmpCollection.clear();
                 tmp = "";
             }
@@ -211,10 +201,10 @@ public class LevelOfExpressionIHCReport{
             
             //GET FINDINGS, CAST TO APPROPRIATE FINDINGS AND ADD TO ARRAYLIST (RESULTS)
             ArrayList dFindings = new ArrayList(finding.getDomainFindings());
-            ArrayList<LevelOfExpressionIHCFinding> domainFindings = new ArrayList<LevelOfExpressionIHCFinding>(dFindings);
-			ArrayList<LevelOfExpressionIHCFindingReportBean> results = new ArrayList<LevelOfExpressionIHCFindingReportBean>();
-            for(LevelOfExpressionIHCFinding loef : domainFindings)  {
-                LevelOfExpressionIHCFindingReportBean reportBean = new LevelOfExpressionIHCFindingReportBean(loef);
+            ArrayList<LossOfExpressionIHCFinding> domainFindings = new ArrayList<LossOfExpressionIHCFinding>(dFindings);
+			ArrayList<LossOfExpressionIHCFindingReportBean> results = new ArrayList<LossOfExpressionIHCFindingReportBean>();
+            for(LossOfExpressionIHCFinding loef : domainFindings)  {
+                LossOfExpressionIHCFindingReportBean reportBean = new LossOfExpressionIHCFindingReportBean(loef);
                 results.add(reportBean);
             }
             
@@ -227,19 +217,19 @@ public class LevelOfExpressionIHCReport{
                 
                 //CREATE A HASHMAP SORTED BY PATIENT DID AS THE KEY AND THE ARRAYLIST OF REPORTBEANS AS THE VALUE                
                  
-                Map<String,ArrayList<LevelOfExpressionIHCFindingReportBean>> reportBeanMap = new HashMap<String,ArrayList<LevelOfExpressionIHCFindingReportBean>>();
+                Map<String,ArrayList<LossOfExpressionIHCFindingReportBean>> reportBeanMap = new HashMap<String,ArrayList<LossOfExpressionIHCFindingReportBean>>();
                 
                 for(int i =0; i<results.size();i++){
                     if(i==0){
-                        reportBeanMap.put(results.get(i).getPatientDID()+"_"+results.get(i).getBiomarkerName(),new ArrayList<LevelOfExpressionIHCFindingReportBean>());
+                        reportBeanMap.put(results.get(i).getPatientDID()+"_"+results.get(i).getBiomarkerName(),new ArrayList<LossOfExpressionIHCFindingReportBean>());
                         reportBeanMap.get(results.get(i).getPatientDID()+"_"+results.get(i).getBiomarkerName()).add(results.get(i));                        
                     }
                     else if(!results.get(i).getPatientDID().equalsIgnoreCase(results.get(i-1).getPatientDID())){ 
-                        reportBeanMap.put(results.get(i).getPatientDID()+"_"+results.get(i).getBiomarkerName(),new ArrayList<LevelOfExpressionIHCFindingReportBean>());
+                        reportBeanMap.put(results.get(i).getPatientDID()+"_"+results.get(i).getBiomarkerName(),new ArrayList<LossOfExpressionIHCFindingReportBean>());
                         reportBeanMap.get(results.get(i).getPatientDID()+"_"+results.get(i).getBiomarkerName()).add(results.get(i));
                     }
                     else if(results.get(i).getPatientDID().equalsIgnoreCase(results.get(i-1).getPatientDID()) && !results.get(i).getBiomarkerName().equalsIgnoreCase(results.get(i-1).getBiomarkerName())){ 
-                        reportBeanMap.put(results.get(i).getPatientDID()+"_"+results.get(i).getBiomarkerName(),new ArrayList<LevelOfExpressionIHCFindingReportBean>());
+                        reportBeanMap.put(results.get(i).getPatientDID()+"_"+results.get(i).getBiomarkerName(),new ArrayList<LossOfExpressionIHCFindingReportBean>());
                         reportBeanMap.get(results.get(i).getPatientDID()+"_"+results.get(i).getBiomarkerName()).add(results.get(i));
                     }
                     else{
@@ -251,7 +241,7 @@ public class LevelOfExpressionIHCReport{
                 Set<String> b = reportBeanMap.keySet();
                         for(String g: b){
                             while(reportBeanMap.get(g).size()<(reportBeanMap.get(g).get(0).getTimepointHeaders(criteria).size())){
-                                reportBeanMap.get(g).add(new LevelOfExpressionIHCFindingReportBean(new LevelOfExpressionIHCFinding()));
+                                reportBeanMap.get(g).add(new LossOfExpressionIHCFindingReportBean(new LossOfExpressionIHCFinding()));
                             }
                         }
 				
@@ -309,11 +299,11 @@ public class LevelOfExpressionIHCReport{
                                        cell = null;
                                        
                                         //GRAB EACH REPORT BEAN IN EACH ARRAYLIST AND MATCH UP TO THE APPROPRIATE TIMEPOINT AS A MAP WITH THE TIMEPOINT AS KEY AND REPORTBEAN THE VALUE
-                                        ArrayList<LevelOfExpressionIHCFindingReportBean> myList = reportBeanMap.get(key);
-                                        Map<String,LevelOfExpressionIHCFindingReportBean> myMap = new HashMap<String,LevelOfExpressionIHCFindingReportBean>();
-                                        ArrayList<LevelOfExpressionIHCFindingReportBean> mySortedMap = new ArrayList<LevelOfExpressionIHCFindingReportBean>();
+                                        ArrayList<LossOfExpressionIHCFindingReportBean> myList = reportBeanMap.get(key);
+                                        Map<String,LossOfExpressionIHCFindingReportBean> myMap = new HashMap<String,LossOfExpressionIHCFindingReportBean>();
+                                        ArrayList<LossOfExpressionIHCFindingReportBean> mySortedMap = new ArrayList<LossOfExpressionIHCFindingReportBean>();
                                         
-                                        for(LevelOfExpressionIHCFindingReportBean ggg : myList){
+                                        for(LossOfExpressionIHCFindingReportBean ggg : myList){
                                             for(int i=0; i<tpHeaders.size();i++){
                                                 if(ggg.getTimepoint().equalsIgnoreCase(tpHeaders.get(i))){
                                                     myMap.put(tpHeaders.get(i),ggg);
@@ -340,36 +330,43 @@ public class LevelOfExpressionIHCReport{
                                             
                                             
                                         //ITERATE OVER THE MAP FOR EACH DATA FIELD WITH ITS CORRESPONDING TIMEPOINT AND BUILD DATA ROWS
-                                        for(LevelOfExpressionIHCFindingReportBean reportBean : mySortedMap)	{         		        	      			        
+                                        for(LossOfExpressionIHCFindingReportBean reportBean : mySortedMap)	{         		        	      			        
                         			        cell = dataRow.addElement("Cell").addAttribute("type", "data").addAttribute("class", "data").addAttribute("group", "data");
-                                            data = cell.addElement("Data").addAttribute("type", "header").addText(reportBean.getPercentPositive());                                        
+                                            data = cell.addElement("Data").addAttribute("type", "header").addText(reportBean.getBenignPresentValue());                                        
                         			        data = null;
                         			        cell = null;
                                         }
-                                        for(LevelOfExpressionIHCFindingReportBean reportBean : mySortedMap)  {
+                                        for(LossOfExpressionIHCFindingReportBean reportBean : mySortedMap)  {
                                             cell = dataRow.addElement("Cell").addAttribute("type", "data").addAttribute("class", "data").addAttribute("group", "data");
-                                            data = cell.addElement("Data").addAttribute("type", "header").addText(reportBean.getStainIntensity());
+                                            data = cell.addElement("Data").addAttribute("type", "header").addText(reportBean.getInvasiveSum());
                                             data = null;
                                             cell = null;
                         			       
                                         }
-                                        for(LevelOfExpressionIHCFindingReportBean reportBean : mySortedMap)  {
+                                        for(LossOfExpressionIHCFindingReportBean reportBean : mySortedMap)  {
                                             cell = dataRow.addElement("Cell").addAttribute("type", "data").addAttribute("class", "data").addAttribute("group", "data");
-                                            data = cell.addElement("Data").addAttribute("type", "header").addText(reportBean.getStainLocalization());
+                                            data = cell.addElement("Data").addAttribute("type", "header").addText(reportBean.getBenignSum());
                                             data = null;
                                             cell = null;
                                            
                                         }
-                                        for(LevelOfExpressionIHCFindingReportBean reportBean : mySortedMap)  {
+                                        for(LossOfExpressionIHCFindingReportBean reportBean : mySortedMap)  {
                                             cell = dataRow.addElement("Cell").addAttribute("type", "data").addAttribute("class", "data").addAttribute("group", "data");
-                                            data = cell.addElement("Data").addAttribute("type", "header").addText(reportBean.getInvasivePresentation());
+                                            data = cell.addElement("Data").addAttribute("type", "header").addText(reportBean.getInvasiveBenignDiff());
                                             data = null;
                                             cell = null;
                                            
                                         }
-                                        for(LevelOfExpressionIHCFindingReportBean reportBean : mySortedMap)  {
+                                        for(LossOfExpressionIHCFindingReportBean reportBean : mySortedMap)  {
                                             cell = dataRow.addElement("Cell").addAttribute("type", "data").addAttribute("class", "data").addAttribute("group", "data");
-                                            data = cell.addElement("Data").addAttribute("type", "header").addText(reportBean.getOverallExpression());
+                                            data = cell.addElement("Data").addAttribute("type", "header").addText(reportBean.getComments());
+                                            data = null;
+                                            cell = null;
+                                           
+                                        }
+                                        for(LossOfExpressionIHCFindingReportBean reportBean : mySortedMap)  {
+                                            cell = dataRow.addElement("Cell").addAttribute("type", "data").addAttribute("class", "data").addAttribute("group", "data");
+                                            data = cell.addElement("Data").addAttribute("type", "header").addText(reportBean.getLossResult());
                                             data = null;
                                             cell = null;
                                            
@@ -380,7 +377,7 @@ public class LevelOfExpressionIHCReport{
             
 			else {
 				//TODO: handle this error
-				sb.append("<br><Br>Level of Expression is empty<br>");
+				sb.append("<br><Br>Loss of Expression is empty<br>");
 			}
 		    
 		    return document;
