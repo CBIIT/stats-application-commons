@@ -93,8 +93,8 @@ public class SessionTracker implements HttpSessionListener {
 	private static boolean appplicationRunning = false;
 	
 	public SessionTracker() {
-		Properties loggerProperties = PropertyLoader.loadProperties("log4j.properties");
-	        PropertyConfigurator.configure(loggerProperties);
+		//Properties loggerProperties = PropertyLoader.loadProperties("log4j.properties");
+	    //    PropertyConfigurator.configure(loggerProperties);
 		theCacheTracker = new CacheTracker();	
 		BusinessCacheManager.getInstance().addCacheListener(theCacheTracker);
 		new CacheCleaner(theCacheTracker, this).start();
