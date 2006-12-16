@@ -91,7 +91,7 @@ public class PresentationCacheManager implements PresentationTierCache{
 	protected final String PERSISTED_SUFFIX = "__p"; //flag persisted items with this internal suffix
 	private static Logger logger = Logger.getLogger(PresentationCacheManager.class);
 	private static PresentationTierCache myInstance;
-	static private CacheManager manager = null;
+	static protected CacheManager manager = null;
 	static private Cache presentationCache = null;
 	static {
 	   	try {
