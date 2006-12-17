@@ -1,4 +1,4 @@
-<project name="caintegrator-application-commons" default="build_jar_anthill" basedir=".">
+<project name="caintegrator-application-commons" default="build_dependency" basedir=".">
 	<property file="basic_build.properties"/>
 	<!--
 	TARGET: COMPILE
@@ -28,6 +28,10 @@
 		<jar jarfile="caintegrator-application-commons.jar">
 			<fileset dir="${build.classes.dir}"/>
 		</jar>
+		<antcall target="retrieve_deployment_artifacts"></antcall>
+	</target>
+	<target name="retrieve_deployment_artifacts">
+		<copy file="conf/caintegrator-jbossmq-destinations-service.xml" todir="${anthill.artifacts.dir}"/>
 	</target>
 	<target name="jar_check">
 		<property name="weka.jar" value="${build.deploy.lib.dir}/weka.jar" />
