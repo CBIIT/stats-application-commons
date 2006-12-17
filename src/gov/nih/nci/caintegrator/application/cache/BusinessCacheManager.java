@@ -83,7 +83,7 @@ public class BusinessCacheManager implements BusinessTierCache{
 	private static final String BUSINESS_TIER_CACHE = "businessTierCache"; 
     private static transient List cacheListeners;
     private static Logger logger = Logger.getLogger(BusinessCacheManager.class);
-    private static CacheManager manager = null;
+    protected static CacheManager manager = null;
     private static BusinessCacheManager instance = null;       
     //Create the CacheManager and the ApplicationCache
     static {
