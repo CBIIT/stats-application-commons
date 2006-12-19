@@ -92,8 +92,8 @@ public class CacheCleaner extends Thread {
     /***************** Configurable properties *******************/
     //Time to check the sessionCacheChecker: default 5 minutes (300000 ms) 
     private static long CHECK_CACHE_INTERVAL = 300000;  //300000;
-    //Cache Timeout in milliseconds: default 10 minutes (600000 ms)
-    private static long CACHE_TIME_OUT = 600000;  //600000;
+    //Cache Timeout in milliseconds: default 20 minutes (1200000 ms)
+    private static long CACHE_TIME_OUT = 1200000;  //1200000;
     
     /**
      * Constructor for the CacheCleaner.  Attempts to load a spcified property
@@ -157,6 +157,10 @@ public class CacheCleaner extends Thread {
 				for(Iterator i = cacheKeys.iterator();i.hasNext();) {
 					String sessionId = (String)i.next();
 					HttpSession session = sessions.getSession(sessionId);
+					//session-timeout - 30 sec
+					CACHE_TIME_OUT = session.getMaxInactiveInterval()- 30000;
+					logger.debug("Session.getMaxInactiveInterval: "+ session.getMaxInactiveInterval());
+					logger.debug("CACHE_TIME_OUT: "+ CACHE_TIME_OUT);
 					if(session!=null) {
 						/*
 						 * This is the check to see if the session has been idle
