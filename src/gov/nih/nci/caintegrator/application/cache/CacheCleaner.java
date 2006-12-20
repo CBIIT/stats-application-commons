@@ -158,9 +158,9 @@ public class CacheCleaner extends Thread {
 					String sessionId = (String)i.next();
 					HttpSession session = sessions.getSession(sessionId);
 					//session-timeout - 30 sec
-					CACHE_TIME_OUT = session.getMaxInactiveInterval()- 30000;
-					logger.debug("Session.getMaxInactiveInterval: "+ session.getMaxInactiveInterval());
-					logger.debug("CACHE_TIME_OUT: "+ CACHE_TIME_OUT);
+					//CACHE_TIME_OUT = session.getMaxInactiveInterval()- 30000;
+					//logger.debug("Session.getMaxInactiveInterval: "+ session.getMaxInactiveInterval());
+					//logger.debug("CACHE_TIME_OUT: "+ CACHE_TIME_OUT);
 					if(session!=null) {
 						/*
 						 * This is the check to see if the session has been idle
