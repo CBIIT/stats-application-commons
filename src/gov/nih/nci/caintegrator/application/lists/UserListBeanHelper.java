@@ -131,7 +131,7 @@ public class UserListBeanHelper{
     public List<UserList> getLists(ListType listType) {
         List<UserList> typeList = new ArrayList<UserList>();
         
-        if(!userListBean.getEntireList().isEmpty()){
+        if(userListBean!=null && userListBean.getEntireList()!=null && !userListBean.getEntireList().isEmpty()){
             for(UserList list : userListBean.getEntireList()){
                 if(list.getListType() == listType){
                     typeList.add(list);
