@@ -170,10 +170,11 @@ public class UserListBeanHelper{
     
     public List<UserList> getAllLists() {
         List<UserList> allList = new ArrayList<UserList>();
-    
-        for(UserList list : userListBean.getEntireList()){
-            allList.add(list);
-        }        
+        if(userListBean!=null){
+	        for(UserList list : userListBean.getEntireList()){
+	            allList.add(list);
+	        } 
+        }
         return allList;
     }
     
