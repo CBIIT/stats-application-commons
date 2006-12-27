@@ -208,7 +208,7 @@ public class AnalysisServerClientManager implements ApplicationService, MessageL
 						"org.jnp.interfaces.NamingContextFactory");
 				props.put(Context.PROVIDER_URL, jmsProviderURL);
 				props.put("java.naming.rmi.security.manager", "yes");
-				props.put(Context.URL_PKG_PREFIXES, "org.jboss.naming");
+				props.put(Context.URL_PKG_PREFIXES, "org.jboss.naming:org.jnp.interfaces");
 			
 				// Get the initial context with given properties
 				Context context = new InitialContext(props);
