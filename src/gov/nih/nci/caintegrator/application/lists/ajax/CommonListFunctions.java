@@ -70,7 +70,7 @@ public class CommonListFunctions {
 	}
 	*/
 	
-	//doesnt accept ListSubTypes (see below), just sets as ListSubType.Custom
+	//DWR ONLY: doesnt accept ListSubTypes (see below), just sets as ListSubType.Custom
 	public static String createGenericList(ListType type, List<String> list, String name, ListValidator lv)	{
 		//no duplicates
 		HashSet<String> h = new HashSet<String>();
@@ -101,7 +101,7 @@ public class CommonListFunctions {
 		return success;
 	}
 	
-	//takes a list of ListSubTypes, also appends ListSubType.Custom
+	//DWR ONLY:  takes a list of ListSubTypes, also appends ListSubType.Custom
 	public static String createGenericList(ListType type, List<ListSubType> listSubTypes, List<String> list, String name, ListValidator lv)	{
 		//no duplicates
 		HashSet<String> h = new HashSet<String>();
@@ -122,7 +122,39 @@ public class CommonListFunctions {
 			else	{
 				mylist.setListSubType(ListSubType.Custom);
 			}
+			//only works thru DWR
 			UserListBeanHelper ulbh = new UserListBeanHelper();
+			if(ulbh!=null)	{
+				ulbh.addList(mylist);
+				success = "pass";
+			}
+		}
+		catch (Exception e) {}
+		return success;
+	}
+
+	//CAN be used outside DWR...takes a list of ListSubTypes, also appends ListSubType.Custom
+	public static String createGenericListWithSession(ListType type, List<ListSubType> listSubTypes, List<String> list, String name, ListValidator lv, HttpSession session)	{
+		//no duplicates
+		HashSet<String> h = new HashSet<String>();
+		for (int i = 0; i < list.size(); i++)
+			h.add(list.get(i).trim());
+		List<String> cleanList = new ArrayList<String>();
+		for(String n : h)	{
+			cleanList.add(n);
+		}
+		String success = "fail";
+		ListManager um = ListManager.getInstance();
+		try	{
+			UserList mylist = um.createList(type, name, cleanList, lv);
+			if(listSubTypes!=null && listSubTypes.size()>0){
+				listSubTypes.add(ListSubType.Custom);
+				mylist.setListSubType(listSubTypes);
+			}
+			else	{
+				mylist.setListSubType(ListSubType.Custom);
+			}
+			UserListBeanHelper ulbh = new UserListBeanHelper(session);
 			ulbh.addList(mylist);
 			success = "pass";
 		}
