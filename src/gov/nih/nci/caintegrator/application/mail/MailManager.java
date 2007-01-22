@@ -92,6 +92,38 @@ public class MailManager {
 			logger.error("Send FTP mail error", e);
 		}
 	 }
+	
+	/**
+	 * sendUserRequestMail is used to send a message to the appropriate user approval email
+	 * address with the user request information.
+	 * <P>
+	 * @param msgBody The user request content to send to 
+	 */
+	public void sendUserRequestMail(String msgBody)
+	{
+		try
+		{				
+		    // Part 1 is always included  
+		    String message = new MessageFormat(MailConfig.getInstance(mailProperties).getRequestUnformattedBody()).format(new String[] {MailConfig.getInstance(mailProperties).getAcronym()});		  
+		    
+		    // Part 2 always appears  
+		    message += "\n\n" + msgBody;
+		    
+	        // Send the message
+		    String mailTo = MailConfig.getInstance(mailProperties).getUserRequestMail();
+		    String mailCC = MailConfig.getInstance(mailProperties).getUserRequestCC();
+		    
+	        new SendMail(mailProperties).sendMail(mailTo, mailCC, message, formatUserRequestSubject());		
+		}
+		catch (Exception e)
+		{
+			logger.error("Send user request mail error", e);
+		}
+		catch (ValidationException e)
+		{
+			logger.error("Send user request mail error", e);
+		}
+	 }
 
 
 	/**
@@ -147,6 +179,10 @@ public class MailManager {
 	public String formatFTPErrorSubject(){
 		 String ftpSubject = new MessageFormat(MailConfig.getInstance(mailProperties).getFtpErrorSubject()).format(new String[] {MailConfig.getInstance(mailProperties).getProject(),MailConfig.getInstance(mailProperties).getAcronym()});
 		 return ftpSubject;
+	}
+	public String formatUserRequestSubject(){
+		 String subject = new MessageFormat(MailConfig.getInstance(mailProperties).getRequestSubject()).format(new String[] {MailConfig.getInstance(mailProperties).getProject(),MailConfig.getInstance(mailProperties).getAcronym()});
+		 return subject;
 	}
 
 }

@@ -127,6 +127,30 @@ public class MailConfig
 		return mailProperties.getProperty("spreadsheet.mailSubject");
 	}
 	/**
+	 * @return Returns the userRequestMail address.
+	 */
+	public String getUserRequestMail() {
+		return mailProperties.getProperty("userRequestMail");
+	}
+	/**
+	 * @return Returns the userRequestCC address.
+	 */
+	public String getUserRequestCC() {
+		return mailProperties.getProperty("userRequestCC");
+	}
+	/**
+	 * @return Returns the requestSubject.
+	 */
+	public String getRequestSubject() {
+		return mailProperties.getProperty("request.Subject");
+	}
+	/**
+	 * @return Returns the requestUnformattedBody.
+	 */
+	public String getRequestUnformattedBody() {
+		return mailProperties.getProperty("request.Body");
+	}
+	/**
 	 * @return Returns the registerSubject.
 	 */
 	public String getRegisterSubject() {
