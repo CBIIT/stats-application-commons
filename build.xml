@@ -32,6 +32,7 @@
 	</target>
 	<target name="retrieve_deployment_artifacts">
 		<copy file="conf/caintegrator-jbossmq-destinations-service.xml" todir="${anthill.artifacts.dir}"/>
+		<copy file="conf/csm/oracle-ds.xml.template" tofile="${anthill.artifacts.dir}/oracle-ds.xml"/>
 	</target>
 	<target name="jar_check">
 		<property name="weka.jar" value="${build.deploy.lib.dir}/weka.jar" />
