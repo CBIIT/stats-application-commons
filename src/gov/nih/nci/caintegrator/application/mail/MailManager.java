@@ -93,6 +93,10 @@ public class MailManager {
 		    				  MailConfig.getInstance(mailProperties).getProject(),
 		    				  MailConfig.getInstance(mailProperties).getAcronym()});		  
 		    
+		    // If there was additional text passed in then include that here
+		    if (additionalText != null)
+		    	message += additionalText + "\n\n";
+		    
 		    // Part 2 always appears  
 		    message += new MessageFormat(MailConfig.getInstance(mailProperties).getFtpUnformattedErrorBody2()).format(
 		    	new String[] {MailConfig.getInstance(mailProperties).getAppSupportNumber(),
@@ -100,10 +104,6 @@ public class MailManager {
 		    				  MailConfig.getInstance(mailProperties).getTechSupportEndTime(),
 		    				  MailConfig.getInstance(mailProperties).getAcronym(),
 		    				  MailConfig.getInstance(mailProperties).getTechSupportURL()});
-		    
-		    // If there was additional text passed in then include that here
-		    if (additionalText != null)
-		    	message += additionalText + "\n\n";
 		    
 	        // Send the message
 		    String mailCC = MailConfig.getInstance(mailProperties).getTechSupportMail();
