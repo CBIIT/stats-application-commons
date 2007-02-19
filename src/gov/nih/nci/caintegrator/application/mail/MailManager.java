@@ -26,6 +26,7 @@ public class MailManager {
 	 * 
 	 * @param mailTo - email address
 	 * @param fileName - filename
+	 * @param additionalText - This is used for sending the query parameters but can be null
 	 * @throws Exception
 	 */
 	public void sendFTPMail(String mailTo, List<String> fileNames, String additionalText)
@@ -33,31 +34,45 @@ public class MailManager {
 		try
 		{				
 		    // Part 1 is always included  
-		    String message = new MessageFormat(MailConfig.getInstance(mailProperties).getFtpUnformattedBody1()).format(new String[] {MailConfig.getInstance(mailProperties).getFileRetentionPeriodInDays(),MailConfig.getInstance(mailProperties).getProject(),MailConfig.getInstance(mailProperties).getAcronym()});		  
+		    String message = new MessageFormat(MailConfig.getInstance(mailProperties).getFtpUnformattedBody1()).format(
+		    	new String[] {MailConfig.getInstance(mailProperties).getFileRetentionPeriodInDays(),
+		    			      MailConfig.getInstance(mailProperties).getProject(),
+		    			      MailConfig.getInstance(mailProperties).getAcronym()});		  
 			
 		    // If there was additional text passed in then include that here
 		    if (additionalText != null)
 		    	message += additionalText + "\n\n";
 		    
 		    // Part 2 is only included if there are multiple fies
-		    if(fileNames.size() > 1) {
+		    if(fileNames.size() > 1)
+		    {
 		    	message += MailConfig.getInstance(mailProperties).getFtpUnformattedBody2();	
 		    }
 		    	
 		    // Part 3 appears once for each file
 		    for(String fileName : fileNames)
 		    {    	
-		    	message += new MessageFormat(MailConfig.getInstance(mailProperties).getFtpUnformattedBody3()).format(new String[] {cleanFileName(fileName), MailConfig.getInstance(mailProperties).getFtpHostnameAndPort()});	
+		    	message += new MessageFormat(MailConfig.getInstance(mailProperties).getFtpUnformattedBody3()).format(
+		    		new String[] {cleanFileName(fileName), MailConfig.getInstance(mailProperties).getFtpHostnameAndPort()});	
 		    }
 		    
 		    // Part 4 always appears  
-		    message += new MessageFormat(MailConfig.getInstance(mailProperties).getFtpUnformattedBody4()).format(new String[] {MailConfig.getInstance(mailProperties).getAppSupportNumber(), MailConfig.getInstance(mailProperties).getTechSupportStartTime(), MailConfig.getInstance(mailProperties).getTechSupportEndTime(),MailConfig.getInstance(mailProperties).getAcronym(),MailConfig.getInstance(mailProperties).getTechSupportURL()});
+		    message += new MessageFormat(MailConfig.getInstance(mailProperties).getFtpUnformattedBody4()).format(
+		    	new String[] {MailConfig.getInstance(mailProperties).getAppSupportNumber(),
+		    			      MailConfig.getInstance(mailProperties).getTechSupportStartTime(),
+		    			      MailConfig.getInstance(mailProperties).getTechSupportEndTime(),
+		    			      MailConfig.getInstance(mailProperties).getAcronym(),
+		    			      MailConfig.getInstance(mailProperties).getTechSupportURL()});
 		    
 	        // Send the message
 	        new SendMail(mailProperties).sendMail(mailTo, null, message,formatFTPSubject());		
-		} catch (Exception e) {
+		} 
+		catch (Exception e) 
+		{
 			logger.error("Send FTP mail error", e);
-		} catch (ValidationException e) {
+		} 
+		catch (ValidationException e) 
+		{
 			logger.error("Send FTP mail error", e);
 		}
 	 }
@@ -68,20 +83,32 @@ public class MailManager {
 	 * <P>
 	 * @param mailTo The email address of the user to be notified
 	 */
-	public void sendFTPErrorMail(String mailTo)
+	public void sendFTPErrorMail(String mailTo, String additionalText)
 	{
 		try
 		{				
 		    // Part 1 is always included  
-		    String message = new MessageFormat(MailConfig.getInstance(mailProperties).getFtpUnformattedErrorBody1()).format(new String[] {MailConfig.getInstance(mailProperties).getFileRetentionPeriodInDays(),MailConfig.getInstance(mailProperties).getProject(),MailConfig.getInstance(mailProperties).getAcronym()});		  
+		    String message = new MessageFormat(MailConfig.getInstance(mailProperties).getFtpUnformattedErrorBody1()).format(
+		    	new String[] {MailConfig.getInstance(mailProperties).getFileRetentionPeriodInDays(),
+		    				  MailConfig.getInstance(mailProperties).getProject(),
+		    				  MailConfig.getInstance(mailProperties).getAcronym()});		  
 		    
 		    // Part 2 always appears  
-		    message += new MessageFormat(MailConfig.getInstance(mailProperties).getFtpUnformattedErrorBody2()).format(new String[] {MailConfig.getInstance(mailProperties).getAppSupportNumber(), MailConfig.getInstance(mailProperties).getTechSupportStartTime(), MailConfig.getInstance(mailProperties).getTechSupportEndTime(),MailConfig.getInstance(mailProperties).getAcronym(),MailConfig.getInstance(mailProperties).getTechSupportURL()});
+		    message += new MessageFormat(MailConfig.getInstance(mailProperties).getFtpUnformattedErrorBody2()).format(
+		    	new String[] {MailConfig.getInstance(mailProperties).getAppSupportNumber(),
+		    				  MailConfig.getInstance(mailProperties).getTechSupportStartTime(),
+		    				  MailConfig.getInstance(mailProperties).getTechSupportEndTime(),
+		    				  MailConfig.getInstance(mailProperties).getAcronym(),
+		    				  MailConfig.getInstance(mailProperties).getTechSupportURL()});
+		    
+		    // If there was additional text passed in then include that here
+		    if (additionalText != null)
+		    	message += additionalText + "\n\n";
 		    
 	        // Send the message
 		    String mailCC = MailConfig.getInstance(mailProperties).getTechSupportMail();
 		    
-	        new SendMail(mailProperties).sendMail(mailTo, mailCC, message,formatFTPErrorSubject());		
+	        new SendMail(mailProperties).sendMail(mailTo, mailCC, message, formatFTPErrorSubject());		
 		}
 		catch (Exception e)
 		{

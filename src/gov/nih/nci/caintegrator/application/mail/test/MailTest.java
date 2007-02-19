@@ -32,7 +32,7 @@ public class MailTest extends TestCase {
 			MailManager mailManager = new MailManager(mailProperties);
 
 			mailManager.sendFTPMail("sahnih@mail.nih.gov", al, null);
-			mailManager.sendFTPErrorMail("sahnih@mail.nih.gov");
+			mailManager.sendFTPErrorMail("sahnih@mail.nih.gov", null);
 		 } catch (Exception e1) {
             e1.printStackTrace();
         }
