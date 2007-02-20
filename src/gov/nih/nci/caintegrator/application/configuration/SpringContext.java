@@ -7,6 +7,13 @@ import javax.servlet.ServletContext;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
+/**
+ * Helper class that provides an easy way to load beans from any point in the application,
+ * not just from a spring managed bean.
+ * 
+ *
+ * @author caIntegrator Team
+ */
 public class SpringContext implements Serializable {
     
     private static final long serialVersionUID = 3125223827888524892L;
@@ -24,7 +31,15 @@ public class SpringContext implements Serializable {
       }
       return wac;
     }
-      
+    
+    /**
+     * Returns a bean from the spring ApplicationFactory with the
+     * provided name.
+     * 
+     * @param name
+     * @return
+     * @throws IllegalStateException
+     */
     public static Object getBean(final String name) throws IllegalStateException {
       if (!initialized) throw new IllegalStateException("SpringContext has not been initialized.");
       return wac.getBean(name);
