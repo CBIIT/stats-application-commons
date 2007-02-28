@@ -3,8 +3,8 @@ package gov.nih.nci.caintegrator.application.bean;
 import gov.nih.nci.caintegrator.service.findings.Finding;
 
 import java.io.Serializable;
-import java.util.Collection;
 
+import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.dom4j.Document;
 
 
@@ -71,10 +71,31 @@ public class FindingReportBean implements Serializable {
 	private Document xmlDoc;
 	private gov.nih.nci.caintegrator.service.findings.Finding finding;
     private Document xmlDocCSV;
+    private HSSFWorkbook excelDoc;
 	
 	public FindingReportBean()	{}
 
-	public Finding getFinding() {
+	
+
+    /**
+     * @return Returns the excelDoc.
+     */
+    public HSSFWorkbook getExcelDoc() {
+        return excelDoc;
+    }
+
+
+
+    /**
+     * @param excelDoc The excelDoc to set.
+     */
+    public void setExcelDoc(HSSFWorkbook excelDoc) {
+        this.excelDoc = excelDoc;
+    }
+
+
+
+    public Finding getFinding() {
 		return finding;
 	}
 

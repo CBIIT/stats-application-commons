@@ -1,12 +1,13 @@
 package gov.nih.nci.caintegrator.application.report;
 
-import gov.nih.nci.caintegrator.application.bean.LevelOfExpressionIHCFindingReportBean;
+import gov.nih.nci.caintegrator.application.bean.LossOfExpressionIHCFindingReportBean;
 import gov.nih.nci.caintegrator.application.bean.LossOfExpressionIHCFindingReportBean;
 import gov.nih.nci.caintegrator.application.util.PatientComparator;
 import gov.nih.nci.caintegrator.application.util.TimepointStringComparator;
-import gov.nih.nci.caintegrator.domain.finding.protein.ihc.bean.LevelOfExpressionIHCFinding;
+import gov.nih.nci.caintegrator.domain.finding.protein.ihc.bean.LossOfExpressionIHCFinding;
 import gov.nih.nci.caintegrator.domain.finding.protein.ihc.bean.LossOfExpressionIHCFinding;
 import gov.nih.nci.caintegrator.service.findings.Finding;
+import gov.nih.nci.caintegrator.studyQueryService.dto.ihc.LossOfExpressionIHCFindingCriteria;
 import gov.nih.nci.caintegrator.studyQueryService.dto.ihc.LossOfExpressionIHCFindingCriteria;
 
 import java.util.ArrayList;
@@ -15,6 +16,10 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.poi.hssf.usermodel.HSSFCell;
+import org.apache.poi.hssf.usermodel.HSSFRow;
+import org.apache.poi.hssf.usermodel.HSSFSheet;
+import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.dom4j.Document;
 import org.dom4j.DocumentHelper;
 import org.dom4j.Element;
@@ -382,6 +387,174 @@ public class LossOfExpressionIHCReport{
 		    
 		    return document;
 	}
+    
+    public static HSSFWorkbook getReportExcel(Finding finding, HashMap map) {
+        HSSFWorkbook wb = new HSSFWorkbook();
+        HSSFSheet sheet = wb.createSheet(finding.getTaskId());
+        
+        ArrayList dFindings = new ArrayList(finding.getDomainFindings());
+        ArrayList<LossOfExpressionIHCFinding> domainFindings = new ArrayList<LossOfExpressionIHCFinding>(dFindings);
+        ArrayList<LossOfExpressionIHCFindingReportBean> results = new ArrayList<LossOfExpressionIHCFindingReportBean>();
+        for(LossOfExpressionIHCFinding loef : domainFindings)  {
+            LossOfExpressionIHCFindingReportBean reportBean = new LossOfExpressionIHCFindingReportBean(loef);
+            results.add(reportBean);
+        }
+        LossOfExpressionIHCFindingCriteria criteria = (LossOfExpressionIHCFindingCriteria)finding.getQueryDTO();
+        
+        if(!results.isEmpty())  {
+            
+            //SORT THE ARRAYLIST(RESULTS) BY PATIENT DID
+            PatientComparator p = new PatientComparator();
+            Collections.sort(results, p);
+            
+            //CREATE A HASHMAP SORTED BY PATIENT DID AS THE KEY AND THE ARRAYLIST OF REPORTBEANS AS THE VALUE                
+             
+            Map<String,ArrayList<LossOfExpressionIHCFindingReportBean>> reportBeanMap = new HashMap<String,ArrayList<LossOfExpressionIHCFindingReportBean>>();
+            
+            for(int i =0; i<results.size();i++){
+                if(i==0){
+                    reportBeanMap.put(results.get(i).getPatientDID()+"_"+results.get(i).getBiomarkerName(),new ArrayList<LossOfExpressionIHCFindingReportBean>());
+                    reportBeanMap.get(results.get(i).getPatientDID()+"_"+results.get(i).getBiomarkerName()).add(results.get(i));                        
+                }
+                else if(!results.get(i).getPatientDID().equalsIgnoreCase(results.get(i-1).getPatientDID())){ 
+                    reportBeanMap.put(results.get(i).getPatientDID()+"_"+results.get(i).getBiomarkerName(),new ArrayList<LossOfExpressionIHCFindingReportBean>());
+                    reportBeanMap.get(results.get(i).getPatientDID()+"_"+results.get(i).getBiomarkerName()).add(results.get(i));
+                }
+                else if(results.get(i).getPatientDID().equalsIgnoreCase(results.get(i-1).getPatientDID()) && !results.get(i).getBiomarkerName().equalsIgnoreCase(results.get(i-1).getBiomarkerName())){ 
+                    reportBeanMap.put(results.get(i).getPatientDID()+"_"+results.get(i).getBiomarkerName(),new ArrayList<LossOfExpressionIHCFindingReportBean>());
+                    reportBeanMap.get(results.get(i).getPatientDID()+"_"+results.get(i).getBiomarkerName()).add(results.get(i));
+                }
+                else{
+                    reportBeanMap.get(results.get(i-1).getPatientDID()+"_"+results.get(i-1).getBiomarkerName()).add(results.get(i));                        
+                }
+            }
+             
+            //IF THE USER SELECTED TIMEPOINTS FOR WHICH THAT PATIENT DID DID NOT HAVE DATA, CREATE NULL BEANS SO AS TO RENDER A READABLE REPORT
+            Set<String> b = reportBeanMap.keySet();
+                    for(String g: b){
+                        while(reportBeanMap.get(g).size()<(reportBeanMap.get(g).get(0).getTimepointHeaders(criteria).size())){
+                            reportBeanMap.get(g).add(new LossOfExpressionIHCFindingReportBean(new LossOfExpressionIHCFinding()));
+                        }
+                    }
+                    
+            ArrayList<String> ntpHeaders = results.get(0).getNonTimepointHeaders();
+            HSSFRow row = sheet.createRow((short) 0);
+            
+            
+            //ADD HEADERS THAT ARE TIMEPOINT DEPENDENT
+            ArrayList<String> headers = results.get(0).getHeaders(); 
+            ArrayList<String> tpHeaders = results.get(0).getTimepointHeaders(criteria);
+            TimepointStringComparator ts = new TimepointStringComparator();
+            Collections.sort(tpHeaders,ts);
+            ArrayList<String> combinedHeaders = new ArrayList<String>(); 
+            for(int i=0; i<headers.size();i++){
+                for(int j=0; j<tpHeaders.size();j++){
+                    combinedHeaders.add(headers.get(i)+tpHeaders.get(j));
+                }
+            }
+            
+            ntpHeaders.addAll(combinedHeaders);
+            
+            for(int i = 0; i<ntpHeaders.size();i++){
+                HSSFCell cell = row.createCell((short) i);
+                cell.setCellValue(ntpHeaders.get(i));                   
+            }
+            
+            row = null;
+            HSSFCell dataCell = null;
+            Set<String> keysSet = reportBeanMap.keySet(); 
+            ArrayList<String> keys = new ArrayList<String>(keysSet);
+            // ADD DATA ROWS           
+               for(int i=0;i<keys.size();i++) {       
+                                   sheet.createFreezePane( 0, 1, 0, 1 );
+                                   row = sheet.createRow((short) i + 1); 
+                                   dataCell = row.createCell((short) 0);
+                                   dataCell.setCellValue(reportBeanMap.get(keys.get(i)).get(0).getPatientDID());
+                                   
+                                   dataCell = row.createCell((short) 1);
+                                   dataCell.setCellValue(reportBeanMap.get(keys.get(i)).get(0).getBiomarkerName());
+               
+                                    //GRAB EACH REPORT BEAN IN EACH ARRAYLIST AND MATCH UP TO THE APPROPRIATE TIMEPOINT AS A MAP WITH THE TIMEPOINT AS KEY AND REPORTBEAN THE VALUE
+                                    ArrayList<LossOfExpressionIHCFindingReportBean> myList = reportBeanMap.get(keys.get(i));
+                                    Map<String,LossOfExpressionIHCFindingReportBean> myMap = new HashMap<String,LossOfExpressionIHCFindingReportBean>();
+                                    ArrayList<LossOfExpressionIHCFindingReportBean> mySortedMap = new ArrayList<LossOfExpressionIHCFindingReportBean>();
+                                    
+                                    for(LossOfExpressionIHCFindingReportBean ggg : myList){
+                                        for(int j=0; j<tpHeaders.size();j++){
+                                            if(ggg.getTimepoint().equalsIgnoreCase(tpHeaders.get(j))){
+                                                myMap.put(tpHeaders.get(j),ggg);
+                                                break;
+                                            }
+                                            else if(ggg.getTimepoint().equals("--")){
+                                                if(!myMap.containsKey(tpHeaders.get(j))){
+                                                    myMap.put(tpHeaders.get(j),ggg);
+                                                    break;
+                                                }                                                    
+                                            }
+                                        }
+                                    }
+                                    
+                                    //SORT MAP BY TIMEPOINT SO THAT THE REPORT BEAN DATA CAN EASILY BE DISPLAYED UNDER THE APPROPRIATE TIEMPOINT
+                                    for(int t=0; t<tpHeaders.size();t++){
+                                        for(String k : myMap.keySet()){
+                                            if(k.equalsIgnoreCase(tpHeaders.get(t))){
+                                                mySortedMap.add(myMap.get(k));
+                                            }
+                                        }
+                                    }
+                                    
+                                        
+                                        
+                                   int counter = 2;
+                                    //ITERATE OVER THE MAP FOR EACH DATA FIELD WITH ITS CORRESPONDING TIMEPOINT AND BUILD DATA ROWS
+                                    for(LossOfExpressionIHCFindingReportBean reportBean : mySortedMap) {                                                   
+                                        dataCell = row.createCell((short) counter++);
+                                        dataCell.setCellValue(reportBean.getBenignPresentValue());                                        
+                                    }
+                                    for(LossOfExpressionIHCFindingReportBean reportBean : mySortedMap)  {
+                                        dataCell = row.createCell((short) counter++);
+                                        if(!reportBean.getInvasiveSum().equals("--")){
+                                        dataCell.setCellValue(Short.parseShort(reportBean.getInvasiveSum())); 
+                                        }else{
+                                        dataCell.setCellValue(reportBean.getInvasiveSum()); 
+                                        }
+                                    }
+                                    for(LossOfExpressionIHCFindingReportBean reportBean : mySortedMap)  {
+                                        dataCell = row.createCell((short) counter++);
+                                        if(!reportBean.getBenignSum().equals("--")){
+                                        dataCell.setCellValue(Short.parseShort(reportBean.getBenignSum())); 
+                                        }else{
+                                        dataCell.setCellValue(reportBean.getBenignSum());     
+                                        }
+                                    }
+                                    for(LossOfExpressionIHCFindingReportBean reportBean : mySortedMap)  {
+                                        dataCell = row.createCell((short) counter++);
+                                        if(!reportBean.getInvasiveBenignDiff().equals("--")){
+                                        dataCell.setCellValue(Short.parseShort(reportBean.getInvasiveBenignDiff()));
+                                        }else{
+                                        dataCell.setCellValue(reportBean.getInvasiveBenignDiff());   
+                                        }
+                                    }
+                                    for(LossOfExpressionIHCFindingReportBean reportBean : mySortedMap)  {
+                                        dataCell = row.createCell((short) counter++);
+                                        dataCell.setCellValue(reportBean.getComments()); 
+                                    }
+                                    for(LossOfExpressionIHCFindingReportBean reportBean : mySortedMap)  {
+                                        dataCell = row.createCell((short) counter++);
+                                        dataCell.setCellValue(reportBean.getLossResult()); 
+                                    }
+               
+                   
+               }  
+        
+        }
+        
+        else {
+            //TODO: handle this error
+           
+        }
+        return wb;
+    }
 
 }
 
