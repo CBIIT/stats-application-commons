@@ -1,0 +1,1 @@
+This is the src directory for common application modules.
