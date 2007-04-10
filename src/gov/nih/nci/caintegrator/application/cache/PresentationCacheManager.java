@@ -1,8 +1,13 @@
 package gov.nih.nci.caintegrator.application.cache;
 
+import gov.nih.nci.caintegrator.service.findings.Finding;
+import gov.nih.nci.caintegrator.service.task.Task;
+
 import java.io.File;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Iterator;
 import java.util.List;
 
 import net.sf.ehcache.Cache;
@@ -210,6 +215,27 @@ public class PresentationCacheManager implements PresentationTierCache{
             logger.error(e);
         }
     	return returnObject;
+    }
+    
+    /* (non-Javadoc)
+     * @see gov.nih.nci.rembrandt.cache.BusinessTierCache#getAllSessionFindings(java.lang.String)
+     */
+    public Collection<Task> getAllSessionTasks(String sessionId){
+        Collection<Task> tasks = new ArrayList<Task>();
+        Cache sessionCache = getSessionCache(sessionId);
+        try {
+            List keys = sessionCache.getKeys();
+            for(Iterator i = keys.iterator();i.hasNext();) {
+                Element element = sessionCache.get((String)i.next());
+                Object object = element.getValue();
+                if(object instanceof Task) {
+                    tasks.add((Task)object);
+                }
+            }
+        }catch(CacheException ce) {
+            logger.error(ce);
+        }
+        return tasks;
     }
 	
 
