@@ -92,6 +92,9 @@ public class QueryInbox {
 	private PresentationTierCache ptc;
     private FindingsManager findingsManager;
 	
+    public QueryInbox() {
+        
+    }
 		
 	public String checkSingle(String sid, String tid)	{
 		//check the status of a single task
@@ -226,6 +229,22 @@ public class QueryInbox {
      */
     public void setFindingsManager(FindingsManager findingsManager) {
         this.findingsManager = findingsManager;
+    }
+
+    public BusinessTierCache getBtc() {
+        return btc;
+    }
+
+    public void setBtc(BusinessTierCache btc) {
+        this.btc = btc;
+    }
+
+    public PresentationTierCache getPtc() {
+        return ptc;
+    }
+
+    public void setPtc(PresentationTierCache ptc) {
+        this.ptc = ptc;
     }
 	
 
