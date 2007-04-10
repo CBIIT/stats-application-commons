@@ -1,18 +1,30 @@
 package gov.nih.nci.caintegrator.application.inbox;
 
-import gov.nih.nci.caintegrator.service.findings.Finding;
-import gov.nih.nci.caintegrator.application.cache.*;
+import gov.nih.nci.caintegrator.application.cache.BusinessTierCache;
+import gov.nih.nci.caintegrator.application.cache.CacheFactory;
+import gov.nih.nci.caintegrator.application.cache.PresentationTierCache;
+
+import gov.nih.nci.caintegrator.enumeration.FindingStatus;
 import gov.nih.nci.caintegrator.exceptions.AnalysisServerException;
+import gov.nih.nci.caintegrator.service.findings.Finding;
+import gov.nih.nci.caintegrator.service.task.Task;
 
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Random;
+import java.util.Set;
 
 import javax.servlet.http.HttpSession;
 
-import uk.ltd.getahead.dwr.ExecutionContext;
 import org.apache.commons.lang.StringEscapeUtils;
+
+import uk.ltd.getahead.dwr.ExecutionContext;
+
+import gov.nih.nci.caintegrator.studyQueryService.FindingsManager;
+import gov.nih.nci.caintegrator.studyQueryService.FindingsManagerImpl;
 
 
 
@@ -78,21 +90,9 @@ public class QueryInbox {
 	private HttpSession session;
 	private BusinessTierCache btc;
 	private PresentationTierCache ptc;
+    private FindingsManager findingsManager;
 	
-	public QueryInbox()	{
-		//get some common stuff
-		session = ExecutionContext.get().getSession(false);
-		btc = CacheFactory.getBusinessTierCache();
-		ptc = CacheFactory.getPresentationTierCache();
-	}
-	
-	public QueryInbox(HttpSession session)	{
-		this.session = session;
-		btc = CacheFactory.getBusinessTierCache();
-		ptc = CacheFactory.getPresentationTierCache();
-	}
-	
-	
+		
 	public String checkSingle(String sid, String tid)	{
 		//check the status of a single task
 		String currentStatus = "";
@@ -139,6 +139,51 @@ public class QueryInbox {
 		
 		return currentStatuses;
 	}
+    
+    public Map checkAllTasksStatus(String sid)   {        
+        Map currentStatuses = new HashMap();        
+        Collection<Task> tasks = ptc.getAllSessionTasks(sid);
+        for(Task task: tasks){ 
+            String tmp = new String();             
+            tmp = this.checkSingleTask(task);            
+            Map fdata = new HashMap();
+            fdata.put("time", String.valueOf(task.getElapsedTime()));
+            fdata.put("status", tmp);
+            if(task.getStatus()!=null && task.getStatus().getComment()!=null) {
+                AnalysisServerException ase = (AnalysisServerException) btc.getObjectFromSessionCache(session.getId(), task.getId()+"_analysisServerException");
+                String comments = ase!=null && ase.getMessage() != null ? ase.getMessage() : "Unspecified Error";
+                fdata.put("comments", StringEscapeUtils.escapeJavaScript(comments));
+//              fdata.put("comments", StringEscapeUtils.escapeJavaScript(f.getStatus().getComment()));
+            }
+            currentStatuses.put(task.getId(), fdata);
+        }
+        
+        return currentStatuses;
+    }
+    
+    public String checkSingleTask(Task task)   {
+        //check the status of a single task
+        String currentStatus = "";        
+        Task currentTask = findingsManager.checkStatus(task); 
+        switch(currentTask.getStatus())   {
+        case Completed:
+            currentStatus = "completed";
+        break;
+        case Running:
+            currentStatus = "running";
+        break;
+        case Error:
+            currentStatus = "error";
+        break;
+        default:
+            currentStatus = "running";
+        break;
+    }
+    
+        
+        
+        return currentStatus;
+    }
 	
 		
 	public String checkStatus()	{
@@ -168,6 +213,20 @@ public class QueryInbox {
 		myMap.put("secondKey", testKey+"_1");
 		return myMap;
 	}
+
+    /**
+     * @return Returns the findingsManager.
+     */
+    public FindingsManager getFindingsManager() {
+        return findingsManager;
+    }
+
+    /**
+     * @param findingsManager The findingsManager to set.
+     */
+    public void setFindingsManager(FindingsManager findingsManager) {
+        this.findingsManager = findingsManager;
+    }
 	
 
 }

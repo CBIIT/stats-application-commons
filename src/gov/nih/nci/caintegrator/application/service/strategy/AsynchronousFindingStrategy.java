@@ -8,6 +8,8 @@ import gov.nih.nci.caintegrator.exceptions.FindingsQueryException;
 import gov.nih.nci.caintegrator.exceptions.ValidationException;
 import gov.nih.nci.caintegrator.service.findings.Finding;
 import gov.nih.nci.caintegrator.service.findings.strategies.SessionBasedFindingStrategy;
+import gov.nih.nci.caintegrator.service.task.Task;
+import gov.nih.nci.caintegrator.service.task.TaskResult;
 import gov.nih.nci.caintegrator.studyQueryService.QueryHandler;
 
 import java.util.List;
@@ -35,6 +37,29 @@ public class AsynchronousFindingStrategy extends SessionBasedFindingStrategy {
     
     protected TaskExecutor taskExecutor;
     
+    private TaskResult taskResult;
+    
+    
+    public TaskResult retrieveTaskResult(Task task){
+        TaskResult taskResult = (TaskResult) businessCacheManager.getObjectFromSessionCache(task.getCacheId(),task.getId());
+        return taskResult;
+    }
+
+    /**
+     * @return Returns the taskResult.
+     */
+    public TaskResult getTaskResult() {
+        return taskResult;
+    }
+
+
+    /**
+     * @param taskResult The taskResult to set.
+     */
+    public void setTaskResult(TaskResult taskResult) {
+        this.taskResult = taskResult;
+    }
+
 
     /**
      * This default constructor is necessary because we are using
