@@ -88,19 +88,20 @@ import gov.nih.nci.caintegrator.studyQueryService.FindingsManagerImpl;
 public class QueryInbox {
 	
 	private HttpSession session;
-	private BusinessTierCache btc;
-	private PresentationTierCache ptc;
+	private BusinessTierCache businessTierCache;
+	private PresentationTierCache presentationTierCache;
     private FindingsManager findingsManager;
 	
-    public QueryInbox() {
-        
+    public QueryInbox() {        
+        businessTierCache = CacheFactory.getBusinessTierCache();
+        presentationTierCache = CacheFactory.getPresentationTierCache();
     }
 		
 	public String checkSingle(String sid, String tid)	{
 		//check the status of a single task
 		String currentStatus = "";
 		
-		Finding f = (Finding) btc.getObjectFromSessionCache(sid, tid);
+		Finding f = (Finding) businessTierCache.getObjectFromSessionCache(sid, tid);
 		
 		switch(f.getStatus())	{
 			case Completed:
@@ -123,7 +124,7 @@ public class QueryInbox {
 	public Map checkAllStatus(String sid)	{
 		Map currentStatuses = new HashMap();
 		
-		Collection<Finding> findings = btc.getAllSessionFindings(sid);
+		Collection<Finding> findings = businessTierCache.getAllSessionFindings(sid);
 		for(Finding f: findings){
 			String tmp = new String();
 			tmp = this.checkSingle(sid, f.getTaskId());
@@ -132,7 +133,7 @@ public class QueryInbox {
 			fdata.put("time", String.valueOf(f.getElapsedTime()));
 			fdata.put("status", tmp);
 			if(f.getStatus()!=null && f.getStatus().getComment()!=null)	{
-				AnalysisServerException ase = (AnalysisServerException) btc.getObjectFromSessionCache(session.getId(), f.getTaskId()+"_analysisServerException");
+				AnalysisServerException ase = (AnalysisServerException) businessTierCache.getObjectFromSessionCache(session.getId(), f.getTaskId()+"_analysisServerException");
 				String comments = ase!=null && ase.getMessage() != null ? ase.getMessage() : "Unspecified Error";
 				fdata.put("comments", StringEscapeUtils.escapeJavaScript(comments));
 //				fdata.put("comments", StringEscapeUtils.escapeJavaScript(f.getStatus().getComment()));
@@ -145,7 +146,7 @@ public class QueryInbox {
     
     public Map checkAllTasksStatus(String sid)   {        
         Map currentStatuses = new HashMap();        
-        Collection<Task> tasks = ptc.getAllSessionTasks(sid);
+        Collection<Task> tasks = presentationTierCache.getAllSessionTasks(sid);
         for(Task task: tasks){ 
             String tmp = new String();             
             tmp = this.checkSingleTask(task);            
@@ -153,7 +154,7 @@ public class QueryInbox {
             fdata.put("time", String.valueOf(task.getElapsedTime()));
             fdata.put("status", tmp);
             if(task.getStatus()!=null && task.getStatus().getComment()!=null) {
-                AnalysisServerException ase = (AnalysisServerException) btc.getObjectFromSessionCache(session.getId(), task.getId()+"_analysisServerException");
+                AnalysisServerException ase = (AnalysisServerException) businessTierCache.getObjectFromSessionCache(session.getId(), task.getId()+"_analysisServerException");
                 String comments = ase!=null && ase.getMessage() != null ? ase.getMessage() : "Unspecified Error";
                 fdata.put("comments", StringEscapeUtils.escapeJavaScript(comments));
 //              fdata.put("comments", StringEscapeUtils.escapeJavaScript(f.getStatus().getComment()));
@@ -231,20 +232,20 @@ public class QueryInbox {
         this.findingsManager = findingsManager;
     }
 
-    public BusinessTierCache getBtc() {
-        return btc;
+    public BusinessTierCache getBusinessTierCache() {
+        return businessTierCache;
     }
 
-    public void setBtc(BusinessTierCache btc) {
-        this.btc = btc;
+    public void setBusinessTierCache(BusinessTierCache btc) {
+        this.businessTierCache = btc;
     }
 
-    public PresentationTierCache getPtc() {
-        return ptc;
+    public PresentationTierCache getPresentationTierCache() {
+        return presentationTierCache;
     }
 
-    public void setPtc(PresentationTierCache ptc) {
-        this.ptc = ptc;
+    public void setPresentationTierCache(PresentationTierCache ptc) {
+        this.presentationTierCache = ptc;
     }
 	
 

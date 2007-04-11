@@ -9,6 +9,8 @@ package gov.nih.nci.caintegrator.application.lists;
 
 
 import gov.nih.nci.caintegrator.application.cache.CacheConstants;
+import gov.nih.nci.caintegrator.application.cache.PresentationCacheManager;
+import gov.nih.nci.caintegrator.application.cache.PresentationTierCache;
 import gov.nih.nci.caintegrator.dto.de.GeneIdentifierDE;
 
 import java.util.ArrayList;
@@ -21,12 +23,8 @@ import java.util.Set;
 
 import javax.servlet.http.HttpSession;
 
-import org.apache.commons.collections.ListUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
-import org.dom4j.Document;
-import org.dom4j.DocumentHelper;
-import org.dom4j.Element;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
@@ -34,6 +32,9 @@ import uk.ltd.getahead.dwr.ExecutionContext;
 
 /**
  * @author rossok
+ * UserListBeanHelper is the touchpoint for any app using list management service
+ * The class uses the presentation tier cache to store a userlist bean containing
+ * all user lists.
  *
  */
 public class UserListBeanHelper{
@@ -41,21 +42,47 @@ public class UserListBeanHelper{
     private String sessionId;
     private UserListBean userListBean;
     private static Logger logger = Logger.getLogger(UserListBeanHelper.class);
-     
+    public PresentationTierCache presentationTierCache = PresentationCacheManager.getInstance();
+    
+    /**
+     * recommended constructor
+     * @param presentationCacheId
+     */
+    public UserListBeanHelper(String presentationCacheId){
+        this.userListBean = (UserListBean)presentationTierCache.getNonPersistableObjectFromSessionCache(presentationCacheId,CacheConstants.USER_LISTS);
+    }
+    
+    public void addBean(String presntationCacheId, String key, UserListBean userListBean){
+        presentationTierCache.addNonPersistableToSessionCache(presntationCacheId, CacheConstants.USER_LISTS, userListBean);        
+    }
+    
+    /**
+     * deprecated constructor -- used to support legacy code
+     * @param userListBean
+     */
     public UserListBeanHelper(UserListBean userListBean){
         this.userListBean = userListBean;
     }
     
+    /**
+     * deprecated constructor -- used to support legacy code
+     * @param userListBean
+     */    
     public UserListBeanHelper(HttpSession session){
-        userListBean = (UserListBean) session.getAttribute(CacheConstants.USER_LISTS);        
-        
+        this.userListBean = (UserListBean)presentationTierCache.getNonPersistableObjectFromSessionCache(session.getId(),CacheConstants.USER_LISTS);                 
     }
+    
+    /**
+     * deprecated constructor -- used to support legacy code
+     * @param userListBean
+     */
     public UserListBeanHelper(){       
         session = ExecutionContext.get().getSession(false); 
         sessionId = ExecutionContext.get().getSession(false).getId(); 
-        userListBean = (UserListBean) session.getAttribute(CacheConstants.USER_LISTS);        
-               
+        this.userListBean = (UserListBean)presentationTierCache.getNonPersistableObjectFromSessionCache(session.getId(),CacheConstants.USER_LISTS);                 
     }
+    
+    
     public void addList(UserList userList) {
         userListBean.addList(userList);        
     }
