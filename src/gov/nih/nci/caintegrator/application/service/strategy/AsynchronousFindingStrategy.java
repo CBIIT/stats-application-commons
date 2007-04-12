@@ -37,8 +37,6 @@ public class AsynchronousFindingStrategy extends SessionBasedFindingStrategy {
     
     protected TaskExecutor taskExecutor;
     
-    private TaskResult taskResult;
-    
     
     public TaskResult retrieveTaskResult(Task task){
         TaskResult taskResult = (TaskResult) businessCacheManager.getObjectFromSessionCache(task.getCacheId(),task.getId());
