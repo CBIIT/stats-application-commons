@@ -3,7 +3,6 @@ package gov.nih.nci.caintegrator.application.analysis;
 import gov.nih.nci.caintegrator.analysis.messaging.AnalysisRequest;
 import gov.nih.nci.caintegrator.analysis.messaging.AnalysisRequestSender;
 import gov.nih.nci.caintegrator.analysis.messaging.AnalysisResult;
-import gov.nih.nci.caintegrator.analysis.messaging.ClassComparisonResultEntry;
 import gov.nih.nci.caintegrator.application.cache.BusinessTierCache;
 import gov.nih.nci.caintegrator.application.service.ApplicationService;
 import gov.nih.nci.caintegrator.application.service.annotation.GeneExprAnnotationService;
@@ -11,15 +10,11 @@ import gov.nih.nci.caintegrator.application.service.annotation.ReporterAnnotatio
 import gov.nih.nci.caintegrator.enumeration.FindingStatus;
 import gov.nih.nci.caintegrator.exceptions.AnalysisServerException;
 import gov.nih.nci.caintegrator.service.findings.AnalysisFinding;
-import gov.nih.nci.caintegrator.service.findings.ClassComparisonFinding;
 import gov.nih.nci.caintegrator.service.findings.ReporterBasedFinding;
-import gov.nih.nci.caintegrator.service.findings.FTestFinding;
 
-import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
-import java.util.Properties;
 
 import javax.jms.DeliveryMode;
 import javax.jms.ExceptionListener;
@@ -122,7 +117,9 @@ public class AnalysisServerClientManager implements ApplicationService, MessageL
 
 	private Queue requestQueue;
 	private Queue resultQueue;
-	private QueueConnection queueConnection;
+	private QueueConnectionFactory queueConnectionFactory;
+    private QueueConnection queueConnection;
+    private Boolean managedBean = false;
     private static AnalysisServerClientManager instance = null;
     private static final long reconnectWaitTimeMS = 5000L;
     //private Properties messagingProps = null;
@@ -217,7 +214,7 @@ public class AnalysisServerClientManager implements ApplicationService, MessageL
 			
 			    //String factoryJNDI = System.getProperty("gov.nih.nci.caintegrator.analysis.jms.factory_jndi");
 				
-				QueueConnectionFactory queueConnectionFactory = (QueueConnectionFactory) context
+				queueConnectionFactory = (QueueConnectionFactory) context
 						.lookup(jndiFactoryName);
 			
 				// Create the connection
@@ -316,10 +313,13 @@ public class AnalysisServerClientManager implements ApplicationService, MessageL
   	  logger.error("onException: caught JMSexception: " + jmsException.getMessage());
   	  try
         {
-  		 if (queueConnection != null) {
-             queueConnection.setExceptionListener(null);
-             //close();
-             queueConnection.close();
+  		 if (queueConnectionFactory != null) {
+             QueueConnection connection = queueConnectionFactory.createQueueConnection();
+             if(connection != null) {
+                 connection.setExceptionListener(null);
+                 //close();
+                 connection.close();
+             }
   		 }
         }
         catch (JMSException c)
@@ -394,6 +394,7 @@ public class AnalysisServerClientManager implements ApplicationService, MessageL
 			FindingStatus newStatus = FindingStatus.Error;
 			//the below actually causes an error/caching effect since this is static
 			newStatus.setComment(analysisServerException.getMessage());
+			finding.getTask().setStatus(newStatus);
 			finding.setStatus(newStatus);
 			logger.debug("Retreiving finding for session: "+sessionId+" & task: "+taskId+" from cache");
 			_cacheManager.addToSessionCache(sessionId,taskId+"_analysisServerException",analysisServerException);
@@ -428,10 +429,14 @@ public class AnalysisServerClientManager implements ApplicationService, MessageL
 	 * @throws JMSException 
 	 * @see sendRequest(Query query, AnalysisRequest request)
 	 */
-	public void sendRequest(AnalysisRequest request) throws JMSException {
+	public void sendRequest(final AnalysisRequest request) throws JMSException {
 		ObjectMessage msg;
+        
 		try {
-			
+            if(managedBean) {
+                queueConnection = queueConnectionFactory.createQueueConnection();
+            }
+		    
 			QueueSession requestSession = queueConnection.createQueueSession(
 				      // No transaction
 				      false,
@@ -448,6 +453,9 @@ public class AnalysisServerClientManager implements ApplicationService, MessageL
 		    requestSender.send(msg, DeliveryMode.NON_PERSISTENT, Message.DEFAULT_PRIORITY, Message.DEFAULT_TIME_TO_LIVE);
 		    requestSender.close();
 		    requestSession.close();
+            if(managedBean) {
+                queueConnection.close();
+            }
 			logger.debug("sendRequest session: "+request.getSessionId()+" & task: "+request.getTaskId()+" has been sent to the JMQ");
 
 		} catch (JMSException e) {
@@ -455,5 +463,46 @@ public class AnalysisServerClientManager implements ApplicationService, MessageL
 			throw e;
 		} 
 	}
+
+
+    public Queue getResultQueue() {
+        return resultQueue;
+    }
+
+
+    public void setResultQueue(Queue resultQueue) {
+        this.resultQueue = resultQueue;
+    }
+
+
+    public QueueConnectionFactory getQueueConnectionFactory() {
+        return queueConnectionFactory;
+    }
+
+
+    public void setQueueConnectionFactory(
+            QueueConnectionFactory queueConnectionFactory) {
+        this.queueConnectionFactory = queueConnectionFactory;
+    }
+
+
+    public Queue getRequestQueue() {
+        return requestQueue;
+    }
+
+
+    public void setRequestQueue(Queue requestQueue) {
+        this.requestQueue = requestQueue;
+    }
+
+
+    public Boolean isManagedBean() {
+        return managedBean;
+    }
+
+
+    public void setManagedBean(Boolean managedBean) {
+        this.managedBean = managedBean;
+    }
 	
 }
