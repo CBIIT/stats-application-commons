@@ -154,7 +154,7 @@ public class QueryInbox {
             fdata.put("time", String.valueOf(task.getElapsedTime()));
             fdata.put("status", tmp);
             if(task.getStatus()!=null && task.getStatus().getComment()!=null) {
-                AnalysisServerException ase = (AnalysisServerException) businessTierCache.getObjectFromSessionCache(session.getId(), task.getId()+"_analysisServerException");
+                AnalysisServerException ase = (AnalysisServerException) businessTierCache.getObjectFromSessionCache(task.getCacheId(), task.getId()+"_analysisServerException");
                 String comments = ase!=null && ase.getMessage() != null ? ase.getMessage() : "Unspecified Error";
                 fdata.put("comments", StringEscapeUtils.escapeJavaScript(comments));
 //              fdata.put("comments", StringEscapeUtils.escapeJavaScript(f.getStatus().getComment()));
