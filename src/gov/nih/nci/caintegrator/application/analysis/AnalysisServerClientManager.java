@@ -372,6 +372,9 @@ public class AnalysisServerClientManager implements ApplicationService, MessageL
 			}
 			
 			finding.setStatus(FindingStatus.Completed);
+            if(finding.getTask() != null) {
+                finding.getTask().setStatus(FindingStatus.Completed);
+            }
 			logger.debug("Following task has been completed:/n  SessionId: "+sessionId+"/n  TaskId: "+taskId);
 			_cacheManager.addToSessionCache(sessionId,taskId,finding);
 			logger.debug("Following finding has been placed in cache:/n  SessionId: "+sessionId+"/n  TaskId: "+taskId);
@@ -394,7 +397,9 @@ public class AnalysisServerClientManager implements ApplicationService, MessageL
 			FindingStatus newStatus = FindingStatus.Error;
 			//the below actually causes an error/caching effect since this is static
 			newStatus.setComment(analysisServerException.getMessage());
-			finding.getTask().setStatus(newStatus);
+            if(finding.getTask() != null) {
+                finding.getTask().setStatus(newStatus);
+            }
 			finding.setStatus(newStatus);
 			logger.debug("Retreiving finding for session: "+sessionId+" & task: "+taskId+" from cache");
 			_cacheManager.addToSessionCache(sessionId,taskId+"_analysisServerException",analysisServerException);
