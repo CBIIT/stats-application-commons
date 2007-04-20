@@ -6,11 +6,13 @@ import gov.nih.nci.caintegrator.analysis.messaging.AnalysisResult;
 import gov.nih.nci.caintegrator.application.cache.BusinessTierCache;
 import gov.nih.nci.caintegrator.application.service.ApplicationService;
 import gov.nih.nci.caintegrator.application.service.annotation.GeneExprAnnotationService;
-import gov.nih.nci.caintegrator.application.service.annotation.ReporterAnnotation;
+import gov.nih.nci.caintegrator.domain.annotation.service.AnnotationManager;
+import gov.nih.nci.caintegrator.dto.query.ClassComparisonQueryDTO;
 import gov.nih.nci.caintegrator.enumeration.FindingStatus;
 import gov.nih.nci.caintegrator.exceptions.AnalysisServerException;
 import gov.nih.nci.caintegrator.service.findings.AnalysisFinding;
 import gov.nih.nci.caintegrator.service.findings.ReporterBasedFinding;
+import gov.nih.nci.caintegrator.studyQueryService.dto.annotation.AnnotationCriteria;
 
 import java.util.Hashtable;
 import java.util.List;
@@ -124,6 +126,9 @@ public class AnalysisServerClientManager implements ApplicationService, MessageL
     private static final long reconnectWaitTimeMS = 5000L;
     //private Properties messagingProps = null;
     private GeneExprAnnotationService gxAnnotService = null;
+    
+    // Spring managed annotation service
+    private AnnotationManager annotationManager;
     
     private String jmsProviderURL = null;
     private String requestQueueName = null;
@@ -350,10 +355,19 @@ public class AnalysisServerClientManager implements ApplicationService, MessageL
 				ReporterBasedFinding rf = (ReporterBasedFinding) finding;
 				List<String> reporterIds = rf.getReporterIds();
 					
-				Map<String,ReporterAnnotation> reporterAnnotationMap = null;
+				Map reporterAnnotationMap = null;
 			
-		        try {		        	
-		        	if (gxAnnotService != null) {
+		        try {
+                    // Use cgom based annotation service if it has been injected
+                    if(managedBean && annotationManager != null) {
+                        AnnotationCriteria criteria = new AnnotationCriteria();
+                        ClassComparisonQueryDTO queryDTO = (ClassComparisonQueryDTO)finding.getTask().getQueryDTO();
+                        
+                        criteria.setReporterIds(reporterIds);
+                        criteria.setArrayPlatformType(queryDTO.getArrayPlatformDE().getValueObjectAsArrayPlatformType());
+                        reporterAnnotationMap = annotationManager.getGenesForReporters(criteria);
+                        rf.setReporterAnnotationsMap(reporterAnnotationMap);
+                    } else if (gxAnnotService != null) {
 		        	  reporterAnnotationMap = gxAnnotService.getAnnotationsMapForReporters(reporterIds);
 		        	  rf.setReporterAnnotationsMap(reporterAnnotationMap);
 		        	}
@@ -508,6 +522,16 @@ public class AnalysisServerClientManager implements ApplicationService, MessageL
 
     public void setManagedBean(Boolean managedBean) {
         this.managedBean = managedBean;
+    }
+
+
+    public AnnotationManager getAnnotationManager() {
+        return annotationManager;
+    }
+
+
+    public void setAnnotationManager(AnnotationManager annotationManager) {
+        this.annotationManager = annotationManager;
     }
 	
 }
