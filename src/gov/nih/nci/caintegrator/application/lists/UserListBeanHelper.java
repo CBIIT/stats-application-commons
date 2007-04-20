@@ -59,6 +59,7 @@ public class UserListBeanHelper{
     /**
      * deprecated constructor -- used to support legacy code
      * @param userListBean
+     * @decripated
      */
     public UserListBeanHelper(UserListBean userListBean){
         this.userListBean = userListBean;
@@ -67,6 +68,7 @@ public class UserListBeanHelper{
     /**
      * deprecated constructor -- used to support legacy code
      * @param userListBean
+     * @decripated
      */    
     public UserListBeanHelper(HttpSession session){
         this.userListBean = (UserListBean)presentationTierCache.getNonPersistableObjectFromSessionCache(session.getId(),CacheConstants.USER_LISTS);                 
@@ -75,6 +77,7 @@ public class UserListBeanHelper{
     /**
      * deprecated constructor -- used to support legacy code
      * @param userListBean
+     * @decripated
      */
     public UserListBeanHelper(){       
         session = ExecutionContext.get().getSession(false); 
@@ -192,7 +195,46 @@ public class UserListBeanHelper{
     }
     
     public List<UserList> getListsBySubType(List<ListSubType> listSubTypes){
-    	return new ArrayList();
+    	List<UserList> subTypeList = new ArrayList<UserList>();
+    	if (listSubTypes == null || userListBean == null || userListBean.getEntireList().isEmpty())
+    		return subTypeList;    	
+    		for (ListSubType subType : listSubTypes){
+    				subTypeList.addAll(getSubTypeList(subType));    			
+    		
+    	}
+    	return subTypeList;
+    }
+    
+    public List<UserList> getAllCustomLists(){
+    	List<UserList> customList = new ArrayList<UserList>();
+    	if (userListBean == null || userListBean.getEntireList().isEmpty())
+    		return customList;
+    	
+    	for (UserList list : userListBean.getEntireList()){
+    		List<ListSubType> subTypes = list.getListSubType();
+    		for (ListSubType subType : subTypes){
+    			if (ListSubType.Custom.equals(subType)){
+    				customList.add(list);
+    			}
+    		}
+    	}
+    	return customList;
+    }
+    
+    public List<UserList> getSubTypeList(ListSubType listSubType){
+    	List<UserList> subTypeList = new ArrayList<UserList>();
+    	if (listSubType == null || userListBean == null || userListBean.getEntireList().isEmpty())
+    		return subTypeList;
+    	
+    	for (UserList list : userListBean.getEntireList()){
+    		List<ListSubType> subTypes = list.getListSubType();
+    		for (ListSubType subType : subTypes){
+    			if (listSubType.equals(subType)){
+    				subTypeList.add(list);
+    			}
+    		}
+    	}
+    	return subTypeList;
     }
     
     public List<UserList> getAllLists() {
