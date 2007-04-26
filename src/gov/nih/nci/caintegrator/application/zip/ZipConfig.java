@@ -94,6 +94,16 @@ public class ZipConfig
     }
     
     /**
+     * Location where files for searching Genotypes will be placed
+     * 
+     * @return
+     */
+    public String getGenotypeLocation()    
+    {
+    	return zipProperties.getProperty("genotype_location");
+    }
+    
+    /**
      * URL for the secure FTP server
      * 
      * @return
