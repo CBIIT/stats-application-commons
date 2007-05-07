@@ -381,7 +381,7 @@ public class AnalysisServerClientManager implements ApplicationService, MessageL
 				  newStatus.setComment("Internal error getting annotations for reporters.");
 				  finding.setStatus(newStatus);
                     if(finding.getTask() != null) {
-                        finding.getTask().setStatus(FindingStatus.Completed);
+                        finding.getTask().setStatus(newStatus);
                     }
 				  _cacheManager.addToSessionCache(sessionId,taskId,finding);
 		          return;
