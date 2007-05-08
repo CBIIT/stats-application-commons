@@ -145,7 +145,8 @@ public class QueryInbox {
 	}
     
     public Map checkAllTasksStatus(String sid)   {        
-        Map currentStatuses = new HashMap();        
+        Map currentStatuses = new HashMap(); 
+        updateTasks(sid);
         Collection<Task> tasks = presentationTierCache.getAllSessionTasks(sid);
         for(Task task: tasks){ 
             String tmp = new String();             
@@ -165,6 +166,14 @@ public class QueryInbox {
         return currentStatuses;
     }
     
+    private void updateTasks(String sid) {
+        Collection<Task> tasks = presentationTierCache.getAllSessionTasks(sid);
+        for(Task task : tasks) {
+            Task currentTask = findingsManager.checkStatus(task);
+            presentationTierCache.addNonPersistableToSessionCache(sid, task.getId(), currentTask);
+        }
+    }
+
     public String checkSingleTask(Task task)   {
         //check the status of a single task
         String currentStatus = "";        
@@ -182,10 +191,10 @@ public class QueryInbox {
         default:
             currentStatus = "running";
         break;
+        
     }
-    
-        
-        
+
+
         return currentStatus;
     }
 	
