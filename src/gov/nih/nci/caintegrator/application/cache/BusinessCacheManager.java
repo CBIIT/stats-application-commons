@@ -148,7 +148,7 @@ public class BusinessCacheManager implements BusinessTierCache{
         	 *  	elements time to idle in seconds = 0 (Special setting which means never check);
         	 *  
         	 */
-            sessionCache = new Cache(sessionId, 1000, false, true, 0, 0);
+            sessionCache = new Cache(sessionId, 1000, true, true, 0, 0);
             logger.debug("New SessionCache created: "+sessionId);
             Element counter = new Element(CacheConstants.REPORT_COUNTER, new SessionTempReportCounter());
             
@@ -177,6 +177,8 @@ public class BusinessCacheManager implements BusinessTierCache{
     	Object returnObject = null;
     	try {
 			Element element = sessionCache.get(key);
+            if(element == null)
+                return null;
 			returnObject = element.getValue();
 		} catch (IllegalStateException e) {
 			logger.error(e);
