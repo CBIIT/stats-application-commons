@@ -3,28 +3,19 @@ package gov.nih.nci.caintegrator.application.inbox;
 import gov.nih.nci.caintegrator.application.cache.BusinessTierCache;
 import gov.nih.nci.caintegrator.application.cache.CacheFactory;
 import gov.nih.nci.caintegrator.application.cache.PresentationTierCache;
-
-import gov.nih.nci.caintegrator.enumeration.FindingStatus;
 import gov.nih.nci.caintegrator.exceptions.AnalysisServerException;
 import gov.nih.nci.caintegrator.service.findings.Finding;
 import gov.nih.nci.caintegrator.service.task.Task;
+import gov.nih.nci.caintegrator.studyQueryService.FindingsManager;
 
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 import java.util.Random;
-import java.util.Set;
 
 import javax.servlet.http.HttpSession;
 
 import org.apache.commons.lang.StringEscapeUtils;
-
-import uk.ltd.getahead.dwr.ExecutionContext;
-
-import gov.nih.nci.caintegrator.studyQueryService.FindingsManager;
-import gov.nih.nci.caintegrator.studyQueryService.FindingsManagerImpl;
 
 
 
@@ -154,11 +145,20 @@ public class QueryInbox {
             Map fdata = new HashMap();
             fdata.put("time", String.valueOf(task.getElapsedTime()));
             fdata.put("status", tmp);
-            if(task.getStatus()!=null && task.getStatus().getComment()!=null) {
-                AnalysisServerException ase = (AnalysisServerException) businessTierCache.getObjectFromSessionCache(task.getCacheId(), task.getId()+"_analysisServerException");
-                String comments = ase!=null && ase.getMessage() != null ? ase.getMessage() : "Unspecified Error";
+            if(task.getStatus()!=null ) {
+
+                String comments = null;
+                if(task.getStatus().getComment() != null) {
+                    comments = task.getStatus().getComment();
+                } else {
+                    AnalysisServerException ase = (AnalysisServerException) businessTierCache.getObjectFromSessionCache(task.getCacheId(), task.getId()+"_analysisServerException");
+                    if(ase == null)
+                        comments = "Unspecified Error";
+                    else
+                        comments = ase!=null && ase.getMessage() != null ? ase.getMessage() : "Unspecified Error";
+                }
+                    
                 fdata.put("comments", StringEscapeUtils.escapeJavaScript(comments));
-//              fdata.put("comments", StringEscapeUtils.escapeJavaScript(f.getStatus().getComment()));
             }
             currentStatuses.put(task.getId(), fdata);
         }
