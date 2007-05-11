@@ -360,6 +360,9 @@ public class AnalysisServerClientManager implements ApplicationService, MessageL
 		        try {
                     // Use cgom based annotation service if it has been injected
                     if(managedBean && annotationManager != null) {
+                        if(reporterIds == null || reporterIds.size() < 1) {
+                            throw new Exception("Query returned no results");
+                        }
                         AnnotationCriteria criteria = new AnnotationCriteria();
                         ClassComparisonQueryDTO queryDTO = (ClassComparisonQueryDTO)finding.getTask().getQueryDTO();
                         
@@ -378,7 +381,7 @@ public class AnalysisServerClientManager implements ApplicationService, MessageL
 		         
 		          //Set the finding status to error and store in the cache
 		          FindingStatus newStatus = FindingStatus.Error;
-				  newStatus.setComment("Internal error getting annotations for reporters.");
+				  newStatus.setComment(e.getMessage());
 				  finding.setStatus(newStatus);
                     if(finding.getTask() != null) {
                         finding.getTask().setStatus(newStatus);
