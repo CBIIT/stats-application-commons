@@ -1,6 +1,7 @@
 package gov.nih.nci.caintegrator.application.lists;
 
 import java.io.File;
+import java.util.Collection;
 import java.util.List;
 
 import javax.naming.OperationNotSupportedException;
@@ -79,4 +80,8 @@ public class ListLoader {
         return userListBean;
     }
 
+    public List<UserList> loadUserLists(){
+        
+        return null;
+    }
 }
