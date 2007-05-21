@@ -1,14 +1,13 @@
 package gov.nih.nci.caintegrator.application.cache;
 
-import java.util.Properties;
+import gov.nih.nci.caintegrator.service.task.Task;
 
-import gov.nih.nci.caintegrator.application.util.PropertyLoader;
+import java.util.Collection;
 
 import javax.servlet.http.HttpSessionEvent;
 import javax.servlet.http.HttpSessionListener;
 
 import org.apache.log4j.Logger;
-import org.apache.log4j.PropertyConfigurator;
 
 /**
  *	SessionTracker is notified whenever an HttpSession is created or destroyed
@@ -114,7 +113,11 @@ public class SessionTracker implements HttpSessionListener {
 		logger.debug("Total Active Sessions: " + activeSessions.size());
 		//remove the cache for the dead session
 		BusinessCacheManager.getInstance().removeSessionCache(evt.getSession().getId());
-		PresentationCacheManager.getInstance().removeSessionCache(evt.getSession().getId());
+		
+        Collection<Task> allTasks = PresentationCacheManager.getInstance().getAllSessionTasks(evt.getSession().getId());
+        BusinessCacheManager.getInstance().removeSessionCacheForTasks(allTasks);
+        
+        PresentationCacheManager.getInstance().removeSessionCache(evt.getSession().getId());
 
 	}
 

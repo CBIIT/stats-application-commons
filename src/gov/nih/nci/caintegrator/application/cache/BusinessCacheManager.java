@@ -1,6 +1,7 @@
 package gov.nih.nci.caintegrator.application.cache;
 
 import gov.nih.nci.caintegrator.service.findings.Finding;
+import gov.nih.nci.caintegrator.service.task.Task;
 //import gov.nih.nci.rembrandt.util.RembrandtConstants;
 //import gov.nih.nci.rembrandt.web.helper.SessionTempReportCounter;
 
@@ -191,17 +192,39 @@ public class BusinessCacheManager implements BusinessTierCache{
     /**
      * 
      */
+    public boolean removeSessionCacheForTasks(Collection<Task> tasks) {
+        for(Task t: tasks){
+            if(manager!=null && manager.cacheExists(t.getCacheId())) {
+                manager.removeCache(t.getCacheId());
+                logger.debug("SessionCache removed for task with cacheId: "+ t.getCacheId());
+                fireCacheRemoveEvent(t.getCacheId());
+                //cache found and removed
+                return true;
+            }
+            else{
+              //there was no sessionCache to remove
+              logger.debug("There was no sessionCache for : "+ t.getCacheId()+" to remove.");
+              return false;
+            }
+        } 
+        // there were no tasks to remove
+        return true;
+    }
+    
+    /**
+     * 
+     */
     public boolean removeSessionCache(String sessionId) {
-    	if(manager!=null && manager.cacheExists(sessionId)) {
-    		manager.removeCache(sessionId);
+        if(manager!=null && manager.cacheExists(sessionId)) {
+            manager.removeCache(sessionId);
             logger.debug("SessionCache removed: "+ sessionId);
             fireCacheRemoveEvent(sessionId);
             //cache found and removed
             return true;
         }else {
-        	//there was no sessionCache to remove
-        	logger.debug("There was no sessionCache for : "+ sessionId+" to remove.");
-        	return false;
+            //there was no sessionCache to remove
+            logger.debug("There was no sessionCache for : "+ sessionId+" to remove.");
+            return false;
         }
     }
     
