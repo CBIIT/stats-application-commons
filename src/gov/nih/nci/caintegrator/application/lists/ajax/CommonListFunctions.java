@@ -193,13 +193,30 @@ public class CommonListFunctions {
 	            DateFormat dateFormat = new SimpleDateFormat("MM/dd/yyyy hh:mm aaa", Locale.US);
 	            if(ul!=null)  {
 	            	JSONArray listSubTypes = new JSONArray();
-	            	for(ListSubType lst : ul.getListSubType()){
-	            		listSubTypes.add(lst.toString());
-	            	}
-	                JSONObject jsonListName = new JSONObject();
+                    if(ul.getListSubType()!=null){
+                        for(ListSubType lst : ul.getListSubType()){
+    	            		listSubTypes.add(lst.toString());
+    	            	}
+                    }
+                    
+                    JSONObject jsonListName = new JSONObject();
+                    String listNotes = ul.getNotes();
+                    if(ul.getNotes()!=null){
+                        
+                        if(listNotes.length()>100){
+                            listNotes = listNotes.substring(0,99);
+                        }                        
+                    }
+                    
+                    jsonListName.put("author", ul.getAuthor());
+                   
+                    jsonListName.put("notes", listNotes);
+	                
 	                jsonListName.put("listSubTypes", listSubTypes);
 	                jsonListName.put("listName", ul.getName());
-	                jsonListName.put("listDate", dateFormat.format(ul.getDateCreated()).toString());
+                    if(ul.getDateCreated()!=null){
+                        jsonListName.put("listDate", dateFormat.format(ul.getDateCreated()).toString());
+                    }
 	                jsonListName.put("itemCount", String.valueOf(ul.getItemCount()));
 	                jsonListName.put("invalidItems", String.valueOf(ul.getInvalidList().size()));
 	                
