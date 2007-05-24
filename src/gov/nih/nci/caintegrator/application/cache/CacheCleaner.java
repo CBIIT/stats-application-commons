@@ -1,7 +1,6 @@
 package gov.nih.nci.caintegrator.application.cache;
 
 import gov.nih.nci.caintegrator.application.util.PropertyLoader;
-import gov.nih.nci.caintegrator.application.cache.CacheConstants;
 
 import java.util.HashMap;
 import java.util.Iterator;

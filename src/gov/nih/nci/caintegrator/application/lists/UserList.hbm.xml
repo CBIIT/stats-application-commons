@@ -8,8 +8,16 @@
 <hibernate-mapping
 	package="gov.nih.nci.caintegrator.application.lists" >
 	
-	<typedef name="EnumUserType" class="gov.nih.nci.caintegrator.util.EnumUserType">
+	<typedef name="ListType" class="gov.nih.nci.caintegrator.util.EnumUserType">
               <param name="enumClassName">gov.nih.nci.caintegrator.application.lists.ListType</param>
+     </typedef>
+     
+     <typedef name="ListSubType" class="gov.nih.nci.caintegrator.util.EnumUserType">
+              <param name="enumClassName">gov.nih.nci.caintegrator.application.lists.ListSubType</param>
+     </typedef>
+     
+     <typedef name="ListOrigin" class="gov.nih.nci.caintegrator.util.EnumUserType">
+              <param name="enumClassName">gov.nih.nci.caintegrator.application.lists.ListOrigin</param>
      </typedef>
      
     	
@@ -25,8 +33,11 @@
                  insert="false"
                  update="false" />
         
-       <property name='listType' column="TYPE" type="EnumUserType" />
+       <property name='listType' column="TYPE" type="ListType" />
        
+       <property name='listSubType' column="SUBTYPE" type="ListSubType" />
+       
+       <property name='listOrigin' column="ORIGIN" type="ListOrigin" />       
                
         <property name="author"
                  type="java.lang.String"

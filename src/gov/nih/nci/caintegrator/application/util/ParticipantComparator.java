@@ -1,6 +1,5 @@
 package gov.nih.nci.caintegrator.application.util;
 
-import gov.nih.nci.caintegrator.application.bean.IHCFindingReportBean;
 import gov.nih.nci.caintegrator.domain.finding.clinical.bean.ClinicalFinding;
 
 import java.util.Comparator;

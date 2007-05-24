@@ -1,6 +1,5 @@
 package gov.nih.nci.caintegrator.application.cache;
 
-import java.io.Serializable;
 
 /**
 * caIntegrator License

@@ -62,7 +62,7 @@ public class ListLoader {
                     listValidator.validate(myType, myTextList);
                     UserList myUserList = listManager.createList(myType, "default"+myType.toString()+(count+1), myTextList, listValidator);
                     //flag all these that are auto loaded as default
-                    myUserList.setListSubType(ListSubType.Default);
+                    myUserList.setListOrigin(ListOrigin.Default);
                     //place the list in the userListBean
                     count++;
                     if(myUserList!=null){

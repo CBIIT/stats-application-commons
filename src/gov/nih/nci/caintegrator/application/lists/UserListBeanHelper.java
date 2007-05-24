@@ -226,38 +226,51 @@ public class UserListBeanHelper{
     }
     
     
+    public List<UserList> getLists(ListType listType, ListSubType listSubType)   {
+        //get lists of this type with these subtypes
+        List<UserList> ul = this.getLists(listType);
+        List<UserList> matches = new ArrayList<UserList>(); 
+        //got all the main type, now see if any of these are of any listsubtypes
+        for(UserList u : ul){
+            ListSubType lst = u.getListSubType();            
+                if(lst.equals(listSubType)){
+                    matches.add(u);
+                }            
+        }
+        return matches;
+    }
+    
     public List<UserList> getLists(ListType listType, List<ListSubType> listSubTypes)   {
         //get lists of this type with these subtypes
         List<UserList> ul = this.getLists(listType);
         List<UserList> matches = new ArrayList<UserList>(); 
         //got all the main type, now see if any of these are of any listsubtypes
         for(UserList u : ul){
-            List<ListSubType> lst = u.getListSubType();
-            for(ListSubType ss : listSubTypes){
-                if(lst.contains(ss) && !matches.contains(u)){
-                    matches.add(u);
-                }            
-            }
+            for(ListSubType subType:listSubTypes){
+                ListSubType lst = u.getListSubType();            
+                    if(lst.equals(subType)){
+                        matches.add(u);
+                    }    
+            }        
         }
         return matches;
     }
     
-    public List<UserList> getLists(ListType listType, ListSubType listSubType){
-        List<ListSubType> lst = new ArrayList<ListSubType>();
-        lst.add(listSubType);
-        return getLists(listType, lst);
+    public List<UserList> getLists(ListType listType, ListOrigin listOrigin)   {
+        //get lists of this type with these subtypes
+        List<UserList> ul = this.getLists(listType);
+        List<UserList> matches = new ArrayList<UserList>(); 
+        //got all the main type, now see if any of these are of any listsubtypes
+        for(UserList u : ul){
+            ListOrigin lo = u.getListOrigin();
+                if(lo.equals(listOrigin)){
+                    matches.add(u);
+                }            
+        }
+        return matches;
     }
     
-    public List<UserList> getListsBySubType(List<ListSubType> listSubTypes){
-        List<UserList> subTypeList = new ArrayList<UserList>();
-        if (listSubTypes == null || userListBean == null || userListBean.getEntireList().isEmpty())
-            return subTypeList;     
-            for (ListSubType subType : listSubTypes){
-                    subTypeList.addAll(getSubTypeList(subType));                
-            
-        }
-        return subTypeList;
-    }
+    
     
     public List<UserList> getAllCustomLists(){
         List<UserList> customList = new ArrayList<UserList>();
@@ -265,31 +278,31 @@ public class UserListBeanHelper{
             return customList;
         
         for (UserList list : userListBean.getEntireList()){
-            List<ListSubType> subTypes = list.getListSubType();
-            for (ListSubType subType : subTypes){
-                if (ListSubType.Custom.equals(subType)){
-                    customList.add(list);
-                }
+            ListOrigin origin = list.getListOrigin();
+            if(origin!=null && origin.equals(ListOrigin.Custom)){
+                customList.add(list);
             }
         }
         return customList;
     }
     
-    public List<UserList> getSubTypeList(ListSubType listSubType){
-        List<UserList> subTypeList = new ArrayList<UserList>();
-        if (listSubType == null || userListBean == null || userListBean.getEntireList().isEmpty())
-            return subTypeList;
+    public List<UserList> getAllCustomListsForType(ListType type){
+        List<UserList> customList = new ArrayList<UserList>();
+        if (userListBean == null || userListBean.getEntireList().isEmpty())
+            return customList;
         
         for (UserList list : userListBean.getEntireList()){
-            List<ListSubType> subTypes = list.getListSubType();
-            for (ListSubType subType : subTypes){
-                if (listSubType.equals(subType)){
-                    subTypeList.add(list);
-                }
+            ListOrigin origin = list.getListOrigin();
+            ListType myType = list.getListType();
+            if(origin!=null && origin.equals(ListOrigin.Custom)
+                    && myType!=null && myType == type){
+                customList.add(list);
             }
         }
-        return subTypeList;
+        return customList;
     }
+    
+    
     
     public List<UserList> getAllLists() {
         List<UserList> allList = new ArrayList<UserList>();
@@ -338,15 +351,9 @@ public class UserListBeanHelper{
         return getGenericListNames(ListType.valueOf(listType));
     }
     
-    public Collection getGenericListNamesFromStringWithSubs(String listType, String commaSubs){ 
+    public Collection getGenericListNamesFromStringWithSubs(String listType, String sub){ 
         //parse the subs
-        List<ListSubType> lst = new ArrayList();
-        String[] sbs = StringUtils.split(commaSubs, ",");
-        for(String s : sbs) {
-            if(ListSubType.valueOf(s.trim())!=null) {
-                lst.add(ListSubType.valueOf(s.trim()));
-            }
-        }
+        ListSubType lst = ListSubType.valueOf(sub.trim());
         return getGenericListNamesWithSubTypes(ListType.valueOf(listType), lst);
     }
     
@@ -360,9 +367,9 @@ public class UserListBeanHelper{
         return setListNames;
     }
     
-    public Collection getGenericListNamesWithSubTypes(ListType lt, List<ListSubType> subs)  {
+    public Collection getGenericListNamesWithSubTypes(ListType lt, ListSubType sub)  {
          Collection<UserList> setList = new ArrayList<UserList>();
-         setList = getLists(lt, subs);
+         setList = getLists(lt, sub);
          Collection setListNames = new ArrayList();
          for(UserList userListName : setList){
              setListNames.add(userListName.toString());
@@ -395,7 +402,7 @@ public class UserListBeanHelper{
             Collections.sort(dList, String.CASE_INSENSITIVE_ORDER);
             
             newList = new UserList(newListName+"_"+listNames.get(0)+"-"+listNames.get(1),listType,dList,new ArrayList<String>(),new Date());
-            newList.setListSubType(ListSubType.Custom);
+            newList.setListOrigin(ListOrigin.Custom);
             newList.setItemCount(dList.size());
             userListBean.addList(newList);
         }
@@ -407,7 +414,7 @@ public class UserListBeanHelper{
             Collections.sort(dList2, String.CASE_INSENSITIVE_ORDER);
             newList = null;
             newList = new UserList(newListName+"_"+listNames.get(1)+"-"+listNames.get(0),listType,dList2,new ArrayList<String>(),new Date());
-            newList.setListSubType(ListSubType.Custom);
+            newList.setListOrigin(ListOrigin.Custom);
             newList.setItemCount(dList2.size());
             userListBean.addList(newList);
         }
@@ -427,7 +434,7 @@ public class UserListBeanHelper{
         items.addAll(unitedSet);
         Collections.sort(items, String.CASE_INSENSITIVE_ORDER);
         UserList newList = new UserList(newListName,listType,items,new ArrayList<String>(),new Date());
-        newList.setListSubType(ListSubType.Custom);
+        newList.setListOrigin(ListOrigin.Custom);
         newList.setItemCount(items.size());
         userListBean.addList(newList);
     }
@@ -450,7 +457,7 @@ public class UserListBeanHelper{
         items.addAll(intersectedList);
         Collections.sort(items, String.CASE_INSENSITIVE_ORDER);
         UserList newList = new UserList(newListName,listType,items,new ArrayList<String>(),new Date());
-        newList.setListSubType(ListSubType.Custom);
+        newList.setListOrigin(ListOrigin.Custom);
         newList.setItemCount(items.size());
         userListBean.addList(newList);
     }

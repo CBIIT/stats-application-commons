@@ -4,6 +4,10 @@ import java.io.Serializable;
 
 public class ListItem implements Serializable{
     
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 4682371205502747948L;
     private Long id;
     private String name;
     private Double rank;

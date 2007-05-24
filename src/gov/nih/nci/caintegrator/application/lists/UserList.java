@@ -16,12 +16,16 @@ import java.util.List;
  *
  */
 public class UserList implements Serializable{ 
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 5729349209858477497L;
     private Long id;
     private String name = "";
     private ListType listType;
     //a list can actually have several sub-types
-    private List<ListSubType> listSubType;
-   
+    private ListSubType listSubType;
+    private ListOrigin listOrigin;
     //user attached notes for a list
     private String notes;
     //private List<String> list = new ArrayList<String>();
@@ -35,22 +39,9 @@ public class UserList implements Serializable{
     private String author;
     private String institute;
     private String category;
-    private boolean isDefault;
     
     
-    /**
-     * @return Returns the isDefault.
-     */
-    public boolean isDefault() {
-        return isDefault;
-    }
-
-    /**
-     * @param isDefault The isDefault to set.
-     */
-    public void setDefault(boolean isDefault) {
-        this.isDefault = isDefault;
-    }
+    
 
     //newest constructor to replace string listsd with listitem lists
     public UserList(String name, ListType listType, List<ListItem> list, List<ListItem> invalidList){
@@ -87,8 +78,8 @@ public class UserList implements Serializable{
     /**
      * @deprecated
      */
-    public UserList(String name, ListType listType, List<ListSubType> listSubTypes, List<String> list, List<String> invalidList, Date dateCreated, String notes)    {
-        new UserList(name, listType, listSubTypes, list, invalidList, dateCreated);
+    public UserList(String name, ListType listType, ListSubType listSubType, List<String> list, List<String> invalidList, Date dateCreated, String notes)    {
+        new UserList(name, listType, listSubType, list, invalidList, dateCreated);
         this.notes = notes;        
     }
     
@@ -96,9 +87,9 @@ public class UserList implements Serializable{
     /**
      * @deprecated
      */
-    public UserList(String name, ListType listType, List<ListSubType> listSubTypes, List<String> list, List<String> invalidList, Date dateCreated)  {
+    public UserList(String name, ListType listType, ListSubType listSubType, List<String> list, List<String> invalidList, Date dateCreated)  {
         new UserList(name,listType,list,invalidList,dateCreated);
-        this.listSubType = listSubTypes;        
+        this.listSubType = listSubType;        
     }
 
     
@@ -254,29 +245,19 @@ public class UserList implements Serializable{
         } 
     }
 
-    public List<ListSubType> getListSubType() {
+    public ListSubType getListSubType() {
         return listSubType;
     }
 
     
-    //conv. in case you only want to add one
-    public void setListSubType(ListSubType listSubType){
-        //if(this.listSubTypes.isEmpty())   {
-            ArrayList<ListSubType> st = new ArrayList();
-            st.add(listSubType);
-            setListSubType(st);
-    //  }
-    //  else if(!this.listSubTypes.contains(listSubType))   {
-    //      this.listSubTypes.add(listSubType);
-    //  }
-    }
     
-    public void setListSubType(List<ListSubType> listSubType) {
+    
+    public void setListSubType(ListSubType listSubType) {
         this.listSubType = listSubType;
     }
     
     public boolean hasSubType(ListSubType listSubType)  {
-        if(this.listSubType.contains(listSubType))  {
+        if(this.listSubType.equals(listSubType))  {
             return true;
         }
         return false;
@@ -322,6 +303,20 @@ public class UserList implements Serializable{
      */
     public void setInvalidListItems(List<ListItem> invalidListItems) {
         this.invalidList = invalidListItems;
+    }
+
+    /**
+     * @return Returns the listOrigin.
+     */
+    public ListOrigin getListOrigin() {
+        return listOrigin;
+    }
+
+    /**
+     * @param listOrigin The listOrigin to set.
+     */
+    public void setListOrigin(ListOrigin listOrigin) {
+        this.listOrigin = listOrigin;
     }
 
     

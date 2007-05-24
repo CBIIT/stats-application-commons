@@ -13,6 +13,7 @@ import java.util.Map;
 import java.util.Set;
 
 import gov.nih.nci.caintegrator.application.lists.ListManager;
+import gov.nih.nci.caintegrator.application.lists.ListOrigin;
 import gov.nih.nci.caintegrator.application.lists.ListSubType;
 import gov.nih.nci.caintegrator.application.lists.ListType;
 import gov.nih.nci.caintegrator.application.lists.ListValidator;
@@ -50,7 +51,7 @@ public class CommonListFunctions {
                 ListManager uploadManager = (ListManager) ListManager.getInstance();
                 Map paramMap = uploadManager.getParams(list);
                 String commas = StringUtils.join(list.getList().toArray(), ",");
-                String sty = list.getListSubType()!=null && !list.getListSubType().contains(ListSubType.Default) ? "color:#A90101" : "";
+                String sty = list.getListOrigin()!=null && !list.getListOrigin().equals(ListOrigin.Default) ? "color:#A90101" : "color:#000";
                 results += ("<li id='" + paramMap.get("listName") + "' title='"+commas+"' style='"+sty+"'>"+paramMap.get("listName")+"</li>");
             }
         } else {
@@ -87,7 +88,7 @@ public class CommonListFunctions {
 		try	{
 			UserList mylist = um.createList(type, name, cleanList, lv);
 			//set the sub-type to custom 
-			mylist.setListSubType(ListSubType.Custom);
+			mylist.setListOrigin(ListOrigin.Custom);
 			//only works thru DWR
 			UserListBeanHelper ulbh = new UserListBeanHelper();
 			if(ulbh!=null)	{
@@ -102,7 +103,7 @@ public class CommonListFunctions {
 	}
 	
 	//DWR ONLY:  takes a list of ListSubTypes, also appends ListSubType.Custom
-	public static String createGenericList(ListType type, List<ListSubType> listSubTypes, List<String> list, String name, ListValidator lv)	{
+	public static String createGenericList(ListType type, ListSubType listSubType, List<String> list, String name, ListValidator lv)	{
 		//no duplicates
 		HashSet<String> h = new HashSet<String>();
 		for (int i = 0; i < list.size(); i++)
@@ -115,12 +116,12 @@ public class CommonListFunctions {
 		ListManager um = ListManager.getInstance();
 		try	{
 			UserList mylist = um.createList(type, name, cleanList, lv);
-			if(listSubTypes!=null && listSubTypes.size()>0){
-				listSubTypes.add(ListSubType.Custom);
-				mylist.setListSubType(listSubTypes);
+			if(listSubType!=null){
+				mylist.setListSubType(listSubType);
+                mylist.setListOrigin(ListOrigin.Custom);
 			}
 			else	{
-				mylist.setListSubType(ListSubType.Custom);
+				mylist.setListOrigin(ListOrigin.Custom);
 			}
 			//only works thru DWR
 			UserListBeanHelper ulbh = new UserListBeanHelper();
@@ -134,7 +135,7 @@ public class CommonListFunctions {
 	}
 
 	//CAN be used outside DWR...takes a list of ListSubTypes, also appends ListSubType.Custom
-	public static String createGenericListWithSession(ListType type, List<ListSubType> listSubTypes, List<String> list, String name, ListValidator lv, HttpSession session)	{
+	public static String createGenericListWithSession(ListType type, ListSubType listSubType, List<String> list, String name, ListValidator lv, HttpSession session)	{
 		//no duplicates
 		HashSet<String> h = new HashSet<String>();
 		for (int i = 0; i < list.size(); i++)
@@ -147,12 +148,12 @@ public class CommonListFunctions {
 		ListManager um = ListManager.getInstance();
 		try	{
 			UserList mylist = um.createList(type, name, cleanList, lv);
-			if(listSubTypes!=null && listSubTypes.size()>0){
-				listSubTypes.add(ListSubType.Custom);
-				mylist.setListSubType(listSubTypes);
+			if(listSubType!=null){
+				mylist.setListSubType(listSubType);
+                mylist.setListOrigin(ListOrigin.Custom);
 			}
 			else	{
-				mylist.setListSubType(ListSubType.Custom);
+				mylist.setListOrigin(ListOrigin.Custom);
 			}
 			UserListBeanHelper ulbh = new UserListBeanHelper(session);
 			ulbh.addList(mylist);
@@ -184,7 +185,7 @@ public class CommonListFunctions {
 	        
 	        listContainer.put("listType", listType);
 	        //which do we want to display differently in the UI
-	        listContainer.put("highlightType", ListSubType.Default.toString());
+	        
 	        
 	        myLists = helper.getGenericListNames(ListType.valueOf(listType));
 	        
@@ -192,27 +193,45 @@ public class CommonListFunctions {
 	            UserList ul = helper.getUserList(listName);
 	            DateFormat dateFormat = new SimpleDateFormat("MM/dd/yyyy hh:mm aaa", Locale.US);
 	            if(ul!=null)  {
-	            	JSONArray listSubTypes = new JSONArray();
+                    String listSubType ="";
                     if(ul.getListSubType()!=null){
-                        for(ListSubType lst : ul.getListSubType()){
-    	            		listSubTypes.add(lst.toString());
-    	            	}
+                        listSubType = "Subtype: " + ul.getListSubType().toString() + " - ";
                     }
                     
                     JSONObject jsonListName = new JSONObject();
                     String listNotes = ul.getNotes();
-                    if(ul.getNotes()!=null){
-                        
+                    if(ul.getNotes()!=null){                        
                         if(listNotes.length()>100){
                             listNotes = listNotes.substring(0,99);
                         }                        
                     }
                     
+                    String style = "";
+                    if(ul.getListOrigin()!=null) {
+                        jsonListName.put("origin", ul.getListOrigin().toString());                        
+                        if(ul.getListOrigin().equals(ListOrigin.Default)){
+                            style = "color:#000000";
+                            jsonListName.put("highlightType", style);
+                        }
+                        if(ul.getListOrigin().equals(ListOrigin.Custom)){
+                            style = "color:#A90101";
+                            jsonListName.put("highlightType", style);
+                        }
+                        
+                    }
+                    else{
+                        jsonListName.put("highlightType", style);
+                    }
+                       
+                    
+                    
+                    
+                    
                     jsonListName.put("author", ul.getAuthor());
                    
                     jsonListName.put("notes", listNotes);
 	                
-	                jsonListName.put("listSubTypes", listSubTypes);
+	                jsonListName.put("listSubType", listSubType);
 	                jsonListName.put("listName", ul.getName());
                     if(ul.getDateCreated()!=null){
                         jsonListName.put("listDate", dateFormat.format(ul.getDateCreated()).toString());

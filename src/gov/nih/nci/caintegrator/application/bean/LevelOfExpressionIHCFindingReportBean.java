@@ -6,7 +6,6 @@ import gov.nih.nci.caintegrator.studyQueryService.dto.ihc.LevelOfExpressionIHCFi
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashSet;
 import java.util.Set;
 
 public class LevelOfExpressionIHCFindingReportBean implements IHCFindingReportBean{
