@@ -154,10 +154,18 @@ public class AsynchronousFindingStrategy extends SessionBasedFindingStrategy {
         
         Runnable task = new Runnable() {
             public void run() {
-            List<gov.nih.nci.caintegrator.domain.finding.bean.Finding> findings = queryHandler
+                List<gov.nih.nci.caintegrator.domain.finding.bean.Finding> findings = null;
+                try {
+                findings = queryHandler
                     .getResults(getTaskResult().getTask().getQueryDTO());
-            getTaskResult().setTaskResults(findings);
-            getTaskResult().getTask().setStatus(FindingStatus.Completed);
+                getTaskResult().setTaskResults(findings);
+                getTaskResult().getTask().setStatus(FindingStatus.Completed);
+                } catch(Exception e) {
+                    FindingStatus status = FindingStatus.Error;
+                    status.setComment(e.getMessage());
+                    getTaskResult().getTask().setStatus(status);
+                }
+
             businessCacheManager.addToSessionCache(getTaskResult().getTask().getCacheId(), 
                     getTaskResult().getTask().getId(), getTaskResult());
             System.out.println("Query has completed, task has been placed back in cache");
