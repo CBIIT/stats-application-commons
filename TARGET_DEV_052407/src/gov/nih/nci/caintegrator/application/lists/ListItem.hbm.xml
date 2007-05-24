@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+
+<!DOCTYPE hibernate-mapping PUBLIC 
+	"-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+	"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping
+	package="gov.nih.nci.caintegrator.application.lists" >
+	<class name="ListItem"
+		table="LIST_ITEM" >	
+		
+		<id name="id" column="ITEM_ID" >
+			<generator class="assigned" />
+		</id>	
+		
+		<property name="name"
+                 type="java.lang.String"
+                 column="ITEM_NAME"
+                 insert="false"
+                 update="false" />
+                 
+        <property name="rank"
+                 type="java.lang.Long"
+                 column="RANK"
+                 insert="false"
+                 update="false" />
+        
+        <property name="notes"
+                 type="java.lang.String"
+                 column="ITEM_DESCRIPTION"
+                 insert="false"
+                 update="false" />
+        
+        <property name="listName"
+                 type="java.lang.String"
+                 column="LIST_NAME"
+                 insert="false"
+                 update="false" />
+                 
+         
+                 
+          
+                                 
+	</class>
+</hibernate-mapping>
