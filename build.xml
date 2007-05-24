@@ -27,6 +27,11 @@
 		</javac>
 		<jar jarfile="caintegrator-application-commons.jar">
 			<fileset dir="${build.classes.dir}"/>
+			<fileset dir="${build.source.dir}">
+	            <exclude name="hibernate.cfg.xml"/>
+	            <exclude name="hibernate.properties"/>
+	            <exclude name="*.java"/>
+        	</fileset>
 		</jar>
 		<antcall target="retrieve_deployment_artifacts"></antcall>
 	</target>
