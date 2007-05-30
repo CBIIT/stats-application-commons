@@ -14,6 +14,7 @@ import gov.nih.nci.caintegrator.studyQueryService.QueryHandler;
 
 import java.util.List;
 
+import org.apache.log4j.Logger;
 import org.springframework.core.task.TaskExecutor;
 
 /**
@@ -34,7 +35,7 @@ public class AsynchronousFindingStrategy extends SessionBasedFindingStrategy {
     // of "domain findings" from the executed query.  This will be
     // placed into the BusinessTierCache
     protected Finding applicationFinding;
-    
+    private static Logger logger = Logger.getLogger(AsynchronousFindingStrategy.class);    
     protected TaskExecutor taskExecutor;
     
     
@@ -161,6 +162,7 @@ public class AsynchronousFindingStrategy extends SessionBasedFindingStrategy {
                 getTaskResult().setTaskResults(findings);
                 getTaskResult().getTask().setStatus(FindingStatus.Completed);
                 } catch(Exception e) {
+                    logger.error("Error issuing query", e);
                     FindingStatus status = FindingStatus.Error;
                     status.setComment(e.getMessage());
                     getTaskResult().getTask().setStatus(status);
