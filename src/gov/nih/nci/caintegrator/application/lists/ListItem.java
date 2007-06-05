@@ -1,19 +1,35 @@
 package gov.nih.nci.caintegrator.application.lists;
 
+
 import java.io.Serializable;
+
+import org.apache.log4j.Logger;
 
 public class ListItem implements Serializable{
     
-    /**
-     * 
-     */
+    private static Logger logger = Logger.getLogger(ListItem.class);
     private static final long serialVersionUID = 4682371205502747948L;
     private Long id;
     private String name;
-    private Double rank;
+    private Long rank;
     private String notes; 
     private String listName;
+    private Long listId;
     
+    /**
+     * @return Returns the listId.
+     */
+    public Long getListId() {
+        return listId;
+    }
+
+    /**
+     * @param listId The listId to set.
+     */
+    public void setListId(Long listId) {
+        this.listId = listId;
+    }
+
     public ListItem(String name, String listName){
         this.name = name;
         this.listName = listName;
@@ -70,13 +86,13 @@ public class ListItem implements Serializable{
     /**
      * @return Returns the rank.
      */
-    public Double getRank() {
+    public Long getRank() {
         return rank;
     }
     /**
      * @param rank The rank to set.
      */
-    public void setRank(Double rank) {
+    public void setRank(Long rank) {
         this.rank = rank;
     }
 
