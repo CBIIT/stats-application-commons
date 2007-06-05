@@ -179,7 +179,7 @@ public class UserListBeanHelper{
                     itemDescription.put("notes",listItem.getNotes());
                 }
                 if(listItem.getRank()!=null){
-                    itemDescription.put("rank",Double.toString(listItem.getRank()));
+                    itemDescription.put("rank",Long.toString(listItem.getRank()));
                 }
                 
                 listItems.add(itemDescription);
