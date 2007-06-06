@@ -14,6 +14,11 @@
 			<generator class="assigned" />
 		</id>	
 		
+		<property name="listId"
+				column="LIST_ID"
+				insert="false"
+                 update="false" />
+		
 		<property name="name"
                  type="java.lang.String"
                  column="ITEM_NAME"
@@ -37,10 +42,11 @@
                  column="LIST_NAME"
                  insert="false"
                  update="false" />
-                 
-         
-                 
-          
-                                 
+                       
 	</class>
+	        
+    <query name="ListItem.containmentReport">
+         	<![CDATA[select distinct li from ListItem li where li.name = (:item) and li.listId in (:listIds)]]>
+    </query>
+        
 </hibernate-mapping>
