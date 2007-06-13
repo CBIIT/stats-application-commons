@@ -176,6 +176,33 @@ public class MailManager {
 		}			
      }
 	
+	/**
+	 * sendFeedbackMail is used to send the feedback information entered from a form in an email
+	 * to the address specified in the mail properties
+	 */
+	public void sendFeedbackMail(String comment, String least, String most)
+	{
+		try
+		{				
+		    // Part 1 is always included  
+		    String message = new MessageFormat(MailConfig.getInstance(mailProperties).getUnformattedFeedback()).format(
+		    	new String[] {comment,
+		    			      least,
+		    			      most});
+		    
+	        // Send the message
+	        new SendMail(mailProperties).sendMail(MailConfig.getInstance(mailProperties).getFeedbackAddress(),
+	        		null, message, MailConfig.getInstance(mailProperties).getFeedbackSubject());		
+		} 
+		catch (Exception e) 
+		{
+			logger.error("Send Feedback mail error", e);
+		} 
+		catch (ValidationException e) 
+		{
+			logger.error("Send Feedback mail error", e);
+		}
+	 }
 
 	/**
 	 * The filename is sometimes sent in with a leading slash.  Clean it off.

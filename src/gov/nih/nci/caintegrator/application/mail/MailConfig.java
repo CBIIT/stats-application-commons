@@ -103,6 +103,24 @@ public class MailConfig
 		return mailProperties.getProperty("ftp.Body4");
 	}
 	/**
+	 * @return Returns the feedback template.
+	 */
+	public String getUnformattedFeedback() {
+		return mailProperties.getProperty("feedback.template");
+	}
+	/**
+	 * @return Returns the feedback mail to address.
+	 */
+	public String getFeedbackAddress() {
+		return mailProperties.getProperty("feedback.mailTo");
+	}
+	/**
+	 * @return Returns the feedback subject.
+	 */
+	public String getFeedbackSubject() {
+		return mailProperties.getProperty("feedback.mailSubject");
+	}
+	/**
 	 * @return Returns the host.
 	 */
 	public String getHost() {
