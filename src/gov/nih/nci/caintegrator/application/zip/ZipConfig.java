@@ -2,7 +2,6 @@ package gov.nih.nci.caintegrator.application.zip;
 
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.text.SimpleDateFormat;
 import java.util.Properties;
 

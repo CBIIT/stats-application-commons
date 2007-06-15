@@ -1,10 +1,16 @@
 package gov.nih.nci.caintegrator.security;
 
-import java.util.*;
+import java.util.Enumeration;
+import java.util.Hashtable;
 
 import javax.naming.Context;
 import javax.naming.NamingEnumeration;
-import javax.naming.directory.*;
+import javax.naming.directory.Attribute;
+import javax.naming.directory.Attributes;
+import javax.naming.directory.DirContext;
+import javax.naming.directory.InitialDirContext;
+import javax.naming.directory.SearchControls;
+import javax.naming.directory.SearchResult;
 
 
 

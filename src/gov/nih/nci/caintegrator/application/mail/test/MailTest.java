@@ -1,8 +1,10 @@
 package gov.nih.nci.caintegrator.application.mail.test;
 
 import gov.nih.nci.caintegrator.application.mail.MailManager;
-import junit.framework.TestCase;
+
 import java.util.ArrayList;
+
+import junit.framework.TestCase;
 
 public class MailTest extends TestCase {
 

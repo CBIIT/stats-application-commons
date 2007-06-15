@@ -1,9 +1,9 @@
 /*
- * $Revision: 1.1 $
- * $Date: 2006-09-12 00:49:25 $
- * $Author: sahnih $
+ * $Revision: 1.2 $
+ * $Date: 2007-06-15 18:36:06 $
+ * $Author: rossok $
  * $Name: not supported by cvs2svn $
- * $Id: ZipFiles.java,v 1.1 2006-09-12 00:49:25 sahnih Exp $
+ * $Id: ZipFiles.java,v 1.2 2007-06-15 18:36:06 rossok Exp $
  * Created on Aug 23, 2005
  *
  *
@@ -11,13 +11,19 @@
  */
 package gov.nih.nci.caintegrator.application.zip;
 
-import java.io.*;
-import java.util.List;
-import java.util.zip.*;
-import java.util.ArrayList;
-import org.apache.log4j.Logger;
-
 import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
+
+import org.apache.log4j.Logger;
 
 /**
  * @author Prashant Shah - NCICB/SAIC
