@@ -13,7 +13,7 @@ import java.net.URL;
  */
 public class URLChecker {
 
-	static boolean exists(String URLName){
+	public static boolean exists(String URLName){
 	  try {
 	    HttpURLConnection.setFollowRedirects(false);
 	    // note : you may also need
