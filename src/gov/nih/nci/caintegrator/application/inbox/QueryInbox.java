@@ -148,7 +148,7 @@ public class QueryInbox {
             fdata.put("status", tmp);
             if (f.getStatus() != null && f.getStatus().getComment() != null) {
                 AnalysisServerException ase = (AnalysisServerException) businessTierCache
-                        .getObjectFromSessionCache(session.getId(), f
+                        .getObjectFromSessionCache(sid, f
                                 .getTaskId()
                                 + "_analysisServerException");
                 String comments = ase != null && ase.getMessage() != null ? ase
