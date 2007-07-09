@@ -1,6 +1,7 @@
 package gov.nih.nci.caintegrator.application.cache;
 
 import gov.nih.nci.caintegrator.service.task.Task;
+import gov.nih.nci.caintegrator.security.PublicUserPool;
 
 import java.util.Collection;
 
@@ -118,7 +119,11 @@ public class SessionTracker implements HttpSessionListener {
         BusinessCacheManager.getInstance().removeSessionCacheForTasks(allTasks);
         
         PresentationCacheManager.getInstance().removeSessionCache(evt.getSession().getId());
-
+    	String gpUser = (String)evt.getSession().getAttribute(PublicUserPool.PUBLIC_USER_NAME);
+    	PublicUserPool pool = (PublicUserPool)evt.getSession().getAttribute(PublicUserPool.PUBLIC_USER_POOL);
+    	if (gpUser != null && pool != null){
+			pool.returnPublicUser(gpUser);
+    	}
 	}
 
 	/**
