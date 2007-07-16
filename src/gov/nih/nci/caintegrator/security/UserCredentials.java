@@ -1,12 +1,12 @@
 package gov.nih.nci.caintegrator.security;
 
-import gov.nih.nci.caintegrator.dto.de.InstitutionDE;
 
+import gov.nih.nci.security.authorization.domainobjects.ProtectionElement;
 import java.util.Collection;
 
 /***
  * Class that will hold the "Credentials" required to fully use a caIntegrator
- * based application.  It will hold the Role of the user and the institutes that
+ * based application.  It will hold the Role of the user and the protectionElements that
  * the user is associated with.
  * 
  * The UserCredentials may have 1 of 3 roles.
@@ -14,9 +14,9 @@ import java.util.Collection;
  *  UserRole.PUBLIC_USER is able to access only public data
  *  
  *  UserRole.INSTITUTE_USER is able to view PUBLIC_USER data and the data of the Institutes
- *  listed in the Set institutes.
+ *  listed in the Set protectionElements.
  *  
- *  UserRole.SUPER_USER is able to view all data across all institutes as well
+ *  UserRole.SUPER_USER is able to view all data across all protectionElements as well
  *  as all public data
  * 
  * 
@@ -89,7 +89,7 @@ public class UserCredentials {
 	private String emailAddress;
 	private String firstName;
 	private String lastName;
-	private Collection<InstitutionDE> institutes;
+	private Collection<ProtectionElement> protectionElements;
 	private boolean authenticated = false;
 	
 	public enum UserRole{
@@ -115,15 +115,15 @@ public class UserCredentials {
 	 * set by the SecurityManager, they can not be modified.
 	 * @param emailAddress
 	 * @param firstName
-	 * @param institutes
+	 * @param protectionElements
 	 * @param lastName
 	 * @param role
 	 * @param userName
 	 */
-	protected UserCredentials(String emailAddress, String firstName, Collection<InstitutionDE> institutes, String lastName, UserRole role, String userName) {
+	protected UserCredentials(String emailAddress, String firstName, Collection<ProtectionElement> protectionElements, String lastName, UserRole role, String userName) {
 		this.emailAddress = emailAddress;
 		this.firstName = firstName;
-		this.institutes = institutes;
+		this.protectionElements = protectionElements;
 		this.lastName = lastName;
 		this.role = role;
 		this.userName = userName;
@@ -136,22 +136,22 @@ public class UserCredentials {
 	 * set by the SecurityManager, they can not be modified.
 	 * @param userName
 	 * @param role
-	 * @param institutes
+	 * @param protectionElements
 	 */
-	protected UserCredentials(String userName, UserRole role, Collection<InstitutionDE> allowableData) {
+	protected UserCredentials(String userName, UserRole role, Collection<ProtectionElement> allowableData) {
 		this.userName = userName;
 		this.role = role;
-		this.institutes = allowableData;
+		this.protectionElements = allowableData;
 		if(role!=null) {
 			authenticated = true;
 		}
 	}
 	/**
-	 * The institutes whose data the user is allowed to see
+	 * The protectionElements whose data the user is allowed to see
 	 * @return
 	 */
-	public Collection<InstitutionDE> getInstitutes() {
-		return this.institutes;
+	public Collection<ProtectionElement> getprotectionElements() {
+		return this.protectionElements;
 	}
 
 	/**

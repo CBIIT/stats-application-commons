@@ -138,8 +138,8 @@ public class SecurityManager {
 	 * create and return a populated UserCredentials object or will throw an
 	 * AuthenticationException.
 	 * 
-	 * Authorization is done through the Rembrandt database where user roles
-	 * are stored with associated Institutes.
+	 * Authorization is done through the caIntegrator Appication database where user roles
+	 * are stored with associated protectionElements such as Insitution Ids or Study names.
 	 * 
 	 * @param userName
 	 * @param password
@@ -157,7 +157,7 @@ public class SecurityManager {
 		}catch(Exception e) {
 			logger.error(e);
 		}
-		Collection<InstitutionDE> institutes = new ArrayList<InstitutionDE>();
+		Collection<ProtectionElement> protectionElements = new ArrayList<ProtectionElement>();
 		User user = authorizationManager.getUser(userName);
 		if(user == null){
 			logger.warn("User "+ userName +" not found") ;
@@ -174,7 +174,7 @@ public class SecurityManager {
 		 * has all the applications Protection Elements assigned to it.  In other
 		 * words username danielR is able to access all protection elements in
 		 * the application, or rather, danielR is able to access all submitted
-		 * data from all institutes.
+		 * data from all protectionElements.
 		 * 
 		 * IMPORTANT!
 		 * For caIntegrator we refer to what the CSM calls a group as a Role.
@@ -184,7 +184,7 @@ public class SecurityManager {
 		 * 
 		 * DBauer
 		 */
-		Set protectionElements;
+		Set<ProtectionElementPrivilegeContext> protectionElementPrivilegeContextSet;
 		String emailAddress = null;
 		String firstName = null;
 		String lastName = null;
@@ -193,32 +193,29 @@ public class SecurityManager {
 			emailAddress = user.getEmailId();
 			firstName = user.getFirstName();
 			lastName = user.getLastName();
-			protectionElements = userProvisioningManager.getProtectionElementPrivilegeContextForUser(user.getUserId().toString());
+			protectionElementPrivilegeContextSet = userProvisioningManager.getProtectionElementPrivilegeContextForUser(user.getUserId().toString());
 			groups = userProvisioningManager.getGroups(user.getUserId().toString());	
 		} catch (Exception e) {
 			logger.error("No ProtectionElementPrivlegeContexts found for user:"+ userName);
 			logger.error(e);
 			throw new AuthenticationException("ProtectionElementPrivlegeContexts are null");
 		}
-		if(protectionElements!=null) {
+		if(protectionElementPrivilegeContextSet!=null) {
 			try {
 				/*
 				 * For all the protection elements allowed for reading
 				 * create institution domain elements and store into the
 				 * user credentials.
 				 */
-				for(Iterator i = protectionElements.iterator();i.hasNext();) {
-					ProtectionElementPrivilegeContext pepc = (ProtectionElementPrivilegeContext)i.next();
+				for(ProtectionElementPrivilegeContext pepc: protectionElementPrivilegeContextSet) {
 					ProtectionElement pe = pepc.getProtectionElement();
-					Long instituteId = new Long(pe.getObjectId());
-					String name = pe.getProtectionElementName();
-					institutes.add(new InstitutionDE(name,instituteId));
+					protectionElements.add(pe);
 				}
 				
 				logger.debug("Username: "+userName+" has the following credentials:");
 				logger.debug("--------------------------------------------------------");
-				for(InstitutionDE institute:institutes) {
-					logger.debug("Allowed to read:" +institute.getInstituteName());
+				for(ProtectionElement pe:protectionElements) {
+					logger.debug("Allowed to read: " +pe.getProtectionElementName()+" ID:"+pe.getObjectId());
 				}
 				logger.debug("--------------------------------------------------------");
 				/*
@@ -230,7 +227,7 @@ public class SecurityManager {
 				 * snap judgments about the user after they are logged in
 				 */
 				UserRole role = getUserRole(groups);
-				credentials = new UserCredentials(emailAddress,firstName,institutes,lastName,role,userName);
+				credentials = new UserCredentials(emailAddress,firstName,protectionElements,lastName,role,userName);
 			}catch(NullPointerException npe) {
 				logger.error("Security Objects are null.") ;
 				throw new AuthenticationException("Some SecurityObjects are null");
