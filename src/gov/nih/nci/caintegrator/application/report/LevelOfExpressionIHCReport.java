@@ -93,34 +93,34 @@ public class LevelOfExpressionIHCReport{
 	public LevelOfExpressionIHCReport() {}
 
 	
-	/**
-	 * @param finding
-	 * @param filterMapParams
-	 * @return Document
-	 */
-	public static Document getReportXML(Finding finding, Map filterMapParams) {
+    /**
+     * @param finding
+     * @param filterMapParams
+     * @return Document
+     */
+    public static Document getReportXML(Finding finding, Map filterMapParams) {
 
-		Document document = DocumentHelper.createDocument();
+        Document document = DocumentHelper.createDocument();
 
-			Element report = document.addElement( "Report" );
-			Element cell = null;
-			Element data = null;
-			Element dataRow = null;
-			//ADD BASIC ATTRIBUTED
-	        report.addAttribute("reportType", "levelExpression");
-	        report.addAttribute("groupBy", "none");
-	        String queryName = finding.getTaskId();	       
-	        report.addAttribute("queryName", queryName);
-	        report.addAttribute("sessionId", "the session id");	        
-		    
-			StringBuffer sb = new StringBuffer();
-		     
-			/* *************************************************************************************************
+            Element report = document.addElement( "Report" );
+            Element cell = null;
+            Element data = null;
+            Element dataRow = null;
+            //ADD BASIC ATTRIBUTED
+            report.addAttribute("reportType", "levelExpression");
+            report.addAttribute("groupBy", "none");
+            String queryName = finding.getTaskId();        
+            report.addAttribute("queryName", queryName);
+            report.addAttribute("sessionId", "the session id");         
+            
+            StringBuffer sb = new StringBuffer();
+             
+            /* *************************************************************************************************
              * 
              * PROCESS QUERY DETAILS
              * 
              * *************************************************************************************************             * 
-			 */
+             */
             LevelOfExpressionIHCFindingCriteria criteria = (LevelOfExpressionIHCFindingCriteria)finding.getQueryDTO();
             ArrayList<String> queryDetails = new ArrayList();
             if(criteria!=null){
@@ -205,7 +205,7 @@ public class LevelOfExpressionIHCReport{
                 tmpCollection.clear();
                 tmp = "";
             }
-			
+            
             String qd = "";
             for(String q : queryDetails){
                 qd += q + " ||| ";
@@ -221,14 +221,14 @@ public class LevelOfExpressionIHCReport{
             //GET FINDINGS, CAST TO APPROPRIATE FINDINGS AND ADD TO ARRAYLIST (RESULTS)
             ArrayList dFindings = new ArrayList(finding.getDomainFindings());
             ArrayList<LevelOfExpressionIHCFinding> domainFindings = new ArrayList<LevelOfExpressionIHCFinding>(dFindings);
-			ArrayList<LevelOfExpressionIHCFindingReportBean> results = new ArrayList<LevelOfExpressionIHCFindingReportBean>();
+            ArrayList<LevelOfExpressionIHCFindingReportBean> results = new ArrayList<LevelOfExpressionIHCFindingReportBean>();
             for(LevelOfExpressionIHCFinding loef : domainFindings)  {
                 LevelOfExpressionIHCFindingReportBean reportBean = new LevelOfExpressionIHCFindingReportBean(loef);
                 results.add(reportBean);
             }
             
             
-			if(!results.isEmpty())	{
+            if(!results.isEmpty())  {
                 
                 //SORT THE ARRAYLIST(RESULTS) BY PATIENT DID
                 PatientComparator p = new PatientComparator();
@@ -239,21 +239,42 @@ public class LevelOfExpressionIHCReport{
                 Map<String,ArrayList<LevelOfExpressionIHCFindingReportBean>> reportBeanMap = new HashMap<String,ArrayList<LevelOfExpressionIHCFindingReportBean>>();
                 
                 for(int i =0; i<results.size();i++){
-                    if(i==0){
-                        reportBeanMap.put(results.get(i).getPatientDID()+"_"+results.get(i).getBiomarkerName(),new ArrayList<LevelOfExpressionIHCFindingReportBean>());
-                        reportBeanMap.get(results.get(i).getPatientDID()+"_"+results.get(i).getBiomarkerName()).add(results.get(i));                        
-                    }
-                    else if(!results.get(i).getPatientDID().equalsIgnoreCase(results.get(i-1).getPatientDID())){ 
-                        reportBeanMap.put(results.get(i).getPatientDID()+"_"+results.get(i).getBiomarkerName(),new ArrayList<LevelOfExpressionIHCFindingReportBean>());
-                        reportBeanMap.get(results.get(i).getPatientDID()+"_"+results.get(i).getBiomarkerName()).add(results.get(i));
-                    }
-                    else if(results.get(i).getPatientDID().equalsIgnoreCase(results.get(i-1).getPatientDID()) && !results.get(i).getBiomarkerName().equalsIgnoreCase(results.get(i-1).getBiomarkerName())){ 
-                        reportBeanMap.put(results.get(i).getPatientDID()+"_"+results.get(i).getBiomarkerName(),new ArrayList<LevelOfExpressionIHCFindingReportBean>());
-                        reportBeanMap.get(results.get(i).getPatientDID()+"_"+results.get(i).getBiomarkerName()).add(results.get(i));
+                    boolean found = false;
+                    Set<String> keys = reportBeanMap.keySet();
+                    if(!keys.isEmpty()){
+                        for(String k:keys){
+                            String s = results.get(i).getPatientDID()+"_"+results.get(i).getBiomarkerName();
+                            if(s.equals(k)){
+                                found = true;
+                                reportBeanMap.get(k).add(results.get(i));
+                                break;
+                            }
+                        }
+                        if(!found){
+                            reportBeanMap.put(results.get(i).getPatientDID()+"_"+results.get(i).getBiomarkerName(),new ArrayList<LevelOfExpressionIHCFindingReportBean>());
+                            reportBeanMap.get(results.get(i).getPatientDID()+"_"+results.get(i).getBiomarkerName()).add(results.get(i));
+                        }
                     }
                     else{
-                        reportBeanMap.get(results.get(i-1).getPatientDID()+"_"+results.get(i-1).getBiomarkerName()).add(results.get(i));                        
+                        reportBeanMap.put(results.get(i).getPatientDID()+"_"+results.get(i).getBiomarkerName(),new ArrayList<LevelOfExpressionIHCFindingReportBean>());
+                        reportBeanMap.get(results.get(i).getPatientDID()+"_"+results.get(i).getBiomarkerName()).add(results.get(i));
                     }
+//                    if(i==0){
+//                        reportBeanMap.put(results.get(i).getPatientDID()+"_"+results.get(i).getBiomarkerName(),new ArrayList<LevelOfExpressionIHCFindingReportBean>());
+//                        reportBeanMap.get(results.get(i).getPatientDID()+"_"+results.get(i).getBiomarkerName()).add(results.get(i));                        
+//                    }
+//                    else if(!results.get(i).getPatientDID().equalsIgnoreCase(results.get(i-1).getPatientDID())){ 
+//                        reportBeanMap.put(results.get(i).getPatientDID()+"_"+results.get(i).getBiomarkerName(),new ArrayList<LevelOfExpressionIHCFindingReportBean>());
+//                        reportBeanMap.get(results.get(i).getPatientDID()+"_"+results.get(i).getBiomarkerName()).add(results.get(i));
+//                    }
+//                    else if(results.get(i).getPatientDID().equalsIgnoreCase(results.get(i-1).getPatientDID()) && !results.get(i).getBiomarkerName().equalsIgnoreCase(results.get(i-1).getBiomarkerName())){ 
+//                        reportBeanMap.put(results.get(i).getPatientDID()+"_"+results.get(i).getBiomarkerName(),new ArrayList<LevelOfExpressionIHCFindingReportBean>());
+//                        reportBeanMap.get(results.get(i).getPatientDID()+"_"+results.get(i).getBiomarkerName()).add(results.get(i));
+//                    }
+//                    else{
+//                        reportBeanMap.get(results.get(i-1).getPatientDID()+"_"+results.get(i-1).getBiomarkerName()).add(results.get(i));                        
+//                    }
+                         
                 }
                  
                 //IF THE USER SELECTED TIMEPOINTS FOR WHICH THAT PATIENT DID DID NOT HAVE DATA, CREATE NULL BEANS SO AS TO RENDER A READABLE REPORT
@@ -263,12 +284,12 @@ public class LevelOfExpressionIHCReport{
                                 reportBeanMap.get(g).add(new LevelOfExpressionIHCFindingReportBean(new LevelOfExpressionIHCFinding()));
                             }
                         }
-				
+                
                 //ADD QUERY DETAILS      
                 Element details = report.addElement("Query_details");                
-				cell = details.addElement("Data");
-				cell.addText(qd);
-				cell = null;
+                cell = details.addElement("Data");
+                cell.addText(qd);
+                cell = null;
                 
                 //ADD HEADERS THAT ARE TIMEPOINT-INDEPENDENT (PATIENT AND BIOMARKER)
                 Element headerRow = report.addElement("Row").addAttribute("name", "headerRow");
@@ -279,17 +300,17 @@ public class LevelOfExpressionIHCReport{
                     data = null;
                     cell = null;    
                 }
-				
-				//ADD HEADERS THAT ARE TIMEPOINT DEPENDENT
+                
+                //ADD HEADERS THAT ARE TIMEPOINT DEPENDENT
                 ArrayList<String> headers = results.get(0).getHeaders();                
                 for(String header : headers){                    
-    		        cell = headerRow.addElement("Cell").addAttribute("type", "header").addAttribute("class", "header").addAttribute("group", "header");
-    			        data = cell.addElement("Data").addAttribute("type", "header").addText(header);
-    			        data = null;
-    			        cell = null;		        
+                    cell = headerRow.addElement("Cell").addAttribute("type", "header").addAttribute("class", "header").addAttribute("group", "header");
+                        data = cell.addElement("Data").addAttribute("type", "header").addText(header);
+                        data = null;
+                        cell = null;                
                 }
                 
-		        
+                
                 //ADD TIMEPOINT SUBHEADERS
                 ArrayList<String> tpHeaders = results.get(0).getTimepointHeaders(criteria);
                 TimepointStringComparator ts = new TimepointStringComparator();
@@ -304,7 +325,7 @@ public class LevelOfExpressionIHCReport{
                 }
                 
                   Set<String> keys = reportBeanMap.keySet();      
-		    	// ADD DATA ROWS		   
+                // ADD DATA ROWS           
                    for(String key : keys) {       
                        
                                        dataRow = report.addElement("Row").addAttribute("name", "dataRow");                         
@@ -349,18 +370,18 @@ public class LevelOfExpressionIHCReport{
                                             
                                             
                                         //ITERATE OVER THE MAP FOR EACH DATA FIELD WITH ITS CORRESPONDING TIMEPOINT AND BUILD DATA ROWS
-                                        for(LevelOfExpressionIHCFindingReportBean reportBean : mySortedMap)	{         		        	      			        
-                        			        cell = dataRow.addElement("Cell").addAttribute("type", "data").addAttribute("class", "data").addAttribute("group", "data");
+                                        for(LevelOfExpressionIHCFindingReportBean reportBean : mySortedMap) {                                                   
+                                            cell = dataRow.addElement("Cell").addAttribute("type", "data").addAttribute("class", "data").addAttribute("group", "data");
                                             data = cell.addElement("Data").addAttribute("type", "header").addText(reportBean.getPercentPositive());                                        
-                        			        data = null;
-                        			        cell = null;
+                                            data = null;
+                                            cell = null;
                                         }
                                         for(LevelOfExpressionIHCFindingReportBean reportBean : mySortedMap)  {
                                             cell = dataRow.addElement("Cell").addAttribute("type", "data").addAttribute("class", "data").addAttribute("group", "data");
                                             data = cell.addElement("Data").addAttribute("type", "header").addText(reportBean.getStainIntensity());
                                             data = null;
                                             cell = null;
-                        			       
+                                           
                                         }
                                         for(LevelOfExpressionIHCFindingReportBean reportBean : mySortedMap)  {
                                             cell = dataRow.addElement("Cell").addAttribute("type", "data").addAttribute("class", "data").addAttribute("group", "data");
@@ -385,15 +406,15 @@ public class LevelOfExpressionIHCReport{
                                         }
                        
                    }                   
-			}
+            }
             
-			else {
-				//TODO: handle this error
-				sb.append("<br><Br>Level of Expression is empty<br>");
-			}
-		    
-		    return document;
-	}
+            else {
+                //TODO: handle this error
+                sb.append("<br><Br>Level of Expression is empty<br>");
+            }
+            
+            return document;
+    }
 
 
     public static HSSFWorkbook getReportExcel(Finding finding, HashMap map) {
