@@ -14,7 +14,8 @@ import org.apache.log4j.Logger;
 import gov.nih.nci.caintegrator.security.PublicUserPool;
 import gov.nih.nci.caintegrator.security.EncryptionUtil;
 import gov.nih.nci.caintegrator.application.analysis.gp.GenePatternPublicUserPool;
-
+import gov.nih.nci.caintegrator.application.util.ApplicationConstants;
+import gov.nih.nci.caintegrator.application.security.UserInfoBean;
 
 
 public class GenePatternIntegrationHelper {
@@ -24,7 +25,17 @@ public class GenePatternIntegrationHelper {
 	public static String gpHomeURL(HttpServletRequest request) 
 				throws Exception {
 		HttpSession session = request.getSession();
-		String user = (String)session.getAttribute("name");
+		String user;
+		UserInfoBean info = (UserInfoBean) session.getAttribute(ApplicationConstants.userInfoBean);
+		
+		if (info != null) {
+			user = info.getUserName();
+		}
+		else {
+		  //for backward compatability
+		  user = (String) session.getAttribute("name");
+		}
+		
 		String publicUser = System.getProperty("gov.nih.nci.caintegrator.gp.publicuser.name");
 		String encryptKey = System.getProperty("gov.nih.nci.caintegrator.gp.desencrypter.key");
 		
@@ -41,6 +52,9 @@ public class GenePatternIntegrationHelper {
 		try {
 		//*				
 			//String password = System.getProperty("gov.nih.nci.ispyportal.gp.publicuser.password");
+			//Get the user name from the userInfoBean
+			
+			
 			
 			if (userName.equals(publicUserName)){
 				String gpUser = (String)session.getAttribute(GenePatternPublicUserPool.PUBLIC_USER_NAME);
