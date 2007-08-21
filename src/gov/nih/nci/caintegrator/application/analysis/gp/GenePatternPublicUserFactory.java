@@ -17,7 +17,7 @@ public class GenePatternPublicUserFactory extends BasePoolableObjectFactory {
 	private String publicUserName = "";
 	
 	public GenePatternPublicUserFactory(){
-		publicUserName = System.getProperty("gov.nih.nci.ispyportal.gp.publicuser.name");
+		publicUserName = System.getProperty("gov.nih.nci.caintegrator.gp.publicuser.name");
 	}
     public Object makeObject() throws Exception {
     	return publicUserName + count++;
