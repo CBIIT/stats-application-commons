@@ -19,7 +19,7 @@ import gov.nih.nci.caintegrator.application.security.LoginException;
  */
 public class CsmLoginService implements LoginService {
 
-    private static final String APP_NAME = "target";
+    private String APP_NAME = "";
     private static Logger logger = Logger.getLogger(CsmLoginService.class);
 
     /**
@@ -51,6 +51,20 @@ public class CsmLoginService implements LoginService {
         userInfo.setUserName(userName);
 
         return userInfo;
+    }
+
+    /**
+     * @return Returns the aPP_NAME.
+     */
+    public String getAPP_NAME() {
+        return APP_NAME;
+    }
+
+    /**
+     * @param app_name The aPP_NAME to set.
+     */
+    public void setAPP_NAME(String app_name) {
+        APP_NAME = app_name;
     }
 
 }

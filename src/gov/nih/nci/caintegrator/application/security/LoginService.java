@@ -14,4 +14,8 @@ import gov.nih.nci.caintegrator.application.security.LoginException;
 public interface LoginService {
 
     public UserInfoBean loginUser(String username, String password) throws LoginException;
+
+    public void setAPP_NAME(String name);
+    
+    public String getAPP_NAME();
 }
