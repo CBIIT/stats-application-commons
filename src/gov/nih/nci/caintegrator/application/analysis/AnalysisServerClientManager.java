@@ -6,6 +6,7 @@ import gov.nih.nci.caintegrator.analysis.messaging.AnalysisResult;
 import gov.nih.nci.caintegrator.application.cache.BusinessTierCache;
 import gov.nih.nci.caintegrator.application.service.ApplicationService;
 import gov.nih.nci.caintegrator.application.service.annotation.GeneExprAnnotationService;
+import gov.nih.nci.caintegrator.domain.annotation.gene.bean.GeneExprReporter;
 import gov.nih.nci.caintegrator.domain.annotation.service.AnnotationManager;
 import gov.nih.nci.caintegrator.dto.query.ClassComparisonQueryDTO;
 import gov.nih.nci.caintegrator.enumeration.FindingStatus;
@@ -14,6 +15,8 @@ import gov.nih.nci.caintegrator.service.findings.AnalysisFinding;
 import gov.nih.nci.caintegrator.service.findings.ReporterBasedFinding;
 import gov.nih.nci.caintegrator.studyQueryService.dto.annotation.AnnotationCriteria;
 
+import java.util.Collection;
+import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
@@ -368,7 +371,11 @@ public class AnalysisServerClientManager implements ApplicationService, MessageL
                         
                         criteria.setReporterIds(reporterIds);
                         criteria.setArrayPlatformType(queryDTO.getArrayPlatformDE().getValueObjectAsArrayPlatformType());
-                        reporterAnnotationMap = annotationManager.getGenesForReporters(criteria);
+                        reporterAnnotationMap = new HashMap();
+                        Collection<GeneExprReporter> reporters = annotationManager.getReporterAnnotations(criteria);
+                        for(GeneExprReporter reporter : reporters) {
+                            reporterAnnotationMap.put(reporter.getName(), reporter);
+                        }
                         rf.setReporterAnnotationsMap(reporterAnnotationMap);
                     } else if (gxAnnotService != null) {
 		        	  reporterAnnotationMap = gxAnnotService.getAnnotationsMapForReporters(reporterIds);
