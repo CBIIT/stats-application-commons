@@ -50,12 +50,7 @@ public class GenePatternIntegrationHelper {
 		String gpserverURL = System.getProperty("gov.nih.nci.caintegrator.gp.server")!=null ? 
 				(String)System.getProperty("gov.nih.nci.caintegrator.gp.server") : "localhost:8080"; //default to localhost
 		try {
-		//*				
-			//String password = System.getProperty("gov.nih.nci.ispyportal.gp.publicuser.password");
-			//Get the user name from the userInfoBean
-			
-			
-			
+
 			if (userName.equals(publicUserName)){
 				String gpUser = (String)session.getAttribute(GenePatternPublicUserPool.PUBLIC_USER_NAME);
 				if (gpUser == null){
@@ -90,8 +85,8 @@ public class GenePatternIntegrationHelper {
 			throw new Exception(e.getMessage());
 		}
 		//ticketString
-		System.out.println("ticketString is..............." + ticketString);
-		
+		logger.debug(ticketString);
+
         return ticketString;
     }
 
