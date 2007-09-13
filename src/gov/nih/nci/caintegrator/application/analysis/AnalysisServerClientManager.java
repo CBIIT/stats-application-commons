@@ -6,6 +6,7 @@ import gov.nih.nci.caintegrator.analysis.messaging.AnalysisResult;
 import gov.nih.nci.caintegrator.application.cache.BusinessTierCache;
 import gov.nih.nci.caintegrator.application.service.ApplicationService;
 import gov.nih.nci.caintegrator.application.service.annotation.GeneExprAnnotationService;
+import gov.nih.nci.caintegrator.domain.annotation.gene.bean.GeneExprReporter;
 import gov.nih.nci.caintegrator.domain.annotation.service.AnnotationManager;
 import gov.nih.nci.caintegrator.dto.query.ClassComparisonQueryDTO;
 import gov.nih.nci.caintegrator.enumeration.FindingStatus;
@@ -14,6 +15,11 @@ import gov.nih.nci.caintegrator.service.findings.AnalysisFinding;
 import gov.nih.nci.caintegrator.service.findings.ReporterBasedFinding;
 import gov.nih.nci.caintegrator.studyQueryService.dto.annotation.AnnotationCriteria;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.io.Writer;
+import java.util.Collection;
+import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
@@ -121,6 +127,7 @@ public class AnalysisServerClientManager implements ApplicationService, MessageL
 	private Queue resultQueue;
 	private QueueConnectionFactory queueConnectionFactory;
     private QueueConnection queueConnection;
+    private QueueConnection oldConnection = null;
     private Boolean managedBean = false;
     private static AnalysisServerClientManager instance = null;
     private static final long reconnectWaitTimeMS = 5000L;
@@ -192,9 +199,6 @@ public class AnalysisServerClientManager implements ApplicationService, MessageL
 		//Properties messagingProps = ApplicationContext.getJMSProperties();
 		//String jbossURL = System.getProperty("gov.nih.nci.caintegrator.analysis.jms.jboss_url");
 		
-		try {
-			
-		
 			while (!connected) {
 		
 			  try {
@@ -257,7 +261,9 @@ public class AnalysisServerClientManager implements ApplicationService, MessageL
 			    logger.info("  successfully found response queue=" + responseQueueName);
 			    logger.info("Now listening for requests...");
 			  }
-			  catch (JMSException ex) {
+			  catch (Exception ex) {
+				  logger.error("Caught exception when trying to establish connection.");
+				  logger.error(ex);
 			    numConnectAttempts++;
 			  
 			    if (numConnectAttempts <= 10) {
@@ -282,11 +288,7 @@ public class AnalysisServerClientManager implements ApplicationService, MessageL
 		    }
 		  }	
 		}
-		catch (Exception ex) {
-			  logger.error("Caught exception when trying to establish connection.");
-			  logger.error(ex);
-		}
-	}
+
 	
 	/**
 	 * JMS notification about a new message
@@ -309,10 +311,63 @@ public class AnalysisServerClientManager implements ApplicationService, MessageL
 		}
 		
 	}
-	
+	////////////////////
 	/**
 	 * JMS notification about an exception
 	 */
+	public synchronized void onException(JMSException jmsException) {
+		logger.error("onException: caught JMSexception: " + jmsException.getMessage());
+		jmsException.printStackTrace();
+		oldConnection = queueConnection;
+		boolean reconnection = false;
+		//retry : for (int i = 0; i < 10; i++) {
+			try {
+		   	    //attempt to re-establish the queue connection
+		   	    establishQueueConnection();
+		   	    reconnection = true;
+				//break retry;
+			} catch (Exception e2) {
+				logger.error( "reconnection failed ");
+				try {
+					logger.error( "sleep for 2 seconds and try reconnect again ");
+					Thread.sleep(2000);
+				} catch (InterruptedException e1) {
+					logger.error( "reconnection failed "+e1.getMessage());
+					e1.printStackTrace();
+				}
+			}
+		//}
+		if (!reconnection) {
+			logger.error( "RECONNECTION FAILED ");
+		}
+
+		Thread disconnThread = new Thread() {
+			public void run() {
+				try {
+					if (oldConnection != null) {
+						oldConnection.setExceptionListener(null);
+						oldConnection.close();
+						oldConnection = null;
+					}
+					logger.debug( "close the old connection success ");
+					return;
+				} catch (Exception e) {
+			      	logger.error("Catching exception thrown when closing broken connection msg=" + e.getMessage());
+			      	final Writer result = new StringWriter();
+			        final PrintWriter printWriter = new PrintWriter(result);
+			        e.printStackTrace(printWriter);
+			        logger.error(result.toString());
+				}
+			}
+		};
+		disconnThread.start();
+	} 
+	
+	////////////////////////
+	/**
+	 * JMS notification about an exception
+	 */
+	/*
     public void onException(JMSException jmsException) {
     	 //System.out.println("onException: caught JMSexception: " + exception.getMessage());
   	  logger.error("onException: caught JMSexception: " + jmsException.getMessage());
@@ -325,18 +380,22 @@ public class AnalysisServerClientManager implements ApplicationService, MessageL
                  //close();
                  connection.close();
              }
-  		 }
+  		 }  	  	  
+   	    //attempt to re-establish the queue connection
+   	    establishQueueConnection();
         }
         catch (JMSException c)
         {
-      	logger.info("Ignoring exception thrown when closing broken connection msg=" + c.getMessage());
-          //System.out.println("Ignoring exception thrown when closing broken connection msg=" + c.getMessage());
-          //c.printStackTrace(System.out);
+      	logger.error("Catching exception thrown when closing broken connection msg=" + c.getMessage());
+      	final Writer result = new StringWriter();
+        final PrintWriter printWriter = new PrintWriter(result);
+        c.printStackTrace(printWriter);
+        logger.error(result.toString());
+
         }
-  	  
-  	    //attempt to re-establish the queue connection
-  	    establishQueueConnection();
+
 	}
+	*/
     /***
      * Receive an analysis result
      * 
@@ -368,7 +427,11 @@ public class AnalysisServerClientManager implements ApplicationService, MessageL
                         
                         criteria.setReporterIds(reporterIds);
                         criteria.setArrayPlatformType(queryDTO.getArrayPlatformDE().getValueObjectAsArrayPlatformType());
-                        reporterAnnotationMap = annotationManager.getGenesForReporters(criteria);
+                        reporterAnnotationMap = new HashMap();
+                        Collection<GeneExprReporter> reporters = annotationManager.getReporterAnnotations(criteria);
+                        for(GeneExprReporter reporter : reporters) {
+                            reporterAnnotationMap.put(reporter.getName(), reporter);
+                        }
                         rf.setReporterAnnotationsMap(reporterAnnotationMap);
                     } else if (gxAnnotService != null) {
 		        	  reporterAnnotationMap = gxAnnotService.getAnnotationsMapForReporters(reporterIds);
@@ -539,5 +602,5 @@ public class AnalysisServerClientManager implements ApplicationService, MessageL
     public void setAnnotationManager(AnnotationManager annotationManager) {
         this.annotationManager = annotationManager;
     }
-	
+
 }
