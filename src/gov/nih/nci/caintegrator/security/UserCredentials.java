@@ -2,6 +2,8 @@ package gov.nih.nci.caintegrator.security;
 
 
 import gov.nih.nci.security.authorization.domainobjects.ProtectionElement;
+
+import java.io.Serializable;
 import java.util.Collection;
 
 /***
@@ -82,7 +84,7 @@ import java.util.Collection;
 * 
 */
 
-public class UserCredentials {
+public class UserCredentials implements Serializable{
 
 	private String userName;
 	private UserRole role;

@@ -32,6 +32,7 @@ public class CsmLoginService implements LoginService {
      * @param password
      * @return
      * @throws LoginException
+     * @deprecated
      */
     public UserInfoBean loginUser(String userName, String password)
             throws LoginException {
@@ -49,9 +50,38 @@ public class CsmLoginService implements LoginService {
         }
         userInfo.setLoggedIn(true);
         userInfo.setUserName(userName);
+        
 
         return userInfo;
     }
+    
+    /**
+     * This method will authenticate a user agains the security manager
+     * for the specified project.  Throws a LoginException if the user
+     * cannot be authenticated, otherwise returns a UserInfoBean with information
+     * about the user.
+     *
+     * @param userName
+     * @param password
+     * @return
+     * @throws LoginException
+     */
+    public UserCredentials login(String userName, String password)
+            throws LoginException {
+
+       UserCredentials user = null;
+        SecurityManager secManager = SecurityManager.getInstance(APP_NAME);
+        try {
+            if (secManager.authenticate(userName, password)) {
+                user = secManager.authorization(userName);
+            }
+        } catch (AuthenticationException e) {
+            throw new LoginException(e);
+        }
+
+        return user;
+    }
+    
 
     /**
      * @return Returns the aPP_NAME.

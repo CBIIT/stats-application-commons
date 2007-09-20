@@ -2,6 +2,7 @@ package gov.nih.nci.caintegrator.application.security;
 
 import gov.nih.nci.caintegrator.application.security.UserInfoBean;
 import gov.nih.nci.caintegrator.application.security.LoginException;
+import gov.nih.nci.caintegrator.security.UserCredentials;
 
 /**
  * This is an interface for the LoginService.  It has one method
@@ -12,8 +13,17 @@ import gov.nih.nci.caintegrator.application.security.LoginException;
  * @author caIntegrator Team
  */
 public interface LoginService {
-
+    
+    /**@deprecated
+     * 
+     * @param username
+     * @param password
+     * @return
+     * @throws LoginException
+     */
     public UserInfoBean loginUser(String username, String password) throws LoginException;
+    
+    public UserCredentials login(String username, String password) throws LoginException;
 
     public void setAPP_NAME(String name);
     
