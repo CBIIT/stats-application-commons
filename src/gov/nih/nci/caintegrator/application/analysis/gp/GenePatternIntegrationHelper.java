@@ -15,8 +15,7 @@ import gov.nih.nci.caintegrator.security.PublicUserPool;
 import gov.nih.nci.caintegrator.security.EncryptionUtil;
 import gov.nih.nci.caintegrator.application.analysis.gp.GenePatternPublicUserPool;
 import gov.nih.nci.caintegrator.application.util.ApplicationConstants;
-import gov.nih.nci.caintegrator.application.security.UserInfoBean;
-
+import gov.nih.nci.caintegrator.security.UserCredentials;
 
 public class GenePatternIntegrationHelper {
 	public static String gpPoolString = ":GP30:RBT";
@@ -26,9 +25,8 @@ public class GenePatternIntegrationHelper {
 				throws Exception {
 		HttpSession session = request.getSession();
 		String user;
-		UserInfoBean info = (UserInfoBean) session.getAttribute(ApplicationConstants.userInfoBean);
-		
-		if (info != null) {
+		UserCredentials info = (UserCredentials)session.getAttribute(ApplicationConstants.userInfoBean);
+		if (info != null ){
 			user = info.getUserName();
 		}
 		else {
