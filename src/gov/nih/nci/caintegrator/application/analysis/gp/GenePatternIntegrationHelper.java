@@ -14,6 +14,8 @@ import org.apache.log4j.Logger;
 import gov.nih.nci.caintegrator.security.PublicUserPool;
 import gov.nih.nci.caintegrator.security.EncryptionUtil;
 import gov.nih.nci.caintegrator.application.analysis.gp.GenePatternPublicUserPool;
+import gov.nih.nci.caintegrator.application.cache.PresentationCacheManager;
+import gov.nih.nci.caintegrator.application.cache.PresentationTierCache;
 import gov.nih.nci.caintegrator.application.util.ApplicationConstants;
 import gov.nih.nci.caintegrator.security.UserCredentials;
 
@@ -24,9 +26,11 @@ public class GenePatternIntegrationHelper {
 	public static String gpHomeURL(HttpServletRequest request) 
 				throws Exception {
 		HttpSession session = request.getSession();
+		PresentationTierCache presentationTierCache = PresentationCacheManager.getInstance();
+	    
 		String user;
-		UserCredentials info = (UserCredentials)session.getAttribute(ApplicationConstants.userInfoBean);
-		if (info != null ){
+		UserCredentials info = (UserCredentials) presentationTierCache.getNonPersistableObjectFromSessionCache(session.getId(), ApplicationConstants.userInfoBean);
+        if (info != null ){
 			user = info.getUserName();
 		}
 		else {
