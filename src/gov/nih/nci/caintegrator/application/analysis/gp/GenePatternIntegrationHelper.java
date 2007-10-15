@@ -53,7 +53,7 @@ public class GenePatternIntegrationHelper {
 				(String)System.getProperty("gov.nih.nci.caintegrator.gp.server") : "localhost:8080"; //default to localhost
 		try {
 
-			if (userName.equals(publicUserName)){
+			if (userName == null || userName.equals(publicUserName)){
 				String gpUser = (String)session.getAttribute(GenePatternPublicUserPool.PUBLIC_USER_NAME);
 				if (gpUser == null){
 					PublicUserPool pool = GenePatternPublicUserPool.getInstance();
