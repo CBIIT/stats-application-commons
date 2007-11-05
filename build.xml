@@ -4,13 +4,13 @@
 	TARGET: COMPILE
 		Compiles the source directory
 	-->
-	<target name="build_dependency" if="anthill.artifacts.dir" depends="build_jar_anthill">
+	<target name="build_dependency" if="anthill.artifacts.dir" depends="build_jar">
 		<echo>
 			Artifacts copied to ${anthill.artifacts.dir}
 		</echo>
 		<copy file="caintegrator-application-commons.jar" todir="${anthill.artifacts.dir}"/>
 	</target>
-	<target name="build_jar_anthill" >
+	<target name="build_jar" >
 		<delete dir="${build.classes.dir}" failonerror="false"/>
 		<delete file="caintegrator-application-commons.jar" failonerror="false"/>
 		<mkdir dir="${build.classes.dir}"/>
