@@ -135,6 +135,55 @@ public class AnalysisHelper {
 		}
 		return findings;
 	}
+	
+	public static ExpressionLookupFinding getExpressionValuesForReporters2(ReporterGroup reporters,String rbinaryFileName,SampleGroup samples, String sessionId) {
+	    Finding finding = null;
+        
+        try {
+            AnalysisServerClientManager as = AnalysisServerClientManager.getInstance();
+                    
+            String taskId = new Long(System.currentTimeMillis()).toString();
+            
+            ExpressionLookupRequest lookupReq = new ExpressionLookupRequest(sessionId, taskId); 
+            ExpressionLookupFinding elf = new ExpressionLookupFinding(sessionId,taskId, FindingStatus.Running);
+                        
+            BusinessTierCache btcache = CacheFactory.getBusinessTierCache();
+            btcache.addToSessionCache(sessionId, taskId, elf);
+            
+            as.setCache(btcache);
+            
+            lookupReq.setReporters(reporters);
+            lookupReq.setSamples(samples);
+            lookupReq.setDataFileName(rbinaryFileName);
+            
+            as.sendRequest(lookupReq);
+            finding = btcache.getSessionFinding(sessionId, taskId);
+            while(finding.getStatus() == FindingStatus.Running){
+                 finding = btcache.getSessionFinding(sessionId,taskId);          
+                     try {              
+                        Thread.sleep(1000);
+                    } catch (InterruptedException e) {
+                        logger.error(e);
+                    }
+            }
+                           
+        }
+        catch (NamingException e) {
+            // TODO Auto-generated catch block
+            logException(e);
+        } catch (JMSException e) {
+            // TODO Auto-generated catch block
+            logException(e);
+        }
+        catch (Exception e) {
+            logException(e); 
+         
+        }
+        
+        return (ExpressionLookupFinding) finding;
+        
+    }
+	
  	
 	public static ExpressionLookupFinding getExpressionValuesForReporters(ReporterGroup reporters,String rbinaryFileName,SampleGroup samples) {
 		
@@ -144,7 +193,7 @@ public class AnalysisHelper {
 			AnalysisServerClientManager as = AnalysisServerClientManager.getInstance();
 					
 			String sessionId = new Long(System.currentTimeMillis()).toString();
-			String taskId = sessionId + "_1";
+			String taskId = new Long(System.currentTimeMillis()).toString();
 			
 			ExpressionLookupRequest lookupReq = new ExpressionLookupRequest(sessionId, taskId); 
 			ExpressionLookupFinding elf = new ExpressionLookupFinding(sessionId,taskId, FindingStatus.Running);
