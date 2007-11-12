@@ -161,7 +161,7 @@ public class AnalysisHelper {
             while(finding.getStatus() == FindingStatus.Running){
                  finding = btcache.getSessionFinding(sessionId,taskId);          
                      try {              
-                        Thread.sleep(1000);
+                        Thread.sleep(500);
                     } catch (InterruptedException e) {
                         logger.error(e);
                     }
@@ -212,7 +212,7 @@ public class AnalysisHelper {
 		    while(finding.getStatus() == FindingStatus.Running){
 				 finding = btcache.getSessionFinding(sessionId,taskId);			 
 					 try {				
-						Thread.sleep(1000);
+						Thread.sleep(500);
 					} catch (InterruptedException e) {
 						logger.error(e);
 					}
