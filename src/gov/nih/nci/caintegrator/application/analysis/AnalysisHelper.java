@@ -22,6 +22,13 @@ import javax.naming.NamingException;
 
 import org.apache.log4j.Logger;
 
+/**
+ * This class provides some helper methods for making synchronous calls to the analysis server
+ * functions. The analysis server is asynchronous so the methods in this class are requrired to transform
+ * them into synchronous calls.
+ * @author harrismic
+ *
+ */
 public class AnalysisHelper {
 	
 	private static Logger logger = Logger.getLogger(AnalysisHelper.class);
