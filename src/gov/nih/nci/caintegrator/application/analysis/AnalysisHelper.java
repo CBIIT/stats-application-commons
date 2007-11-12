@@ -136,7 +136,7 @@ public class AnalysisHelper {
 		return findings;
 	}
 	
-	public static ExpressionLookupFinding getExpressionValuesForReporters2(ReporterGroup reporters,String rbinaryFileName,SampleGroup samples, String sessionId) {
+	public static ExpressionLookupFinding getExpressionValuesForReporters(ReporterGroup reporters,String rbinaryFileName,SampleGroup samples, String sessionId) {
 	    Finding finding = null;
         
         try {
