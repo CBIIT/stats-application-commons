@@ -4,6 +4,7 @@ import gov.nih.nci.caintegrator.analysis.messaging.AnalysisRequest;
 import gov.nih.nci.caintegrator.analysis.messaging.AnalysisRequestSender;
 import gov.nih.nci.caintegrator.analysis.messaging.AnalysisResult;
 import gov.nih.nci.caintegrator.application.cache.BusinessTierCache;
+import gov.nih.nci.caintegrator.application.cache.CacheFactory;
 import gov.nih.nci.caintegrator.application.service.ApplicationService;
 import gov.nih.nci.caintegrator.application.service.annotation.GeneExprAnnotationService;
 import gov.nih.nci.caintegrator.domain.annotation.gene.bean.GeneExprReporter;
@@ -449,7 +450,7 @@ public class AnalysisServerClientManager implements ApplicationService, MessageL
                     if(finding.getTask() != null) {
                         finding.getTask().setStatus(newStatus);
                     }
-				  _cacheManager.addToSessionCache(sessionId,taskId,finding);
+				  _cacheManager.addToSessionCache(sessionId,taskId,finding);				  
 		          return;
 		        }
 			}
