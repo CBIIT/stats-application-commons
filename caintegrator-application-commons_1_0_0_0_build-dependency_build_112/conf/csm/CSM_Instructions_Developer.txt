@@ -1,0 +1,60 @@
+Developer Steps for setting up CSM locally: (updated 10/03/06 by: Kevin Rosso)
+************************************
+1. If this is the first time you are using csm for login security, please read carefully...
+   In the current release of csm, the following 2 files are bundled with the application.
+   -ApplicationSecurityConfig.xml
+   -oracle-ds.xml
+   These 2 files are both located at \api\src\resources\
+   For csm to function, ApplicationSecurityConfig.xml is to be copied to 
+   C:\devtools\jboss-4.0.2\server\default\conf in your JBOSS installation and
+   oracle-ds.xml is to be copied to C:\devtools\jboss-4.0.2\server\default\deploy.
+   
+   However, when working with this build script, this step is unecessary as the ant build
+   will carry out this task for you. So, do not add the provided templates for these
+   2 files into their respective JBOSS directories if this is your first time using
+   csm. If you already have csm running with these files, just quickly check the files
+   to make sure they are both well-formed xml. 
+   
+************************************
+
+2. In buildCSM.properties, make sure that you set the following properties
+   custom to your workstation AND specific project if you do not already have
+   CSM implemented. The following shows "example" values:
+	  
+	 -project_name=ispy
+	 -jboss.install.dir=C:/devtools/jboss/jboss-4.0.2/
+	 -jboss.server.name=default
+	 
+	 -urlDbalias=something:@server2-d.nci.nih.gov:port:ANAME
+     -databaseUser=USER_NAME
+     -databasePassword=pa$$word
+     -jdbcRuntimeDriver=oracle.jdbc.driver.OracleDriver
+     
+     -ldap.initial.context.factory=com.sun.jndi.ldap.LdapCtxFactory
+     -ldap.provider.url=ldaps://some.server.name:999
+     -ldap.security.authentication=simple
+     -ldap.security.protocol=ssl
+     -ldap.context=ou=nci,o=nih
+	 
+ 
+************************************
+  
+3. Run the target "configure_CSM" (which is also the default)
+
+************************************
+
+4. This step may not be necessary for all developers. PLEASE READ:
+   Look in the file named properties-services.xml. Look for an entry
+   of the following that points to the ApplicationSecurityConfig.xml
+   Example:
+   			<attribute name="Properties">
+      				gov.nih.nci.security.configFile=C:/devtools/jboss/jboss-4.0.2/server/default/conf/ApplicationSecurityConfig.xml
+			</attribute>
+   If this is found, move onto the next step. If not, in the buildCSM.xml
+   file, run the target, "appendPropertyService".
+   
+*************************************
+5.  Lastly, until the CSM is upgraded you must delete the conficting folder that
+	is JBoss/server/default/deploy/jboss-hibernate.deployer.
+
+	Right now there is a conflict between the different versions of hibernate.
