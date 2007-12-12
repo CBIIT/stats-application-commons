@@ -11,8 +11,8 @@ import gov.nih.nci.caintegrator.service.findings.strategies.SessionBasedFindingS
 import gov.nih.nci.caintegrator.service.task.Task;
 import gov.nih.nci.caintegrator.service.task.TaskResult;
 import gov.nih.nci.caintegrator.studyQueryService.QueryHandler;
-
 import java.util.List;
+import java.util.Iterator;
 
 import org.apache.log4j.Logger;
 import org.springframework.core.task.TaskExecutor;
@@ -151,16 +151,34 @@ public class AsynchronousFindingStrategy extends SessionBasedFindingStrategy {
         
         businessCacheManager.addToSessionCache(getTaskResult().getTask().getCacheId(),
                 getTaskResult().getTask().getId(), getTaskResult());
-        System.out.println("Task has been set to running and placed in cache, query will be run");
+        logger.info("Task has been set to running and placed in cache, query will be run");
         
         Runnable task = new Runnable() {
             public void run() {
                 List findings = null;
                 try {
-                findings = queryHandler
+                	findings = queryHandler
                     .getResults(getTaskResult().getTask().getQueryDTO());
-                getTaskResult().setTaskResults(findings);
-                getTaskResult().getTask().setStatus(FindingStatus.Completed);
+                	getTaskResult().setTaskResults(findings);
+                	//Function specific code to deal with status.
+                	boolean isSet = false;
+                	for (Iterator it = findings.iterator(); it.hasNext();){
+                		Object obj = it.next();
+                		if (obj instanceof gov.nih.nci.caintegrator.service.findings.Finding){
+                			gov.nih.nci.caintegrator.service.findings.Finding theFinding = 
+                				(gov.nih.nci.caintegrator.service.findings.Finding)obj;
+                			if (theFinding.getStatus() == FindingStatus.Error){
+                				getTaskResult().getTask().setStatus(theFinding.getStatus());
+                				isSet = true;
+                				break;
+                			}
+                		}
+                	}
+                	if (!isSet)
+                		getTaskResult().getTask().setStatus(FindingStatus.Completed);
+                
+                //getResults() never throws exception so specific code added here 
+                //to generate error or completed.
                 } catch(Exception e) {
                     logger.error("Error issuing query", e);
                     FindingStatus status = FindingStatus.Error;
@@ -168,9 +186,9 @@ public class AsynchronousFindingStrategy extends SessionBasedFindingStrategy {
                     getTaskResult().getTask().setStatus(status);
                 }
 
-            businessCacheManager.addToSessionCache(getTaskResult().getTask().getCacheId(), 
+                businessCacheManager.addToSessionCache(getTaskResult().getTask().getCacheId(), 
                     getTaskResult().getTask().getId(), getTaskResult());
-            System.out.println("Query has completed, task has been placed back in cache");
+                logger.info("Query has completed, task has been placed back in cache");
     
             }
         };
