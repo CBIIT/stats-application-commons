@@ -1,6 +1,7 @@
 package gov.nih.nci.caintegrator.application.analysis;
 
 
+import gov.nih.nci.caintegrator.analysis.messaging.CopyNumberLookupRequest;
 import gov.nih.nci.caintegrator.analysis.messaging.DataPoint;
 import gov.nih.nci.caintegrator.analysis.messaging.DataPointVector;
 import gov.nih.nci.caintegrator.analysis.messaging.ExpressionLookupRequest;
@@ -8,13 +9,18 @@ import gov.nih.nci.caintegrator.analysis.messaging.ReporterGroup;
 import gov.nih.nci.caintegrator.analysis.messaging.SampleGroup;
 import gov.nih.nci.caintegrator.application.cache.BusinessTierCache;
 import gov.nih.nci.caintegrator.application.cache.CacheFactory;
+import gov.nih.nci.caintegrator.domain.finding.copyNumber.bean.CopyNumberFinding;
 import gov.nih.nci.caintegrator.enumeration.FindingStatus;
+import gov.nih.nci.caintegrator.service.findings.AnalysisFinding;
+import gov.nih.nci.caintegrator.service.findings.CopyNumberLookupFinding;
 import gov.nih.nci.caintegrator.service.findings.ExpressionLookupFinding;
 import gov.nih.nci.caintegrator.service.findings.Finding;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 import javax.jms.JMSException;
@@ -240,6 +246,45 @@ public class AnalysisHelper {
 		
 		return (ExpressionLookupFinding) finding;
 	    
+	}
+	
+	public static Collection<CopyNumberFinding> getCopyNumberFindingsForReporters(ReporterGroup reporters,String rbinaryFileName,SampleGroup samples) {
+		
+		
+		AnalysisServerClientManager as;
+		try {
+			as = AnalysisServerClientManager.getInstance();
+		
+		
+			String sessionId = new Long(System.currentTimeMillis()).toString();
+			String taskId = new Long(System.currentTimeMillis()).toString();
+			
+			CopyNumberLookupRequest lookupReq = new CopyNumberLookupRequest(sessionId, taskId); 
+			CopyNumberLookupFinding elf = new CopyNumberLookupFinding(sessionId,taskId, FindingStatus.Running);
+						
+			BusinessTierCache btcache = CacheFactory.getBusinessTierCache();
+		    btcache.addToSessionCache(sessionId, taskId, elf);
+		    
+		    as.setCache(btcache);
+			
+			//Do analysis server call to get copy number values.
+			
+			lookupReq.setDataFileName(rbinaryFileName);
+			lookupReq.setReporters(reporters);
+			lookupReq.setSamples(samples);
+			
+			//Create and load copy number findings
+			
+			//return copy number findings
+		
+		} catch (NamingException e) {
+			logger.error(e);
+		} catch (JMSException e) {
+			// TODO Auto-generated catch block
+			logger.error(e);
+		}
+		
+		return Collections.emptyList();
 	}
 	
 	private static void logException(Exception ex) {
