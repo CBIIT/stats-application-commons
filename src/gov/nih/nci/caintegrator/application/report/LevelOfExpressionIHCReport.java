@@ -229,21 +229,28 @@ public class LevelOfExpressionIHCReport{
             
             
             if(!results.isEmpty())  {
+            	
+            	
+            	
+                
                 
                 //SORT THE ARRAYLIST(RESULTS) BY PATIENT DID
                 PatientComparator p = new PatientComparator();
                 Collections.sort(results, p);
+               
                 
                 //CREATE A HASHMAP SORTED BY PATIENT DID AS THE KEY AND THE ARRAYLIST OF REPORTBEANS AS THE VALUE                
                  
                 Map<String,ArrayList<LevelOfExpressionIHCFindingReportBean>> reportBeanMap = new HashMap<String,ArrayList<LevelOfExpressionIHCFindingReportBean>>();
-                
+                int j= results.size();
                 for(int i =0; i<results.size();i++){
                     boolean found = false;
                     Set<String> keys = reportBeanMap.keySet();
+                    int key = keys.size();
                     if(!keys.isEmpty()){
                         for(String k:keys){
-                            String s = results.get(i).getPatientDID()+"_"+results.get(i).getBiomarkerName();
+                         //   String s = results.get(i).getPatientDID()+"_"+results.get(i).getBiomarkerName();
+                        	 String s = results.get(i).getSpecimenIdentifier()+"_"+results.get(i).getBiomarkerName();
                             if(s.equals(k)){
                                 found = true;
                                 reportBeanMap.get(k).add(results.get(i));
@@ -251,29 +258,15 @@ public class LevelOfExpressionIHCReport{
                             }
                         }
                         if(!found){
-                            reportBeanMap.put(results.get(i).getPatientDID()+"_"+results.get(i).getBiomarkerName(),new ArrayList<LevelOfExpressionIHCFindingReportBean>());
-                            reportBeanMap.get(results.get(i).getPatientDID()+"_"+results.get(i).getBiomarkerName()).add(results.get(i));
+                            reportBeanMap.put(results.get(i).getSpecimenIdentifier()+"_"+results.get(i).getBiomarkerName(),new ArrayList<LevelOfExpressionIHCFindingReportBean>());
+                            reportBeanMap.get(results.get(i).getSpecimenIdentifier()+"_"+results.get(i).getBiomarkerName()).add(results.get(i));
                         }
                     }
                     else{
-                        reportBeanMap.put(results.get(i).getPatientDID()+"_"+results.get(i).getBiomarkerName(),new ArrayList<LevelOfExpressionIHCFindingReportBean>());
-                        reportBeanMap.get(results.get(i).getPatientDID()+"_"+results.get(i).getBiomarkerName()).add(results.get(i));
+                        reportBeanMap.put(results.get(i).getSpecimenIdentifier()+"_"+results.get(i).getBiomarkerName(),new ArrayList<LevelOfExpressionIHCFindingReportBean>());
+                        reportBeanMap.get(results.get(i).getSpecimenIdentifier()+"_"+results.get(i).getBiomarkerName()).add(results.get(i));
                     }
-//                    if(i==0){
-//                        reportBeanMap.put(results.get(i).getPatientDID()+"_"+results.get(i).getBiomarkerName(),new ArrayList<LevelOfExpressionIHCFindingReportBean>());
-//                        reportBeanMap.get(results.get(i).getPatientDID()+"_"+results.get(i).getBiomarkerName()).add(results.get(i));                        
-//                    }
-//                    else if(!results.get(i).getPatientDID().equalsIgnoreCase(results.get(i-1).getPatientDID())){ 
-//                        reportBeanMap.put(results.get(i).getPatientDID()+"_"+results.get(i).getBiomarkerName(),new ArrayList<LevelOfExpressionIHCFindingReportBean>());
-//                        reportBeanMap.get(results.get(i).getPatientDID()+"_"+results.get(i).getBiomarkerName()).add(results.get(i));
-//                    }
-//                    else if(results.get(i).getPatientDID().equalsIgnoreCase(results.get(i-1).getPatientDID()) && !results.get(i).getBiomarkerName().equalsIgnoreCase(results.get(i-1).getBiomarkerName())){ 
-//                        reportBeanMap.put(results.get(i).getPatientDID()+"_"+results.get(i).getBiomarkerName(),new ArrayList<LevelOfExpressionIHCFindingReportBean>());
-//                        reportBeanMap.get(results.get(i).getPatientDID()+"_"+results.get(i).getBiomarkerName()).add(results.get(i));
-//                    }
-//                    else{
-//                        reportBeanMap.get(results.get(i-1).getPatientDID()+"_"+results.get(i-1).getBiomarkerName()).add(results.get(i));                        
-//                    }
+//                   
                          
                 }
                  
@@ -433,8 +426,10 @@ public class LevelOfExpressionIHCReport{
         if(!results.isEmpty())  {
             
             //SORT THE ARRAYLIST(RESULTS) BY PATIENT DID
-            PatientComparator p = new PatientComparator();
-            Collections.sort(results, p);
+           PatientComparator p = new PatientComparator();
+           Collections.sort(results, p);
+            
+         
             
             //CREATE A HASHMAP SORTED BY PATIENT DID AS THE KEY AND THE ARRAYLIST OF REPORTBEANS AS THE VALUE                
              
@@ -442,22 +437,23 @@ public class LevelOfExpressionIHCReport{
             
             for(int i =0; i<results.size();i++){
                 if(i==0){
-                    reportBeanMap.put(results.get(i).getPatientDID()+"_"+results.get(i).getBiomarkerName(),new ArrayList<LevelOfExpressionIHCFindingReportBean>());
-                    reportBeanMap.get(results.get(i).getPatientDID()+"_"+results.get(i).getBiomarkerName()).add(results.get(i));                        
+                    reportBeanMap.put(results.get(i).getSpecimenIdentifier()+"_"+results.get(i).getBiomarkerName(),new ArrayList<LevelOfExpressionIHCFindingReportBean>());
+                    reportBeanMap.get(results.get(i).getSpecimenIdentifier()+"_"+results.get(i).getBiomarkerName()).add(results.get(i));                        
                 }
-                else if(!results.get(i).getPatientDID().equalsIgnoreCase(results.get(i-1).getPatientDID())){ 
-                    reportBeanMap.put(results.get(i).getPatientDID()+"_"+results.get(i).getBiomarkerName(),new ArrayList<LevelOfExpressionIHCFindingReportBean>());
-                    reportBeanMap.get(results.get(i).getPatientDID()+"_"+results.get(i).getBiomarkerName()).add(results.get(i));
+                else if(!results.get(i).getSpecimenIdentifier().equalsIgnoreCase(results.get(i-1).getSpecimenIdentifier())){ 
+                    reportBeanMap.put(results.get(i).getSpecimenIdentifier()+"_"+results.get(i).getBiomarkerName(),new ArrayList<LevelOfExpressionIHCFindingReportBean>());
+                    reportBeanMap.get(results.get(i).getSpecimenIdentifier()+"_"+results.get(i).getBiomarkerName()).add(results.get(i));
                 }
-                else if(results.get(i).getPatientDID().equalsIgnoreCase(results.get(i-1).getPatientDID()) && !results.get(i).getBiomarkerName().equalsIgnoreCase(results.get(i-1).getBiomarkerName())){ 
-                    reportBeanMap.put(results.get(i).getPatientDID()+"_"+results.get(i).getBiomarkerName(),new ArrayList<LevelOfExpressionIHCFindingReportBean>());
-                    reportBeanMap.get(results.get(i).getPatientDID()+"_"+results.get(i).getBiomarkerName()).add(results.get(i));
+                else if(results.get(i).getSpecimenIdentifier().equalsIgnoreCase(results.get(i-1).getSpecimenIdentifier()) && !results.get(i).getBiomarkerName().equalsIgnoreCase(results.get(i-1).getBiomarkerName())){ 
+                    reportBeanMap.put(results.get(i).getSpecimenIdentifier()+"_"+results.get(i).getBiomarkerName(),new ArrayList<LevelOfExpressionIHCFindingReportBean>());
+                    reportBeanMap.get(results.get(i).getSpecimenIdentifier()+"_"+results.get(i).getBiomarkerName()).add(results.get(i));
                 }
                 else{
-                    reportBeanMap.get(results.get(i-1).getPatientDID()+"_"+results.get(i-1).getBiomarkerName()).add(results.get(i));                        
+                    reportBeanMap.get(results.get(i-1).getSpecimenIdentifier()+"_"+results.get(i-1).getBiomarkerName()).add(results.get(i));                        
                 }
             }
-             
+            
+          
             //IF THE USER SELECTED TIMEPOINTS FOR WHICH THAT PATIENT DID DID NOT HAVE DATA, CREATE NULL BEANS SO AS TO RENDER A READABLE REPORT
             Set<String> b = reportBeanMap.keySet();
                     for(String g: b){
