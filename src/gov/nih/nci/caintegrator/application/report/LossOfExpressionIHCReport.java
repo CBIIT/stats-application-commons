@@ -229,7 +229,8 @@ public class LossOfExpressionIHCReport{
                     Set<String> keys = reportBeanMap.keySet();
                     if(!keys.isEmpty()){
                         for(String k:keys){
-                            String s = results.get(i).getPatientDID()+"_"+results.get(i).getBiomarkerName();
+                            String s = results.get(i).getSpecimenIdentifier()+"_"+results.get(i).getBiomarkerName();
+                            
                             if(s.equals(k)){
                                 found = true;
                                 reportBeanMap.get(k).add(results.get(i));
@@ -237,14 +238,16 @@ public class LossOfExpressionIHCReport{
                             }
                         }
                         if(!found){
-                            reportBeanMap.put(results.get(i).getPatientDID()+"_"+results.get(i).getBiomarkerName(),new ArrayList<LossOfExpressionIHCFindingReportBean>());
-                            reportBeanMap.get(results.get(i).getPatientDID()+"_"+results.get(i).getBiomarkerName()).add(results.get(i));
+                            reportBeanMap.put(results.get(i).getSpecimenIdentifier()+"_"+results.get(i).getBiomarkerName(),new ArrayList<LossOfExpressionIHCFindingReportBean>());
+                            reportBeanMap.get(results.get(i).getSpecimenIdentifier()+"_"+results.get(i).getBiomarkerName()).add(results.get(i));
+                     
                         }
                     }
                     else{
-                        reportBeanMap.put(results.get(i).getPatientDID()+"_"+results.get(i).getBiomarkerName(),new ArrayList<LossOfExpressionIHCFindingReportBean>());
-                        reportBeanMap.get(results.get(i).getPatientDID()+"_"+results.get(i).getBiomarkerName()).add(results.get(i));
-                    }
+                    	
+                        reportBeanMap.put(results.get(i).getSpecimenIdentifier()+"_"+results.get(i).getBiomarkerName(),new ArrayList<LossOfExpressionIHCFindingReportBean>());
+                        reportBeanMap.get(results.get(i).getSpecimenIdentifier()+"_"+results.get(i).getBiomarkerName()).add(results.get(i));
+                      }
                 }
                  
                 //IF THE USER SELECTED TIMEPOINTS FOR WHICH THAT PATIENT DID DID NOT HAVE DATA, CREATE NULL BEANS SO AS TO RENDER A READABLE REPORT
@@ -418,19 +421,19 @@ public class LossOfExpressionIHCReport{
             
             for(int i =0; i<results.size();i++){
                 if(i==0){
-                    reportBeanMap.put(results.get(i).getPatientDID()+"_"+results.get(i).getBiomarkerName(),new ArrayList<LossOfExpressionIHCFindingReportBean>());
-                    reportBeanMap.get(results.get(i).getPatientDID()+"_"+results.get(i).getBiomarkerName()).add(results.get(i));                        
+                    reportBeanMap.put(results.get(i).getSpecimenIdentifier()+"_"+results.get(i).getBiomarkerName(),new ArrayList<LossOfExpressionIHCFindingReportBean>());
+                    reportBeanMap.get(results.get(i).getSpecimenIdentifier()+"_"+results.get(i).getBiomarkerName()).add(results.get(i));                        
                 }
-                else if(!results.get(i).getPatientDID().equalsIgnoreCase(results.get(i-1).getPatientDID())){ 
-                    reportBeanMap.put(results.get(i).getPatientDID()+"_"+results.get(i).getBiomarkerName(),new ArrayList<LossOfExpressionIHCFindingReportBean>());
-                    reportBeanMap.get(results.get(i).getPatientDID()+"_"+results.get(i).getBiomarkerName()).add(results.get(i));
+                else if(!results.get(i).getSpecimenIdentifier().equalsIgnoreCase(results.get(i-1).getSpecimenIdentifier())){ 
+                    reportBeanMap.put(results.get(i).getSpecimenIdentifier()+"_"+results.get(i).getBiomarkerName(),new ArrayList<LossOfExpressionIHCFindingReportBean>());
+                    reportBeanMap.get(results.get(i).getSpecimenIdentifier()+"_"+results.get(i).getBiomarkerName()).add(results.get(i));
                 }
-                else if(results.get(i).getPatientDID().equalsIgnoreCase(results.get(i-1).getPatientDID()) && !results.get(i).getBiomarkerName().equalsIgnoreCase(results.get(i-1).getBiomarkerName())){ 
-                    reportBeanMap.put(results.get(i).getPatientDID()+"_"+results.get(i).getBiomarkerName(),new ArrayList<LossOfExpressionIHCFindingReportBean>());
-                    reportBeanMap.get(results.get(i).getPatientDID()+"_"+results.get(i).getBiomarkerName()).add(results.get(i));
+                else if(results.get(i).getSpecimenIdentifier().equalsIgnoreCase(results.get(i-1).getSpecimenIdentifier()) && !results.get(i).getBiomarkerName().equalsIgnoreCase(results.get(i-1).getBiomarkerName())){ 
+                    reportBeanMap.put(results.get(i).getSpecimenIdentifier()+"_"+results.get(i).getBiomarkerName(),new ArrayList<LossOfExpressionIHCFindingReportBean>());
+                    reportBeanMap.get(results.get(i).getSpecimenIdentifier()+"_"+results.get(i).getBiomarkerName()).add(results.get(i));
                 }
                 else{
-                    reportBeanMap.get(results.get(i-1).getPatientDID()+"_"+results.get(i-1).getBiomarkerName()).add(results.get(i));                        
+                    reportBeanMap.get(results.get(i-1).getSpecimenIdentifier()+"_"+results.get(i-1).getBiomarkerName()).add(results.get(i));                        
                 }
             }
              
