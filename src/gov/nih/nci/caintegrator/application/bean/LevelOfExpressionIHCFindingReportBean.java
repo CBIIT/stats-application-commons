@@ -30,11 +30,20 @@ public class LevelOfExpressionIHCFindingReportBean implements IHCFindingReportBe
         else return defaultV;       
     }
     
+    
+    public String getSpecimenIdentifier(){
+        if(finding.getSpecimen()!=null && finding.getSpecimen().getSpecimenIdentifier()!=null){
+              return finding.getSpecimen().getSpecimenIdentifier();            
+        }
+        else return defaultV;       
+    }
+    
     public String getTimepoint(){
         if(finding.getSpecimen()!=null && finding.getSpecimen().getTimePoint()!=null){
             return finding.getSpecimen().getTimePoint();
         }
-        else return defaultV;
+        //return null;
+       else return defaultV;
     }
     
     public String getBiomarkerName(){
