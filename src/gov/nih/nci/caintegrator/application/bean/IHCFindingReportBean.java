@@ -5,4 +5,6 @@ public interface IHCFindingReportBean {
     public String getPatientDID();
     
     public String getTimepoint();
+    
+    public String getSpecimenIdentifier();
 }
