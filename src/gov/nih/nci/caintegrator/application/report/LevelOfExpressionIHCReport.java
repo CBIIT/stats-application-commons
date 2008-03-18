@@ -270,6 +270,7 @@ public class LevelOfExpressionIHCReport{
                          
                 }
                  
+                
                 //IF THE USER SELECTED TIMEPOINTS FOR WHICH THAT PATIENT DID DID NOT HAVE DATA, CREATE NULL BEANS SO AS TO RENDER A READABLE REPORT
                 Set<String> b = reportBeanMap.keySet();
                         for(String g: b){
