@@ -299,7 +299,12 @@ public class LossOfExpressionIHCReport{
                 
                   Set<String> keys = reportBeanMap.keySet();      
 		    	// ADD DATA ROWS		   
-                   for(String key : keys) {       
+                   for(String key : keys) {     
+                	   
+                	      String tp = reportBeanMap.get(key).get(0).getTimepoint();
+                    	   
+                      	  if(tpHeaders.contains(tp)) {                
+                    
                        
                                        dataRow = report.addElement("Row").addAttribute("name", "dataRow");                         
                                        cell = dataRow.addElement("Cell").addAttribute("type", "data").addAttribute("class", "sample").addAttribute("group", "data");
@@ -384,7 +389,7 @@ public class LossOfExpressionIHCReport{
                                             cell = null;
                                            
                                         }
-                       
+                      	  }
                    }                   
 			}
             
@@ -473,7 +478,11 @@ public class LossOfExpressionIHCReport{
             Set<String> keysSet = reportBeanMap.keySet(); 
             ArrayList<String> keys = new ArrayList<String>(keysSet);
             // ADD DATA ROWS           
-               for(int i=0;i<keys.size();i++) {       
+               for(int i=0;i<keys.size();i++) { 
+            	   
+            	  String tp = reportBeanMap.get(keys.get(i)).get(0).getTimepoint();            	   
+               	  if(tpHeaders.contains(tp)) {                
+             
                                    sheet.createFreezePane( 0, 1, 0, 1 );
                                    row = sheet.createRow((short) i + 1); 
                                    dataCell = row.createCell((short) 0);
@@ -552,7 +561,7 @@ public class LossOfExpressionIHCReport{
                                         dataCell.setCellValue(reportBean.getLossResult()); 
                                     }
                
-                   
+               	     }
                }  
         
         }
