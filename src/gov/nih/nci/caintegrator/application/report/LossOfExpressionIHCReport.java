@@ -11,6 +11,7 @@ import gov.nih.nci.caintegrator.studyQueryService.dto.ihc.LossOfExpressionIHCFin
 import gov.nih.nci.caintegrator.studyQueryService.dto.ihc.LossOfExpressionIHCFindingCriteria;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -302,10 +303,47 @@ public class LossOfExpressionIHCReport{
                    for(String key : keys) {     
                 	   
                 	      String tp = reportBeanMap.get(key).get(0).getTimepoint();
+                	      Integer invasiveSumCrit = criteria.getInvasiveSum();
+                	      String invasiveSumOpCrit = criteria.getInvasiveSumOperator();
+                   	   
+                	      String   invasiveSum = reportBeanMap.get(key).get(0).getInvasiveSum();
+                	      String   invasiveSumOp = reportBeanMap.get(key).get(0).getInvasiveSumOperator();
+                	      
+                	      int j=0;
+                	      
+                	      if(invasiveSumCrit != null && invasiveSumOpCrit != null) {
+                	    	  j= new Integer(invasiveSum).compareTo(invasiveSumCrit);
+                	      }
+                	      
+                	      Integer benignSumCrit = criteria.getBenignSum();
+                	      String  benignSumOpCrit = criteria.getBenignSumOperator();
+                	      
+                	      String   benignSum = reportBeanMap.get(key).get(0).getBenignSum();
+                	      String   benignSumOp = reportBeanMap.get(key).get(0).getBenignSumOperator();
+                	   
+                          int h=0;
+                	      
+                	      if(benignSumCrit != null && benignSumOpCrit != null) {
+                	    	  h= new Integer(benignSum).compareTo(benignSumCrit);
+                	      }
+                	      
+                	      Collection<String>   resultCodeCollection = criteria.getResultCodeCollection();                    	 
+                    	  String resultCode=reportBeanMap.get(key).get(0).getLossResult();
+                    	  
+                    	  // filter time points, invasice sum, benign sum, and result code to match what were in the search criteria
                     	   
-                      	  if(tpHeaders.contains(tp)) {                
-                    
-                       
+                    		  if(tpHeaders.contains(tp) 
+                        			  && ( resultCodeCollection ==null || (resultCodeCollection!= null && resultCodeCollection.contains(resultCode))) 		                      
+                        		      && (( invasiveSumCrit == null &&  invasiveSumOpCrit == null) 
+                        		    	 || ( invasiveSumCrit != null && (invasiveSumOpCrit != null && invasiveSumOpCrit.equals("=")) && invasiveSumCrit.toString().equals(invasiveSum))
+                              		     || ( invasiveSumCrit != null && (invasiveSumOpCrit != null && invasiveSumOpCrit.equals(">=")) && j>=0)
+                              		     || ( invasiveSumCrit != null && (invasiveSumOpCrit != null && invasiveSumOpCrit.equals("<=")) && j<=0))                 		    	
+                        		      && (( benignSumCrit == null &&  benignSumOpCrit == null)
+                        		    	  || ( benignSumCrit != null && (benignSumOpCrit!= null && benignSumOpCrit.equals("=")) && benignSumCrit.toString().equals(benignSum))
+                        		    	  || ( benignSumCrit != null && (benignSumOpCrit != null && benignSumOpCrit.equals(">=")) && h>=0)
+                               		      || ( benignSumCrit != null && (benignSumOpCrit != null && benignSumOpCrit.equals("<=")) && h<=0))  ) { 
+                          		    
+                             	    
                                        dataRow = report.addElement("Row").addAttribute("name", "dataRow");                         
                                        cell = dataRow.addElement("Cell").addAttribute("type", "data").addAttribute("class", "sample").addAttribute("group", "data");
                                            data = cell.addElement("Data").addAttribute("type", "selectable").addText(reportBeanMap.get(key).get(0).getPatientDID());
@@ -346,7 +384,6 @@ public class LossOfExpressionIHCReport{
                                         }
                                             
                                             
-                                            
                                         //ITERATE OVER THE MAP FOR EACH DATA FIELD WITH ITS CORRESPONDING TIMEPOINT AND BUILD DATA ROWS
                                         for(LossOfExpressionIHCFindingReportBean reportBean : mySortedMap)	{         		        	      			        
                         			        cell = dataRow.addElement("Cell").addAttribute("type", "data").addAttribute("class", "data").addAttribute("group", "data");
@@ -354,13 +391,18 @@ public class LossOfExpressionIHCReport{
                         			        data = null;
                         			        cell = null;
                                         }
-                                        for(LossOfExpressionIHCFindingReportBean reportBean : mySortedMap)  {
-                                            cell = dataRow.addElement("Cell").addAttribute("type", "data").addAttribute("class", "data").addAttribute("group", "data");
-                                            data = cell.addElement("Data").addAttribute("type", "header").addText(reportBean.getInvasiveSum());
-                                            data = null;
-                                            cell = null;
+                                        
+                                        if(invasiveSumOp.equals("--")) {           
+                                                   
+                                            for(LossOfExpressionIHCFindingReportBean reportBean : mySortedMap)  {
+                                               cell = dataRow.addElement("Cell").addAttribute("type", "data").addAttribute("class", "data").addAttribute("group", "data");
+                                               data = cell.addElement("Data").addAttribute("type", "header").addText(reportBean.getInvasiveSum());
+                                               data = null;
+                                               cell = null;
                         			       
-                                        }
+                                           }
+                      	                }
+                                        
                                         for(LossOfExpressionIHCFindingReportBean reportBean : mySortedMap)  {
                                             cell = dataRow.addElement("Cell").addAttribute("type", "data").addAttribute("class", "data").addAttribute("group", "data");
                                             data = cell.addElement("Data").addAttribute("type", "header").addText(reportBean.getBenignSum());
@@ -400,7 +442,7 @@ public class LossOfExpressionIHCReport{
 		    
 		    return document;
 	}
-    
+    // write the report to an excel file
     public static HSSFWorkbook getReportExcel(Finding finding, HashMap map) {
         HSSFWorkbook wb = new HSSFWorkbook();
         HSSFSheet sheet = wb.createSheet(finding.getTaskId());
@@ -477,14 +519,56 @@ public class LossOfExpressionIHCReport{
             HSSFCell dataCell = null;
             Set<String> keysSet = reportBeanMap.keySet(); 
             ArrayList<String> keys = new ArrayList<String>(keysSet);
+            int u=0;
             // ADD DATA ROWS           
                for(int i=0;i<keys.size();i++) { 
             	   
-            	  String tp = reportBeanMap.get(keys.get(i)).get(0).getTimepoint();            	   
-               	  if(tpHeaders.contains(tp)) {                
+            	   
+            	  String tp = reportBeanMap.get(keys.get(i)).get(0).getTimepoint();  
+            	  
+            	  Integer invasiveSumCrit = criteria.getInvasiveSum();
+        	      String invasiveSumOpCrit = criteria.getInvasiveSumOperator();
+           	   
+        	      String   invasiveSum = reportBeanMap.get(keys.get(i)).get(0).getInvasiveSum();
+        	      String   invasiveSumOp = reportBeanMap.get(keys.get(i)).get(0).getInvasiveSumOperator();
+        	      
+        	      int q=0;
+        	      
+        	      if(invasiveSumCrit != null && invasiveSumOpCrit != null) {
+        	    	  q= new Integer(invasiveSum).compareTo(invasiveSumCrit);
+        	      }
+        	      
+        	      Integer benignSumCrit = criteria.getBenignSum();
+        	      String  benignSumOpCrit = criteria.getBenignSumOperator();
+        	      
+        	      String   benignSum = reportBeanMap.get(keys.get(i)).get(0).getBenignSum();
+        	      String   benignSumOp = reportBeanMap.get(keys.get(i)).get(0).getBenignSumOperator();
+        	   
+                  int h=0;
+        	      
+        	      if(benignSumCrit != null && benignSumOpCrit != null) {
+        	    	  h= new Integer(benignSum).compareTo(benignSumCrit);
+        	      }
+        	      
+        	      Collection<String>   resultCodeCollection = criteria.getResultCodeCollection();                    	 
+            	  String resultCode=reportBeanMap.get(keys.get(i)).get(0).getLossResult();
+            	
+               	 // if(tpHeaders.contains(tp)) {                
              
+            	  
+            	  if(tpHeaders.contains(tp) 
+            			  && ( resultCodeCollection ==null || (resultCodeCollection!= null && resultCodeCollection.contains(resultCode))) 		                      
+            		      && (( invasiveSumCrit == null &&  invasiveSumOpCrit == null) 
+            		    	 || ( invasiveSumCrit != null && (invasiveSumOpCrit != null && invasiveSumOpCrit.equals("=")) && invasiveSumCrit.toString().equals(invasiveSum))
+                  		     || ( invasiveSumCrit != null && (invasiveSumOpCrit != null && invasiveSumOpCrit.equals(">=")) && q>=0)
+                  		     || ( invasiveSumCrit != null && (invasiveSumOpCrit != null && invasiveSumOpCrit.equals("<=")) && q<=0))                 		    	
+            		      && (( benignSumCrit == null &&  benignSumOpCrit == null)
+            		    	  || ( benignSumCrit != null && (benignSumOpCrit!= null && benignSumOpCrit.equals("=")) && benignSumCrit.toString().equals(benignSum))
+            		    	  || ( benignSumCrit != null && (benignSumOpCrit != null && benignSumOpCrit.equals(">=")) && h>=0)
+                   		      || ( benignSumCrit != null && (benignSumOpCrit != null && benignSumOpCrit.equals("<=")) && h<=0))  ) { 
+              		              
                                    sheet.createFreezePane( 0, 1, 0, 1 );
-                                   row = sheet.createRow((short) i + 1); 
+                                   row = sheet.createRow((short) u + 1); 
                                    dataCell = row.createCell((short) 0);
                                    dataCell.setCellValue(reportBeanMap.get(keys.get(i)).get(0).getPatientDID());
                                    
@@ -560,7 +644,7 @@ public class LossOfExpressionIHCReport{
                                         dataCell = row.createCell((short) counter++);
                                         dataCell.setCellValue(reportBean.getLossResult()); 
                                     }
-               
+                                    u++;
                	     }
                }  
         
