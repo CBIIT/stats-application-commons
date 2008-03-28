@@ -97,7 +97,23 @@ public class LossOfExpressionIHCFindingReportBean implements IHCFindingReportBea
         else return defaultV;
     }    
    
-
+    public String getBenignSumOperator() {
+    	
+    	if(finding.getBenignSumOperator()!=null){
+            return finding.getBenignSumOperator();
+        }
+        else return defaultV;
+	}
+    
+    public String getInvasiveSumOperator() {
+    	 
+    	if(finding.getInvasiveSumOperator()!=null){
+            return finding.getInvasiveSumOperator();
+        }
+        else return defaultV;
+	}
+    
+    
     public ArrayList<String> getHeaders(){
         String[] myHeaders = {"Benign Present Value", "Invasive Sum", "Benign Sum", "Invasive-Benign Difference","Comments","Result Code"};        
         ArrayList<String> headers = new ArrayList<String>(Arrays.asList(myHeaders));
