@@ -8,6 +8,7 @@ import gov.nih.nci.caintegrator.service.findings.Finding;
 import gov.nih.nci.caintegrator.studyQueryService.dto.ihc.LevelOfExpressionIHCFindingCriteria;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -303,6 +304,8 @@ public class LevelOfExpressionIHCReport{
                 
                 //ADD TIMEPOINT SUBHEADERS
                 ArrayList<String> tpHeaders = results.get(0).getTimepointHeaders(criteria);
+                //ArrayList<String> localizations = results.get(0).getTimepointHeaders(criteria);
+                
                 TimepointStringComparator ts = new TimepointStringComparator();
                 Collections.sort(tpHeaders,ts);   
                 Element tpHeaderRow = report.addElement("Row").addAttribute("name", "tpHeaderRow");
@@ -321,8 +324,17 @@ public class LevelOfExpressionIHCReport{
                    for(String key : keys) {
                 	   
                 	  String tp = reportBeanMap.get(key).get(0).getTimepoint();
+                	  Collection<String>   localizationCollection = criteria.getStainLocalizationCollection();
+                	  Collection<String>   intensityCollection = criteria.getStainIntensityCollection();
+                 	 
+                	  String localization=reportBeanMap.get(key).get(0).getStainLocalization();
+                	  String intensity=reportBeanMap.get(key).get(0).getStainIntensity();
                 	   
-                	  if(tpHeaders.contains(tp)) {
+                	  if(tpHeaders.contains(tp) 
+                			  && ( localizationCollection ==null || (localizationCollection!= null &&localizationCollection.contains(localization)))
+                		      && ( intensityCollection ==null || (intensityCollection!= null &&intensityCollection.contains(intensity)))) {
+                    		  
+                		  
                 	   
                        
                                        dataRow = report.addElement("Row").addAttribute("name", "dataRow");                         
@@ -353,7 +365,7 @@ public class LevelOfExpressionIHCReport{
                                                     }                                                    
                                                 }
                                             }
-                                        }
+                                          }
                                         
                                         //SORT MAP BY TIMEPOINT SO THAT THE REPORT BEAN DATA CAN EASILY BE DISPLAYED UNDER THE APPROPRIATE TIEMPOINT
                                         for(int i=0; i<tpHeaders.size();i++){
@@ -367,41 +379,44 @@ public class LevelOfExpressionIHCReport{
                                       
                                         //ITERATE OVER THE MAP FOR EACH DATA FIELD WITH ITS CORRESPONDING TIMEPOINT AND BUILD DATA ROWS
                                         for(LevelOfExpressionIHCFindingReportBean reportBean : mySortedMap) {
+                                                
                                         	cell = dataRow.addElement("Cell").addAttribute("type", "data").addAttribute("class", "data").addAttribute("group", "data");
                                             data = cell.addElement("Data").addAttribute("type", "header").addText(reportBean.getPercentPositive());                                        
                                             data = null;
                                             cell = null;
-                                       // }
-                                       // for(LevelOfExpressionIHCFindingReportBean reportBean : mySortedMap)  {
+                                        }
+                                        for(LevelOfExpressionIHCFindingReportBean reportBean : mySortedMap)  {
                                             cell = dataRow.addElement("Cell").addAttribute("type", "data").addAttribute("class", "data").addAttribute("group", "data");
                                             data = cell.addElement("Data").addAttribute("type", "header").addText(reportBean.getStainIntensity());
                                             data = null;
                                             cell = null;
                                            
-                                       // }
-                                       // for(LevelOfExpressionIHCFindingReportBean reportBean : mySortedMap)  {
+                                       }
+                                       for(LevelOfExpressionIHCFindingReportBean reportBean : mySortedMap)  {
                                             cell = dataRow.addElement("Cell").addAttribute("type", "data").addAttribute("class", "data").addAttribute("group", "data");
                                             data = cell.addElement("Data").addAttribute("type", "header").addText(reportBean.getStainLocalization());
                                             data = null;
                                             cell = null;
+                                          
                                            
-                                       // }
-                                        //for(LevelOfExpressionIHCFindingReportBean reportBean : mySortedMap)  {
+                                       }
+                                        for(LevelOfExpressionIHCFindingReportBean reportBean : mySortedMap)  {
                                             cell = dataRow.addElement("Cell").addAttribute("type", "data").addAttribute("class", "data").addAttribute("group", "data");
                                             data = cell.addElement("Data").addAttribute("type", "header").addText(reportBean.getInvasivePresentation());
                                             data = null;
                                             cell = null;
                                            
-                                        //}
-                                        //for(LevelOfExpressionIHCFindingReportBean reportBean : mySortedMap)  {
+                                        }
+                                        for(LevelOfExpressionIHCFindingReportBean reportBean : mySortedMap)  {
                                             cell = dataRow.addElement("Cell").addAttribute("type", "data").addAttribute("class", "data").addAttribute("group", "data");
                                             data = cell.addElement("Data").addAttribute("type", "header").addText(reportBean.getOverallExpression());
                                             data = null;
                                             cell = null;
                                            
-                                          }
+                                            }
+                                    }
                 	       } 
-                   }                   
+                                
             }
             
             else {
@@ -492,14 +507,24 @@ public class LevelOfExpressionIHCReport{
             HSSFCell dataCell = null;
             Set<String> keysSet = reportBeanMap.keySet(); 
             ArrayList<String> keys = new ArrayList<String>(keysSet);
+            int u=0;
             // ADD DATA ROWS           
                for(int i=0;i<keys.size();i++) {  
-            	      String tp = reportBeanMap.get(keys.get(i)).get(0).getTimepoint();                	   
-                  	  if(tpHeaders.contains(tp)) {               
-                
+            	      String tp = reportBeanMap.get(keys.get(i)).get(0).getTimepoint();    
+            	      Collection<String>   localizationCollection = criteria.getStainLocalizationCollection();
+                	  Collection<String>   intensityCollection = criteria.getStainIntensityCollection();
+                 	 
+                	  String localization=reportBeanMap.get(keys.get(i)).get(0).getStainLocalization();
+                	  String intensity=reportBeanMap.get(keys.get(i)).get(0).getStainIntensity();
+                	
+            	      if(tpHeaders.contains(tp) 
+                			  && ( localizationCollection ==null || (localizationCollection!= null &&localizationCollection.contains(localization)))
+                		      && ( intensityCollection ==null || (intensityCollection!= null &&intensityCollection.contains(intensity)))) {
+                    		  
+                		  
                                    
                                    sheet.createFreezePane( 0, 1, 0, 1 );
-                                   row = sheet.createRow((short) i + 1); 
+                                   row = sheet.createRow((short) u + 1); 
                                    dataCell = row.createCell((short) 0);
                                    dataCell.setCellValue(reportBeanMap.get(keys.get(i)).get(0).getPatientDID());
                                    
@@ -559,6 +584,7 @@ public class LevelOfExpressionIHCReport{
                                         dataCell = row.createCell((short) counter++);
                                         dataCell.setCellValue(reportBean.getOverallExpression()); 
                                     }
+                                    u++;
                    
                              } 
                    }
