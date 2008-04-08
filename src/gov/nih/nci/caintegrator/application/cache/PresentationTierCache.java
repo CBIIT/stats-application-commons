@@ -1,5 +1,6 @@
 package gov.nih.nci.caintegrator.application.cache;
 
+import gov.nih.nci.caintegrator.service.task.GPTask;
 import gov.nih.nci.caintegrator.service.task.Task;
 
 import java.io.Serializable;
@@ -71,7 +72,7 @@ public interface PresentationTierCache {
     
     //retrieves all Task objects in the cache
     public Collection<Task> getAllSessionTasks(String sessionId);
-
+    public Collection<GPTask> getAllSessionGPTasks(String sessionId);
 	//items that will NOT be persisted..  Can be used similar to the HTTPSession
 	//these things still need to implement serializable though
 	public void addNonPersistableToSessionCache(String sessionId, Serializable key, Serializable object);
