@@ -17,5 +17,6 @@
 			 	<include name="${module_name}.jar"/>
              </zipfileset>		
          </zip>
+		<copy file="${module_name}.zip" todir="${anthill.artifacts.dir}" />
      </target>
 </project>
