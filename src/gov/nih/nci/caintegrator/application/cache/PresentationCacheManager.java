@@ -2,8 +2,6 @@ package gov.nih.nci.caintegrator.application.cache;
 
 import gov.nih.nci.caintegrator.service.findings.Finding;
 import gov.nih.nci.caintegrator.service.task.Task;
-import gov.nih.nci.caintegrator.service.task.GPTask;
-
 
 import java.io.File;
 import java.io.Serializable;
@@ -240,26 +238,7 @@ public class PresentationCacheManager implements PresentationTierCache{
         return tasks;
     }
 	
-    /* (non-Javadoc)
-     * @see gov.nih.nci.rembrandt.cache.BusinessTierCache#getAllSessionFindings(java.lang.String)
-     */
-    public Collection<GPTask> getAllSessionGPTasks(String sessionId){
-        Collection<GPTask> tasks = new ArrayList<GPTask>();
-        Cache sessionCache = getSessionCache(sessionId);
-        try {
-            List keys = sessionCache.getKeys();
-            for(Iterator i = keys.iterator();i.hasNext();) {
-                Element element = sessionCache.get((String)i.next());
-                Object object = element.getValue();
-                if(object instanceof GPTask) {
-                    tasks.add((GPTask)object);
-                }
-            }
-        }catch(CacheException ce) {
-            logger.error(ce);
-        }
-        return tasks;
-    }
+
 	
 	 /**
 	  * Returns the singleton instance of the PresentationTierCache
