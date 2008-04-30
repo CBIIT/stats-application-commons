@@ -246,6 +246,7 @@ public class CaIntegratorRunVisualizer {
         fLibdir.mkdirs();
 
         File[] currentFiles = fLibdir.listFiles();
+        //System.out.println("downloadSupportFiles: fLibdir = " + fLibdir.getCanonicalPath() + " and there are " + currentFiles.length + " files");
         int supf;
 
         // delete any currently downloaded files that are extraneous or
@@ -275,7 +276,7 @@ public class CaIntegratorRunVisualizer {
                 }
             }
         }
-
+        //System.out.println("Going to download support file.........");
         // user CaIntegrator's genepattern server URL ---------- CaIntegrator
         String serverLibdir = (String)params.get(GP_SERVER);
         // figure out which support files are not in the currently downloaded
@@ -302,12 +303,16 @@ public class CaIntegratorRunVisualizer {
                             .println(" received " + file.length() + " bytes in " + downloadTime / 1000.0 + " seconds");
                 }
             }
+            //else
+            	//System.out.println(supportFileNames[supf] + "  exist");
+            //System.out.println("downloaded support file........." + supportFileNames[supf]);
         }
 
         if (DEBUG) {
             System.out.println("Total download time " + (new Date().getTime() - startDLTime.getTime()) / 1000.0
                     + " seconds");
         }
+        //System.out.println("Support file path = " + fLibdir.getCanonicalPath());
         return fLibdir.getCanonicalPath();
     }
 
@@ -508,13 +513,20 @@ public class CaIntegratorRunVisualizer {
         String c = (String) params.get(CaIntegratorRunVisualizerConstants.COMMAND_LINE);
 
         String prefix = (name.length() < 3 ? "dl" + name : name);
-        File tempdir = File.createTempFile(prefix, ".tmp");
-        //File tempdir = getTempDir(); 
-        //File tempdir =File.createTempFile("foo", ".libdir", new File("C:\\temp\\applet\\gpattern"));
-        tempdir.delete();
-        tempdir.mkdir();
-        tempdir.deleteOnExit();
+       
+        File tempdir = new File(getTempDir(), name + ".gctdir");
+        tempdir.mkdirs();
 
+        File[] currentFiles = tempdir.listFiles();
+        
+    	for (int i = 0; i < currentFiles.length; i++){
+    		
+    		if (currentFiles[i].isFile()){
+    			//System.out.println("It is a file " + currentFiles[i].getName());
+    			currentFiles[i].delete();
+    		}
+    	}
+        
         while (stDownloadables.hasMoreTokens()) {
             String paramName = stDownloadables.nextToken();
             String paramURL = (String) params.get(paramName);
@@ -523,10 +535,12 @@ public class CaIntegratorRunVisualizer {
                 paramURL = variableSubstitution(paramURL, hmDownloadables);
 
                 String filename = getURLFileName(new URL(paramURL));
+                //System.out.println("File Name = " + filename);
                 if (DEBUG) {
                     System.out.println("downloading " + paramURL + " to " + tempdir + " as " + filename);
                 }
                 File file = downloadFile(new URL(paramURL), tempdir, filename);
+                //System.out.println("Input file path = " + file.getCanonicalPath());
                 file.deleteOnExit();
                 //File file = new File("C:\\temp\\applet\\gp.gct");
                 hmDownloadables.put(paramName, file);
