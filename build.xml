@@ -38,6 +38,32 @@
 	<target name="retrieve_deployment_artifacts">
 		<copy file="conf/caintegrator-jbossmq-destinations-service.xml" todir="${anthill.artifacts.dir}"/>
 		<copy file="conf/csm/oracle-ds.xml.template" tofile="${anthill.artifacts.dir}/oracle-ds.xml"/>
-	</target>	
+	</target>
+	
+	<!-- ************************************************************************************************-->
+	<!--                                  Applet Compile/Signing                                          -->
+	<!-- ************************************************************************************************-->
+	<!-- make sure the keystore file path is correct for the computer where this build file is run -->	
+   <property name="keystore.alias" value="tomcat" /> 
+   <property name="keystore.keypass" value="changeit" /> 
+   <property name="keystore.storepass" value="changeit" /> 
+   <property name="keystore.location" value="C:/Documents and Settings/chenhang/.keystore"  />
+   <!-- property name="keystore.location" value="C:/temp/server.keystore"  / --> 
+
+	<!--  create the applet jar file first  --> 
+	<target name="jar-hmv-applet" >
+        <jar jarfile="HMVApplet.jar" excludes="**/MANIFEST.MF, *.jar, *.xml" 
+        	basedir="${build.classes.dir}/gov/nih/nci/caintegrator/application/gpvisualizer/heatmapviewer"/>
+	</target>
+
+    <!-- target name="sign-hmv-applet" depends="jar-hmv-applet" -->
+    <target name="sign-hmv-applet" depends="jar-hmv-applet">
+        <signjar jar="HMVApplet.jar" 
+                  alias="${keystore.alias}" 
+                  keypass="${keystore.keypass}" 
+                  storepass="${keystore.storepass}" 
+                  keystore="${keystore.location}" 
+                  signedjar="SignedHMVApplet.jar" /> 
+    </target>
 	
 </project>
