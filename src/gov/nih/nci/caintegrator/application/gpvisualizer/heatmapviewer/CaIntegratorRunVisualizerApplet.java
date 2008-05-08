@@ -38,9 +38,10 @@ public class CaIntegratorRunVisualizerApplet extends Applet {
     
     // the static string for gene pattern server url ------- CaIntegrator
     public static final String GP_SERVER = "genePatternServer";
-
+    public static final String TICKET_STRING = "ticketString";
+    // end of CaIntegrator variable.
     //wellKnownNames also includes a specific string GP_SERVER ------ CaIntegrator
-    String[] wellKnownNames = { GP_SERVER, CaIntegratorRunVisualizerConstants.NAME, CaIntegratorRunVisualizerConstants.COMMAND_LINE,
+    String[] wellKnownNames = { GP_SERVER, TICKET_STRING, CaIntegratorRunVisualizerConstants.NAME, CaIntegratorRunVisualizerConstants.COMMAND_LINE,
             CaIntegratorRunVisualizerConstants.DEBUG, CaIntegratorRunVisualizerConstants.OS, CaIntegratorRunVisualizerConstants.CPU_TYPE,
             CaIntegratorRunVisualizerConstants.LIBDIR, CaIntegratorRunVisualizerConstants.DOWNLOAD_FILES, CaIntegratorRunVisualizerConstants.LSID };
 
@@ -82,7 +83,11 @@ public class CaIntegratorRunVisualizerApplet extends Applet {
             return null;
         }
         try {
-            return URLDecoder.decode(value, "UTF-8");
+        	//CaIntegrator specific code: don't decode ticketString
+        	if (name.equalsIgnoreCase(TICKET_STRING))
+        		return value;
+        	else
+        		return URLDecoder.decode(value, "UTF-8");
         } catch (UnsupportedEncodingException e) {
             return value;
         }

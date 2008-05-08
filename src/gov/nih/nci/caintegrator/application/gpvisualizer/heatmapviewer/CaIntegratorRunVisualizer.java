@@ -65,6 +65,7 @@ public class CaIntegratorRunVisualizer {
 
     // the static string for gene pattern server url ------- CaIntegrator
     public static final String GP_SERVER = "genePatternServer";
+    public static final String TICKET_STRING = "ticketString";
     
     /**
      * @param params
@@ -328,6 +329,8 @@ public class CaIntegratorRunVisualizer {
      *            The filename to download the URL to.
      */
     protected File downloadFile(URL url, File dir, String filename) throws IOException {
+    	
+    	//System.out.println("calling downloadFile()...." + " URL = " + url.toString() + "  - " + dir + " -  " + filename);
         InputStream is = null;
         FileOutputStream fos = null;
         File file = null;
@@ -342,8 +345,11 @@ public class CaIntegratorRunVisualizer {
                 client.executeMethod(get);
                 is = get.getResponseBodyAsStream();
             } else {
+            	//System.out.println("URLConnection begin...");
                 URLConnection conn = url.openConnection();
+                //System.out.println("URLConnection middle...");
                 is = conn.getInputStream();
+                //System.out.println("URLConnection ended...");
             }
             dir.mkdirs();
             file = new File(dir, filename);
@@ -351,11 +357,14 @@ public class CaIntegratorRunVisualizer {
             byte[] buf = new byte[100000];
             int j;
             int i = 0;
+            
+            //System.out.println("going to read file...");
             while ((j = is.read(buf, 0, buf.length)) != -1) {
             	//System.out.println("\ndownloadFile read  i = " + i++ + filename + "\n" );
             	fos.write(buf, 0, j);
             }
         } finally {
+        	//System.out.println("in finally block...");
             if (is != null) {
                 try {
                     is.close();
@@ -374,14 +383,8 @@ public class CaIntegratorRunVisualizer {
                 get.releaseConnection();
             }
         }
-        long filesize = 200000l;
-        if (file.length() < filesize){
-        	//System.out.println("File size is " + file.length() + " for file " + file.getName());
-        	file.delete();
-        	return downloadFile(url, dir, filename);
-        }
-        else
-        	return file;
+
+        return file;
     }
 
     protected boolean validateCPU() throws Exception {
@@ -530,16 +533,23 @@ public class CaIntegratorRunVisualizer {
         while (stDownloadables.hasMoreTokens()) {
             String paramName = stDownloadables.nextToken();
             String paramURL = (String) params.get(paramName);
-
+            //System.out.println("downloadInputURLs: paramName = " + paramName);
+            //System.out.println("downloadInputURLs: paramURL = " + paramURL);
+            //paramURL = URLEncoder.encode(paramURL, "UTF-8");
+            //System.out.println("downloadInputURLs: paramURL after encode = " + paramURL);
             try {
                 paramURL = variableSubstitution(paramURL, hmDownloadables);
 
                 String filename = getURLFileName(new URL(paramURL));
+                //System.out.println("downloadInputURLs: filename = " + filename);
+                //String filename = (String) params.get(SHORT_FILE_NAME);
+                String ticketString = (String) params.get(TICKET_STRING);
+                //System.out.println("downloadInputURLs: ticketString = " + ticketString);
                 //System.out.println("File Name = " + filename);
                 if (DEBUG) {
                     System.out.println("downloading " + paramURL + " to " + tempdir + " as " + filename);
                 }
-                File file = downloadFile(new URL(paramURL), tempdir, filename);
+                File file = downloadFile(new URL(paramURL + ticketString), tempdir, filename);
                 //System.out.println("Input file path = " + file.getCanonicalPath());
                 file.deleteOnExit();
                 //File file = new File("C:\\temp\\applet\\gp.gct");
