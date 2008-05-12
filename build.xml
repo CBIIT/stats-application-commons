@@ -50,14 +50,24 @@
    <property name="keystore.location" value="C:/Documents and Settings/chenhang/.keystore"  />
    <!-- property name="keystore.location" value="C:/temp/server.keystore"  / --> 
 
-	<!--  create the applet jar file first  --> 
-	<target name="jar-hmv-applet" >
-        <jar jarfile="HMVApplet.jar" excludes="**/MANIFEST.MF, *.jar, *.xml" 
-        	basedir="${build.classes.dir}/gov/nih/nci/caintegrator/application/gpvisualizer/heatmapviewer"/>
+<!--  create the applet jar file first  
+	<target name="jar-hmv-applet">
+        <jar jarfile="HMVApplet.jar" excludes="**/MANIFEST.MF, *.jar, *.xml" >
+        	<basedir="${basedir}/applet"/>
+        </jar>
 	</target>
+--> 
 
+	<target name="jar-smart-applet" >
+        <jar jarfile="HMVApplet.jar" excludes="**/MANIFEST.MF, *.jar, *.xml" >
+        	<fileset dir="${basedir}/bin">
+				<include name="gov/nih/nci/caintegrator/application/gpvisualizer/heatmapviewer/*.class"/>
+			</fileset>
+        </jar>
+	</target>
+	
     <!-- target name="sign-hmv-applet" depends="jar-hmv-applet" -->
-    <target name="sign-hmv-applet" depends="jar-hmv-applet">
+    <target name="sign-hmv-applet" depends="jar-smart-applet">
         <signjar jar="HMVApplet.jar" 
                   alias="${keystore.alias}" 
                   keypass="${keystore.keypass}" 
