@@ -1,14 +1,12 @@
 package gov.nih.nci.caintegrator.security;
 
+import gov.nih.nci.caintegrator.dto.de.InstitutionDE;
 
-import gov.nih.nci.security.authorization.domainobjects.ProtectionElement;
-
-import java.io.Serializable;
 import java.util.Collection;
 
 /***
  * Class that will hold the "Credentials" required to fully use a caIntegrator
- * based application.  It will hold the Role of the user and the protectionElements that
+ * based application.  It will hold the Role of the user and the institutes that
  * the user is associated with.
  * 
  * The UserCredentials may have 1 of 3 roles.
@@ -16,9 +14,9 @@ import java.util.Collection;
  *  UserRole.PUBLIC_USER is able to access only public data
  *  
  *  UserRole.INSTITUTE_USER is able to view PUBLIC_USER data and the data of the Institutes
- *  listed in the Set protectionElements.
+ *  listed in the Set institutes.
  *  
- *  UserRole.SUPER_USER is able to view all data across all protectionElements as well
+ *  UserRole.SUPER_USER is able to view all data across all institutes as well
  *  as all public data
  * 
  * 
@@ -84,14 +82,14 @@ import java.util.Collection;
 * 
 */
 
-public class UserCredentials implements Serializable{
+public class UserCredentials {
 
 	private String userName;
 	private UserRole role;
 	private String emailAddress;
 	private String firstName;
 	private String lastName;
-	private Collection<ProtectionElement> protectionElements;
+	private Collection<InstitutionDE> institutes;
 	private boolean authenticated = false;
 	
 	public enum UserRole{
@@ -117,15 +115,15 @@ public class UserCredentials implements Serializable{
 	 * set by the SecurityManager, they can not be modified.
 	 * @param emailAddress
 	 * @param firstName
-	 * @param protectionElements
+	 * @param institutes
 	 * @param lastName
 	 * @param role
 	 * @param userName
 	 */
-	protected UserCredentials(String emailAddress, String firstName, Collection<ProtectionElement> protectionElements, String lastName, UserRole role, String userName) {
+	protected UserCredentials(String emailAddress, String firstName, Collection<InstitutionDE> institutes, String lastName, UserRole role, String userName) {
 		this.emailAddress = emailAddress;
 		this.firstName = firstName;
-		this.protectionElements = protectionElements;
+		this.institutes = institutes;
 		this.lastName = lastName;
 		this.role = role;
 		this.userName = userName;
@@ -138,22 +136,22 @@ public class UserCredentials implements Serializable{
 	 * set by the SecurityManager, they can not be modified.
 	 * @param userName
 	 * @param role
-	 * @param protectionElements
+	 * @param institutes
 	 */
-	protected UserCredentials(String userName, UserRole role, Collection<ProtectionElement> allowableData) {
+	protected UserCredentials(String userName, UserRole role, Collection<InstitutionDE> allowableData) {
 		this.userName = userName;
 		this.role = role;
-		this.protectionElements = allowableData;
+		this.institutes = allowableData;
 		if(role!=null) {
 			authenticated = true;
 		}
 	}
 	/**
-	 * The protectionElements whose data the user is allowed to see
+	 * The institutes whose data the user is allowed to see
 	 * @return
 	 */
-	public Collection<ProtectionElement> getprotectionElements() {
-		return this.protectionElements;
+	public Collection<InstitutionDE> getInstitutes() {
+		return this.institutes;
 	}
 
 	/**

@@ -1,7 +1,10 @@
 package gov.nih.nci.caintegrator.application.mail;
 
+import gov.nih.nci.caintegrator.application.zip.ZipConfig;
+
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.Properties;
 
 import org.apache.log4j.Logger;
@@ -100,24 +103,6 @@ public class MailConfig
 		return mailProperties.getProperty("ftp.Body4");
 	}
 	/**
-	 * @return Returns the feedback template.
-	 */
-	public String getUnformattedFeedback() {
-		return mailProperties.getProperty("feedback.template");
-	}
-	/**
-	 * @return Returns the feedback mail to address.
-	 */
-	public String getFeedbackAddress() {
-		return mailProperties.getProperty("feedback.mailTo");
-	}
-	/**
-	 * @return Returns the feedback subject.
-	 */
-	public String getFeedbackSubject() {
-		return mailProperties.getProperty("feedback.mailSubject");
-	}
-	/**
 	 * @return Returns the host.
 	 */
 	public String getHost() {
@@ -140,30 +125,6 @@ public class MailConfig
 	 */
 	public String getMailSubject() {
 		return mailProperties.getProperty("spreadsheet.mailSubject");
-	}
-	/**
-	 * @return Returns the userRequestMail address.
-	 */
-	public String getUserRequestMail() {
-		return mailProperties.getProperty("userRequestMail");
-	}
-	/**
-	 * @return Returns the userRequestCC address.
-	 */
-	public String getUserRequestCC() {
-		return mailProperties.getProperty("userRequestCC");
-	}
-	/**
-	 * @return Returns the requestSubject.
-	 */
-	public String getRequestSubject() {
-		return mailProperties.getProperty("request.Subject");
-	}
-	/**
-	 * @return Returns the requestUnformattedBody.
-	 */
-	public String getRequestUnformattedBody() {
-		return mailProperties.getProperty("request.Body");
 	}
 	/**
 	 * @return Returns the registerSubject.

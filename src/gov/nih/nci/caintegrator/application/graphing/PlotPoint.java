@@ -1,9 +1,10 @@
 package gov.nih.nci.caintegrator.application.graphing;
 
+import java.util.Collection;
+
 import gov.nih.nci.caintegrator.enumeration.AxisType;
 import gov.nih.nci.caintegrator.ui.graphing.data.DataRange;
-
-import java.util.Collection;
+import gov.nih.nci.caintegrator.ui.graphing.data.principalComponentAnalysis.PrincipalComponentAnalysisDataPoint;
 
 /**
  * Simple Data point class for handling data of the form id,X,Y,Z

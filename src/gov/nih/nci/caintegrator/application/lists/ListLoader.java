@@ -1,7 +1,6 @@
 package gov.nih.nci.caintegrator.application.lists;
 
 import java.io.File;
-import java.util.Collection;
 import java.util.List;
 
 import javax.naming.OperationNotSupportedException;
@@ -62,7 +61,7 @@ public class ListLoader {
                     listValidator.validate(myType, myTextList);
                     UserList myUserList = listManager.createList(myType, "default"+myType.toString()+(count+1), myTextList, listValidator);
                     //flag all these that are auto loaded as default
-                    myUserList.setListOrigin(ListOrigin.Default);
+                    myUserList.setListSubType(ListSubType.Default);
                     //place the list in the userListBean
                     count++;
                     if(myUserList!=null){
@@ -80,8 +79,4 @@ public class ListLoader {
         return userListBean;
     }
 
-    public List<UserList> loadUserLists(){
-        
-        return null;
-    }
 }

@@ -3,13 +3,14 @@ package gov.nih.nci.caintegrator.application.mail;
 
 import gov.nih.nci.caintegrator.exceptions.ValidationException;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.Properties;
-
-import javax.mail.Message;
 import javax.mail.Session;
-import javax.mail.Transport;
-import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
+import javax.mail.internet.InternetAddress;
+import javax.mail.Message;
+import javax.mail.Transport;
 
 import org.apache.commons.validator.EmailValidator;
 import org.apache.log4j.Logger;

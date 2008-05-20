@@ -4,12 +4,13 @@ package gov.nih.nci.caintegrator.application.mail;
 import gov.nih.nci.caintegrator.exceptions.ValidationException;
 
 import java.util.Properties;
-
-import javax.mail.Message;
 import javax.mail.Session;
-import javax.mail.Transport;
-import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
+import javax.mail.internet.InternetAddress;
+import javax.mail.Message;
+import javax.mail.Transport;
+
+import org.apache.log4j.Logger;
 
 
 public class Mail {

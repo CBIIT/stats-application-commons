@@ -1,10 +1,8 @@
 package gov.nih.nci.caintegrator.application.mail.test;
 
 import gov.nih.nci.caintegrator.application.mail.MailManager;
-
-import java.util.ArrayList;
-
 import junit.framework.TestCase;
+import java.util.ArrayList;
 
 public class MailTest extends TestCase {
 
@@ -34,7 +32,7 @@ public class MailTest extends TestCase {
 			MailManager mailManager = new MailManager(mailProperties);
 
 			mailManager.sendFTPMail("sahnih@mail.nih.gov", al, null);
-			mailManager.sendFTPErrorMail("sahnih@mail.nih.gov", null);
+			mailManager.sendFTPErrorMail("sahnih@mail.nih.gov");
 		 } catch (Exception e1) {
             e1.printStackTrace();
         }

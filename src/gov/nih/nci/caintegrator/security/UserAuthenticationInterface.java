@@ -1,8 +1,5 @@
 package gov.nih.nci.caintegrator.security;
 
-import gov.nih.nci.security.authentication.callback.CSMCallbackHandler;
-import gov.nih.nci.security.exceptions.CSException;
-
 import javax.security.auth.login.LoginContext;
 import javax.security.auth.spi.LoginModule;
 

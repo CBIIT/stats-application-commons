@@ -1,5 +1,7 @@
 package gov.nih.nci.caintegrator.application.util;
 
+import gov.nih.nci.caintegrator.application.bean.LevelOfExpressionIHCFindingReportBean;
+
 import java.util.Comparator;
 
 public class TimepointStringComparator implements Comparator<String>{

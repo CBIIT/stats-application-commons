@@ -9,8 +9,6 @@ package gov.nih.nci.caintegrator.application.lists;
 
 
 import gov.nih.nci.caintegrator.application.cache.CacheConstants;
-import gov.nih.nci.caintegrator.application.cache.PresentationCacheManager;
-import gov.nih.nci.caintegrator.application.cache.PresentationTierCache;
 import gov.nih.nci.caintegrator.dto.de.GeneIdentifierDE;
 
 import java.util.ArrayList;
@@ -23,8 +21,12 @@ import java.util.Set;
 
 import javax.servlet.http.HttpSession;
 
+import org.apache.commons.collections.ListUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
+import org.dom4j.Document;
+import org.dom4j.DocumentHelper;
+import org.dom4j.Element;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
@@ -32,9 +34,6 @@ import uk.ltd.getahead.dwr.ExecutionContext;
 
 /**
  * @author rossok
- * UserListBeanHelper is the touchpoint for any app using list management service
- * The class uses the presentation tier cache to store a userlist bean containing
- * all user lists.
  *
  */
 public class UserListBeanHelper{
@@ -42,50 +41,21 @@ public class UserListBeanHelper{
     private String sessionId;
     private UserListBean userListBean;
     private static Logger logger = Logger.getLogger(UserListBeanHelper.class);
-    public PresentationTierCache presentationTierCache = PresentationCacheManager.getInstance();
-    
-    /**
-     * recommended constructor
-     * @param presentationCacheId
-     */
-    public UserListBeanHelper(String presentationCacheId){
-        this.userListBean = (UserListBean)presentationTierCache.getNonPersistableObjectFromSessionCache(presentationCacheId,CacheConstants.USER_LISTS);
-    }
-    
-    public void addBean(String presntationCacheId, String key, UserListBean userListBean){
-        presentationTierCache.addNonPersistableToSessionCache(presntationCacheId, CacheConstants.USER_LISTS, userListBean);        
-    }
-    
-    /**
-     * deprecated constructor -- used to support legacy code
-     * @param userListBean
-     * @deprecated
-     */
+     
     public UserListBeanHelper(UserListBean userListBean){
         this.userListBean = userListBean;
     }
     
-    /**
-     * deprecated constructor -- used to support legacy code
-     * @param userListBean
-     * @deprecated
-     */    
     public UserListBeanHelper(HttpSession session){
-        this.userListBean = (UserListBean)presentationTierCache.getNonPersistableObjectFromSessionCache(session.getId(),CacheConstants.USER_LISTS);                 
+        userListBean = (UserListBean) session.getAttribute(CacheConstants.USER_LISTS);        
+        
     }
-    
-    /**
-     * deprecated constructor -- used to support legacy code
-     * @param userListBean
-     * @deprecated
-     */
     public UserListBeanHelper(){       
         session = ExecutionContext.get().getSession(false); 
         sessionId = ExecutionContext.get().getSession(false).getId(); 
-        this.userListBean = (UserListBean)presentationTierCache.getNonPersistableObjectFromSessionCache(session.getId(),CacheConstants.USER_LISTS);                 
+        userListBean = (UserListBean) session.getAttribute(CacheConstants.USER_LISTS);        
+               
     }
-    
-    
     public void addList(UserList userList) {
         userListBean.addList(userList);        
     }
@@ -94,42 +64,25 @@ public class UserListBeanHelper{
         userListBean.removeList(listName); 
     }
     
-    public String removeListFromAjax(String listName)   {
-        removeList(listName);
-        return listName;
+    public String removeListFromAjax(String listName)	{
+    	removeList(listName);
+    	return listName;
     }
     
     public void addItemToList(String listName, String listItem) {
         UserList userList =  userListBean.getList(listName);
-        ListItem item = new ListItem(listItem,listName);
-        userList.getListItems().add(item);
-        userList.setItemCount(userList.getItemCount()+1); 
+        userList.getList().add(listItem);
+    	userList.setItemCount(userList.getItemCount()+1); 
     }
     
     public void removeItemFromList(String listName, String listItem) {        
-        String[] listItemArray;
-        if(listItem.contains(" notes")){
-            listItemArray = listItem.split(" notes");
-            listItem = listItemArray[0];
-        }
-        else if(listItem.contains(" rank")){
-            listItemArray = listItem.split(" rank");
-            listItem = listItemArray[0];
-        }
-        
         UserList userList =  userListBean.getList(listName);
-        for(ListItem l:userList.getListItems()){
-            if(l.getName().equalsIgnoreCase(listItem)){
-                userList.getListItems().remove(l);
-                break;
-            }
-        }
-        //userList.getList().remove(listItem);
-        userList.setItemCount(userList.getItemCount()-1);           
+        userList.getList().remove(listItem);
+       	userList.setItemCount(userList.getItemCount()-1);        	
     }
     
     public UserList getUserList(String listName){
-        return userListBean.getList(listName);      
+    	return userListBean.getList(listName);    	
     }
     
     
@@ -143,68 +96,31 @@ public class UserListBeanHelper{
         
         JSONObject listDetails = new JSONObject();
         listDetails.put("listName",userList.getName());
-        listDetails.put("listType",userList.getListType().toString());     
+        listDetails.put("listType",userList.getListType().toString());
         
-        /**
-         * new way of retrieving details from lists. Each
-         * listItem is treated as such, and NOT just a string.*/
-         
-//        if(userList.getListItems()!=null && !userList.getListItems().isEmpty()){
-//            JSONArray listItems = new JSONArray();             
-//            
-//            String itemDescription = "";
-//            for(ListItem listItem:userList.getListItems()){
-//                String name = listItem.getName();
-//                itemDescription = name;
-//                if(listItem.getNotes()!=null && listItem.getNotes().trim().length()>=1){
-//                    itemDescription += " notes: " + listItem.getNotes();
-//                }
-//                if(listItem.getRank()!=null){
-//                    itemDescription += " rank: " + Double.toString(listItem.getRank());
-//                }
-//                
-//                listItems.add(itemDescription);
-//            }
-//            listDetails.put("validItems", listItems );
-//        }
-        
-        if(userList.getListItems()!=null && !userList.getListItems().isEmpty()){
-            JSONArray listItems = new JSONArray();   
-            
-            for(ListItem listItem:userList.getListItems()){
-                String name = listItem.getName();
-                JSONObject itemDescription = new JSONObject();
-                itemDescription.put("name",name);
-                if(listItem.getNotes()!=null && listItem.getNotes().trim().length()>=1){
-                    itemDescription.put("notes",listItem.getNotes());
-                }
-                if(listItem.getRank()!=null){
-                    itemDescription.put("rank",Long.toString(listItem.getRank()));
-                }
-                
-                listItems.add(itemDescription);
-            }
-            listDetails.put("validItems", listItems );
-        }
-        
-        
-       /** if(userList.getList()!=null && !userList.getList().isEmpty()){
-            JSONArray item = new JSONArray();             
+        /*
+        Document document =  DocumentHelper.createDocument();
+        Element list = document.addElement("list");
+        Element type = list.addAttribute("type", userList.getListType().toString());
+        Element name = list.addAttribute("name", userList.getName());
+        */
+        if(userList.getList()!=null && !userList.getList().isEmpty()){
+        	JSONArray item = new JSONArray();
             for(String i : userList.getList()){
-                //Element item = list.addElement("item");
-                //item.addText(i);
-                item.add(i);
+            	//Element item = list.addElement("item");
+            	//item.addText(i);
+            	item.add(i);
             }
             listDetails.put("validItems", item );
         }
-        */
+        
         
         if(userList.getInvalidList()!=null && !userList.getInvalidList().isEmpty()){
-            JSONArray item = new JSONArray();
+        	JSONArray item = new JSONArray();
             for(String v : userList.getInvalidList()){
                 //Element item = list.addElement("invalidItem");
                 //item.addText(v);
-                item.add(v);
+            	item.add(v);
             }
             listDetails.put("invalidItems", item );
         }
@@ -215,7 +131,7 @@ public class UserListBeanHelper{
     public List<UserList> getLists(ListType listType) {
         List<UserList> typeList = new ArrayList<UserList>();
         
-        if(userListBean!=null && userListBean.getEntireList()!=null && !userListBean.getEntireList().isEmpty()){
+        if(!userListBean.getEntireList().isEmpty()){
             for(UserList list : userListBean.getEntireList()){
                 if(list.getListType() == listType){
                     typeList.add(list);
@@ -226,91 +142,38 @@ public class UserListBeanHelper{
     }
     
     
-    public List<UserList> getLists(ListType listType, ListSubType listSubType)   {
-        //get lists of this type with these subtypes
-        List<UserList> ul = this.getLists(listType);
-        List<UserList> matches = new ArrayList<UserList>(); 
-        //got all the main type, now see if any of these are of any listsubtypes
-        for(UserList u : ul){
-            ListSubType lst = u.getListSubType();            
-                if(lst.equals(listSubType)){
-                    matches.add(u);
-                }            
-        }
-        return matches;
-    }
-    
-    public List<UserList> getLists(ListType listType, List<ListSubType> listSubTypes)   {
-        //get lists of this type with these subtypes
-        List<UserList> ul = this.getLists(listType);
-        List<UserList> matches = new ArrayList<UserList>(); 
-        //got all the main type, now see if any of these are of any listsubtypes
-        for(UserList u : ul){
-            for(ListSubType subType:listSubTypes){
-                ListSubType lst = u.getListSubType();            
-                    if(lst.equals(subType)){
-                        matches.add(u);
-                    }    
-            }        
-        }
-        return matches;
-    }
-    
-    public List<UserList> getLists(ListType listType, ListOrigin listOrigin)   {
-        //get lists of this type with these subtypes
-        List<UserList> ul = this.getLists(listType);
-        List<UserList> matches = new ArrayList<UserList>(); 
-        //got all the main type, now see if any of these are of any listsubtypes
-        for(UserList u : ul){
-            ListOrigin lo = u.getListOrigin();
-                if(lo.equals(listOrigin)){
-                    matches.add(u);
-                }            
-        }
-        return matches;
-    }
-    
-    
-    
-    public List<UserList> getAllCustomLists(){
-        List<UserList> customList = new ArrayList<UserList>();
-        if (userListBean == null || userListBean.getEntireList().isEmpty())
-            return customList;
-        
-        for (UserList list : userListBean.getEntireList()){
-            ListOrigin origin = list.getListOrigin();
-            if(origin!=null && origin.equals(ListOrigin.Custom)){
-                customList.add(list);
+    public List<UserList> getLists(ListType listType, List<ListSubType> listSubTypes)	{
+    	//get lists of this type with these subtypes
+    	List<UserList> ul = this.getLists(listType);
+    	List<UserList> matches = new ArrayList<UserList>(); 
+    	//got all the main type, now see if any of these are of any listsubtypes
+    	for(UserList u : ul){
+            List<ListSubType> lst = u.getListSubType();
+            for(ListSubType ss : listSubTypes){
+	            if(lst.contains(ss) && !matches.contains(u)){
+	                matches.add(u);
+	            }            
             }
-        }
-        return customList;
+    	}
+    	return matches;
     }
     
-    public List<UserList> getAllCustomListsForType(ListType type){
-        List<UserList> customList = new ArrayList<UserList>();
-        if (userListBean == null || userListBean.getEntireList().isEmpty())
-            return customList;
-        
-        for (UserList list : userListBean.getEntireList()){
-            ListOrigin origin = list.getListOrigin();
-            ListType myType = list.getListType();
-            if(origin!=null && origin.equals(ListOrigin.Custom)
-                    && myType!=null && myType == type){
-                customList.add(list);
-            }
-        }
-        return customList;
+    public List<UserList> getLists(ListType listType, ListSubType listSubType){
+    	List<ListSubType> lst = new ArrayList<ListSubType>();
+    	lst.add(listSubType);
+    	return getLists(listType, lst);
     }
     
-    
+    public List<UserList> getListsBySubType(List<ListSubType> listSubTypes){
+    	return new ArrayList();
+    }
     
     public List<UserList> getAllLists() {
         List<UserList> allList = new ArrayList<UserList>();
-        if(userListBean!=null){
-            for(UserList list : userListBean.getEntireList()){
-                allList.add(list);
-            } 
-        }
+    
+        for(UserList list : userListBean.getEntireList()){
+            allList.add(list);
+        }        
         return allList;
     }
     
@@ -320,7 +183,17 @@ public class UserListBeanHelper{
         return items;
     }
    
-     
+    /*
+    public List<String> getGeneSymbolListNames(){ 
+        Collection<UserList> geneSetList = new ArrayList<UserList>();
+        geneSetList = getLists(ListType.GeneSymbol);  
+        List<String> geneSetListNames = new ArrayList<String>();
+        for(UserList userListName : geneSetList){
+            geneSetListNames.add(userListName.toString());
+        }
+        return geneSetListNames;
+    }
+    */
     
     /**
      * @NOTE : DE may change in future.
@@ -336,6 +209,17 @@ public class UserListBeanHelper{
         return geneIdentifierDECollection;
     }
     
+    /*
+    public Collection getDefaultPatientListNames(){ 
+        Collection<UserList> patientSetList = new ArrayList<UserList>();
+        patientSetList = getLists(ListType.PatientDID, ListSubType.Default);  
+        Collection patientSetListNames = new ArrayList();
+        for(UserList userListName : patientSetList){
+            patientSetListNames.add(userListName.toString());
+        }
+        return patientSetListNames;
+    }
+    */
     
     public Collection getPatientListNames(){ 
         Collection<UserList> patientSetList = new ArrayList<UserList>();
@@ -348,13 +232,19 @@ public class UserListBeanHelper{
     }
     
     public Collection getGenericListNamesFromString(String listType){ 
-        return getGenericListNames(ListType.valueOf(listType));
+    	return getGenericListNames(ListType.valueOf(listType));
     }
     
-    public Collection getGenericListNamesFromStringWithSubs(String listType, String sub){ 
-        //parse the subs
-        ListSubType lst = ListSubType.valueOf(sub.trim());
-        return getGenericListNamesWithSubTypes(ListType.valueOf(listType), lst);
+    public Collection getGenericListNamesFromStringWithSubs(String listType, String commaSubs){ 
+    	//parse the subs
+    	List<ListSubType> lst = new ArrayList();
+    	String[] sbs = StringUtils.split(commaSubs, ",");
+    	for(String s : sbs)	{
+    		if(ListSubType.valueOf(s.trim())!=null)	{
+    			lst.add(ListSubType.valueOf(s.trim()));
+    		}
+    	}
+    	return getGenericListNamesWithSubTypes(ListType.valueOf(listType), lst);
     }
     
     public Collection getGenericListNames(ListType listType){ 
@@ -367,9 +257,9 @@ public class UserListBeanHelper{
         return setListNames;
     }
     
-    public Collection getGenericListNamesWithSubTypes(ListType lt, ListSubType sub)  {
-         Collection<UserList> setList = new ArrayList<UserList>();
-         setList = getLists(lt, sub);
+    public Collection getGenericListNamesWithSubTypes(ListType lt, List<ListSubType> subs)	{
+    	 Collection<UserList> setList = new ArrayList<UserList>();
+         setList = getLists(lt, subs);
          Collection setListNames = new ArrayList();
          for(UserList userListName : setList){
              setListNames.add(userListName.toString());
@@ -377,48 +267,48 @@ public class UserListBeanHelper{
          return setListNames;
     }
     
-    public void differenceLists(List<String> listNames, String newListName, ListType listType)  {
-        
-        //we're only expecting 2 lists here
-        if(listNames.size()!=2) {
-            return;
-        }
-        UserList ulist = userListBean.getList(listNames.get(0));
-        List<String> s1 = ulist.getList();
-        ulist = userListBean.getList(listNames.get(1));
-        List<String> s2 = ulist.getList();
-        
+    public void differenceLists(List<String> listNames, String newListName, ListType listType)	{
+    	
+    	//we're only expecting 2 lists here
+    	if(listNames.size()!=2)	{
+    		return;
+    	}
+    	UserList ulist = userListBean.getList(listNames.get(0));
+    	List<String> s1 = ulist.getList();
+    	ulist = userListBean.getList(listNames.get(1));
+    	List<String> s2 = ulist.getList();
+    	
 
-        //transforms s1 into the (asymmetric) set difference of s1 and s2. 
-        //(For example, the set difference of s1 minus s2 is the set containing all 
-        //the elements found in s1 but not in s2.)
+    	//transforms s1 into the (asymmetric) set difference of s1 and s2. 
+    	//(For example, the set difference of s1 minus s2 is the set containing all 
+    	//the elements found in s1 but not in s2.)
 
-        Set<String> difference = new HashSet<String>(s1);
-        difference.removeAll(s2);
-        UserList newList = null;
-        if(difference.size()>0){
-            List dList = new ArrayList();
-            dList.addAll(difference);
-            Collections.sort(dList, String.CASE_INSENSITIVE_ORDER);
-            
-            newList = new UserList(newListName+"_"+listNames.get(0)+"-"+listNames.get(1),listType,dList,new ArrayList<String>(),new Date());
-            newList.setListOrigin(ListOrigin.Custom);
-            newList.setItemCount(dList.size());
-            userListBean.addList(newList);
-        }
-        Set<String> difference2 = new HashSet<String>(s2);
-        difference2.removeAll(s1);
-        if(difference2.size()>0)    {
-            List dList2 = new ArrayList();
-            dList2.addAll(difference2);
-            Collections.sort(dList2, String.CASE_INSENSITIVE_ORDER);
-            newList = null;
-            newList = new UserList(newListName+"_"+listNames.get(1)+"-"+listNames.get(0),listType,dList2,new ArrayList<String>(),new Date());
-            newList.setListOrigin(ListOrigin.Custom);
-            newList.setItemCount(dList2.size());
-            userListBean.addList(newList);
-        }
-        
+    	Set<String> difference = new HashSet<String>(s1);
+    	difference.removeAll(s2);
+    	UserList newList = null;
+    	if(difference.size()>0){
+	    	List dList = new ArrayList();
+	    	dList.addAll(difference);
+	    	Collections.sort(dList, String.CASE_INSENSITIVE_ORDER);
+	    	
+	        newList = new UserList(newListName+"_"+listNames.get(0)+"-"+listNames.get(1),listType,dList,new ArrayList<String>(),new Date());
+	        newList.setListSubType(ListSubType.Custom);
+	        newList.setItemCount(dList.size());
+	        userListBean.addList(newList);
+    	}
+    	Set<String> difference2 = new HashSet<String>(s2);
+    	difference2.removeAll(s1);
+    	if(difference2.size()>0)	{
+	    	List dList2 = new ArrayList();
+	    	dList2.addAll(difference2);
+	    	Collections.sort(dList2, String.CASE_INSENSITIVE_ORDER);
+	    	newList = null;
+	        newList = new UserList(newListName+"_"+listNames.get(1)+"-"+listNames.get(0),listType,dList2,new ArrayList<String>(),new Date());
+	        newList.setListSubType(ListSubType.Custom);
+	        newList.setItemCount(dList2.size());
+	        userListBean.addList(newList);
+    	}
+    	
     }
     
     public void uniteLists(List<String> listNames, String newListName, ListType listType) {
@@ -434,7 +324,7 @@ public class UserListBeanHelper{
         items.addAll(unitedSet);
         Collections.sort(items, String.CASE_INSENSITIVE_ORDER);
         UserList newList = new UserList(newListName,listType,items,new ArrayList<String>(),new Date());
-        newList.setListOrigin(ListOrigin.Custom);
+        newList.setListSubType(ListSubType.Custom);
         newList.setItemCount(items.size());
         userListBean.addList(newList);
     }
@@ -457,7 +347,7 @@ public class UserListBeanHelper{
         items.addAll(intersectedList);
         Collections.sort(items, String.CASE_INSENSITIVE_ORDER);
         UserList newList = new UserList(newListName,listType,items,new ArrayList<String>(),new Date());
-        newList.setListOrigin(ListOrigin.Custom);
+        newList.setListSubType(ListSubType.Custom);
         newList.setItemCount(items.size());
         userListBean.addList(newList);
     }

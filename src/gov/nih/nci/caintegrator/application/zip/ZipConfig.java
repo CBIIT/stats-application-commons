@@ -2,6 +2,7 @@ package gov.nih.nci.caintegrator.application.zip;
 
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.text.SimpleDateFormat;
 import java.util.Properties;
 
@@ -90,16 +91,6 @@ public class ZipConfig
     public String getFtpLocation()    
     {
     	return zipProperties.getProperty("ftp_location");
-    }
-    
-    /**
-     * Location where files for searching Genotypes will be placed
-     * 
-     * @return
-     */
-    public String getGenotypeLocation()    
-    {
-    	return zipProperties.getProperty("genotype_location");
     }
     
     /**
