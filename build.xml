@@ -1,16 +1,16 @@
-<project name="caintegrator-application-commons" default="build_jar_anthill" basedir=".">
+<project name="caintegrator-application-commons" default="build_dependency" basedir=".">
 	<property file="basic_build.properties"/>
 	<!--
 	TARGET: COMPILE
 		Compiles the source directory
 	-->
-	<target name="build_dependency" if="anthill.artifacts.dir" depends="build_jar_anthill">
+	<target name="build_dependency" if="anthill.artifacts.dir" depends="build_jar">
 		<echo>
 			Artifacts copied to ${anthill.artifacts.dir}
 		</echo>
 		<copy file="caintegrator-application-commons.jar" todir="${anthill.artifacts.dir}"/>
 	</target>
-	<target name="build_jar_anthill" >
+	<target name="build_jar" >
 		<delete dir="${build.classes.dir}" failonerror="false"/>
 		<delete file="caintegrator-application-commons.jar" failonerror="false"/>
 		<mkdir dir="${build.classes.dir}"/>
@@ -27,19 +27,53 @@
 		</javac>
 		<jar jarfile="caintegrator-application-commons.jar">
 			<fileset dir="${build.classes.dir}"/>
+			<fileset dir="${build.source.dir}">
+	            <exclude name="hibernate.cfg.xml"/>
+	            <exclude name="hibernate.properties"/>
+	            <exclude name="*.java"/>
+        	</fileset>
 		</jar>
+		<antcall target="retrieve_deployment_artifacts"></antcall>
 	</target>
-	<target name="jar_check">
-		<property name="weka.jar" value="${build.deploy.lib.dir}/weka.jar" />
-		<available file="${weka.jar}" property="required_jars.present"/>
-		<condition property="required_jars.not.present">
-			<not>
-				<istrue value="${required_jars.present}"/>
-			</not>
-		</condition>
+	<target name="retrieve_deployment_artifacts">
+		<copy file="conf/caintegrator-jbossmq-destinations-service.xml" todir="${anthill.artifacts.dir}"/>
+		<copy file="conf/csm/oracle-ds.xml.template" tofile="${anthill.artifacts.dir}/oracle-ds.xml"/>
 	</target>
-	<target name="warning" if="required_jars.not.present" depends="jar_check">
-		<fail message="Build Failed! The required ${weka.jar} is not present to compile!  Please see ${build.deploy.lib.dir}/readme.txt" />
+	
+	<!-- ************************************************************************************************-->
+	<!--                                  Applet Compile/Signing                                          -->
+	<!-- ************************************************************************************************-->
+	<!-- make sure the keystore file path is correct for the computer where this build file is run -->	
+   <property name="keystore.alias" value="tomcat" /> 
+   <property name="keystore.keypass" value="changeit" /> 
+   <property name="keystore.storepass" value="changeit" /> 
+   <property name="keystore.location" value="C:/Documents and Settings/chenhang/.keystore"  />
+   <!-- property name="keystore.location" value="C:/temp/server.keystore"  / --> 
+
+<!--  create the applet jar file first  
+	<target name="jar-hmv-applet">
+        <jar jarfile="HMVApplet.jar" excludes="**/MANIFEST.MF, *.jar, *.xml" >
+        	<basedir="${basedir}/applet"/>
+        </jar>
 	</target>
-	<target name="noop"/>
+--> 
+
+	<target name="jar-smart-applet" >
+        <jar jarfile="HMVApplet.jar" excludes="**/MANIFEST.MF, *.jar, *.xml" >
+        	<fileset dir="${basedir}/bin">
+				<include name="gov/nih/nci/caintegrator/application/gpvisualizer/heatmapviewer/*.class"/>
+			</fileset>
+        </jar>
+	</target>
+	
+    <!-- target name="sign-hmv-applet" depends="jar-hmv-applet" -->
+    <target name="sign-hmv-applet" depends="jar-smart-applet">
+        <signjar jar="HMVApplet.jar" 
+                  alias="${keystore.alias}" 
+                  keypass="${keystore.keypass}" 
+                  storepass="${keystore.storepass}" 
+                  keystore="${keystore.location}" 
+                  signedjar="SignedHMVApplet.jar" /> 
+    </target>
+	
 </project>
