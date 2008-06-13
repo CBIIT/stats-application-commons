@@ -1,0 +1,166 @@
+<project name="csmsetup" default="configure_CSM" basedir=".">
+	<property file="buildCSM.properties"/>
+	
+	<!--
+	TARGET: config_common_security_module
+	Configures the common security module creating the necessary files
+	for Authentication and Authorization
+	-->
+	<target name="config_common_security_module">
+		<echo message="Configuring Common Security Module"/>		
+		
+		<!-- Configuring ApplicationSecurityConfig.xml -->
+		<echo message="Setting ApplicationSecurityConfig.xml"/>
+		<delete file="csm_deploy/ApplicationSecurityConfig.xml"/>
+		<copy file="conf/csm/ApplicationSecurityConfig.xml.template" tofile="csm_deploy/ApplicationSecurityConfig.xml"/>
+		<replaceregexp file="csm_deploy/ApplicationSecurityConfig.xml" match="@CONTEXT_NAME@" replace="${project_name}" flags="g"/>
+		<replaceregexp file="csm_deploy/ApplicationSecurityConfig.xml" match="@HIBERNATE_CONFIG_FILE@" replace="${csm.hibernate.config.file}" flags="g"/>
+		
+		<!-- Configuring hibernate.cfg.xml	--> 
+		<echo message="Setting hibernate.cfg.xml"/>
+		<delete file="csm_deploy/${project_name}hibernate.cfg.xml"/>
+		<copy file="conf/csm/csm.hibernate.cfg.xml.template" tofile="csm_deploy/${project_name}.hibernate.cfg.xml"/>
+		<replaceregexp file="csm_deploy/${project_name}.hibernate.cfg.xml" match="@DATASOURCE_JNDI@" replace="${csm.jndi.connection.datasource}" flags="g"/>
+	
+		
+		<!-- Configuring oracle-ds.xml-->
+		<echo message="Configuring oracle-ds.xml"/>
+		<delete file="csm_deploy/oracle-ds.xml"/>
+		<copy file="conf/csm/oracle-ds.xml.template" tofile="csm_deploy/oracle-ds.xml"/>
+		<replaceregexp file="csm_deploy/oracle-ds.xml" match="@DATASOURCE_JNDI@" replace="${csm.jndi.connection.datasource}" flags="g"/>
+		<replaceregexp file="csm_deploy/oracle-ds.xml" match="@DB_CONNECTION_URL@" replace="jdbc:oracle:${urlDbalias}" flags="g"/>
+		<replaceregexp file="csm_deploy/oracle-ds.xml" match="@DB_USERNAME@" replace="${databaseUser}" flags="g"/>
+		<replaceregexp file="csm_deploy/oracle-ds.xml" match="@DB_PASSWORD@" replace="${databasePassword}" flags="g"/>
+		<replaceregexp file="csm_deploy/oracle-ds.xml" match="@ORACLE_DRIVER_CLASS@" replace="${jdbcRuntimeDriver}" flags="g"/>
+		<replaceregexp file="csm_deploy/oracle-ds.xml" match="@EXCEPTION_SORTER_CLASS@" replace="${csm.exception.sorter.class}" flags="g"/>
+		
+		
+		<!-- Configuring properties-service.xml-->
+		<echo message="Configuring properties-service.xml"/>
+		<delete file="csm_deploy/properties-service.xml"/>
+		<copy file="conf/csm/properties-service.xml.template" tofile="csm_deploy/properties-service.xml"/>
+		<replaceregexp file="csm_deploy/properties-service.xml" match="@CSM_APPLICATION_CONFIG_FILE@" replace="${csm.application.config.file}" flags="g"/>
+		
+		
+		<!-- Configuring login-config.xml -->
+		<echo message="Configuring login-config.xml"/>
+		<delete file="csm_deploy/login-config.xml"/>
+		<copy file="conf/csm/login-config.xml.template" tofile="csm_deploy/login-config.xml"/>
+		<replaceregexp file="csm_deploy/login-config.xml" match="@PROJECT_NAME@" replace="${project_name}" flags="g"/>
+		<replaceregexp file="csm_deploy/login-config.xml" match="@LDAP_HOST@" replace="${ldap.provider.url}" flags="g"/>
+		<replaceregexp file="csm_deploy/login-config.xml" match="@LDAP_CONTEXT@" replace="${ldap.context}" flags="g"/>
+		
+	</target>
+	
+	<!--checks if oracle-ds.xml exists-->	
+	<target name="ods_check">
+					<property name="ods.xml" value="${jboss.deploy.dir}/oracle-ds.xml"/>
+					<available file="${ods.xml}" property="ods.xml.present"/>
+					<condition property="ods.xml.not.present">
+						<not>
+							<istrue value="${ods.xml.present}"/>
+						</not>
+					</condition>				
+	</target>
+	
+	<!--adds oracle-ds.xml if it does not already exist-->
+	<target name="addOracleDS" if="ods.xml.not.present" depends="ods_check,appendOracleDS">
+			<echo message="No oracle-ds file exists, copy over from csmdeploy dir"/>			
+			<copy file="csm_deploy/oracle-ds.xml" todir="${jboss.deploy.dir}"/>
+	</target>
+	
+	<!--appends section to oracle-ds.xml if it does already exist-->
+	<target name="appendOracleDS" if="ods.xml.present" depends="ods_check">
+			<echo message="There is an oracle-ds.xml present, copy and paste needed sections"/>					
+			<taskdef name="xmltask" classpath="lib/xmltask-v1.13.jar" classname="com.oopsconsultancy.xmltask.ant.XmlTask"/>		
+				<!--copy and insert new oracle configs to jboss file-->
+				<xmltask source="csm_deploy/oracle-ds.xml" clearBuffers="odsBuffer">
+				  			<copy path="//local-tx-datasource" buffer="odsBuffer"  append="false"/>  			
+				</xmltask>
+				<xmltask source="${jboss.deploy.dir}/oracle-ds.xml" dest="${jboss.deploy.dir}/oracle-ds.xml">
+						 	<insert path="//local-tx-datasource" buffer="odsBuffer" position="before" />
+				</xmltask>
+	</target>
+	
+	<!--checks if ApplicationSecurityConfig.xml exists-->	
+	<target name="asc_check">
+					<property name="asc.xml" value="${jboss.conf.dir}/ApplicationSecurityConfig.xml"/>
+					<available file="${asc.xml}" property="asc.xml.present"/>
+					<condition property="asc.xml.not.present">
+						<not>
+							<istrue value="${asc.xml.present}"/>
+						</not>
+					</condition>			
+	</target>
+	
+	<!--adds ApplicationSecurityConfig.xml if it does not already exist-->
+	<target name="addAppSecurityConfig" if="asc.xml.not.present" depends="asc_check,appendAppSecurityConfig">
+		<echo message="No appSecurityConfig file exists, copy over from csmdeploy dir"/>		
+		<copy file="csm_deploy/ApplicationSecurityConfig.xml" todir="${jboss.conf.dir}"/>		
+	</target>
+	
+	<!--appends section to ApplicationSecurityConfig.xml if it does already exist-->
+	<target name="appendAppSecurityConfig" if="asc.xml.present" depends="asc_check">
+		<echo message="There is an appSecurityConfig.xml present, copy and paste needed sections"/>				
+		<taskdef name="xmltask" classpath="lib/xmltask-v1.13.jar" classname="com.oopsconsultancy.xmltask.ant.XmlTask"/>			
+			<!--copy and insert new application security configs to jboss file-->
+	  		<xmltask source="csm_deploy/ApplicationSecurityConfig.xml" clearBuffers="ascBuffer">
+	  			<copy path="//application" buffer="ascBufer" append="false"/>  			
+	  		</xmltask>	
+			<xmltask source="${jboss.conf.dir}/ApplicationSecurityConfig.xml" dest="${jboss.conf.dir}/ApplicationSecurityConfig.xml" omitheader="true">
+			 	<insert path="//application-list[1]" buffer="ascBufer"/>
+			</xmltask>			
+	</target>
+	
+		<!--checks if login-config.xml exists-->	
+		<target name="login_check">
+						<property name="login.xml" value="${jboss.conf.dir}/login-config.xml"/>
+						<available file="${login.xml}" property="login.xml.present"/>
+						<condition property="login.xml.not.present">
+							<not>
+								<istrue value="${login.xml.present}"/>
+							</not>
+						</condition>			
+		</target>
+		
+		<!--adds login-config.xml if it does not already exist-->
+		<target name="addLoginConfig" if="login.xml.not.present" depends="login_check,appendLoginConfig">
+			<echo message="No login-config file exists, copy over from csmdeploy dir"/>		
+			<copy file="csm_deploy/login-config.xml" todir="${jboss.conf.dir}"/>		
+		</target>
+		
+		<!--appends section to login-config.xml if it does already exist-->
+		<target name="appendLoginConfig" if="login.xml.present" depends="login_check">
+			<echo message="There is a login-config.xml present, copy and paste needed sections"/>				
+			<taskdef name="xmltask" classpath="lib/xmltask-v1.13.jar" classname="com.oopsconsultancy.xmltask.ant.XmlTask"/>			
+				<!--copy and insert new login configs to jboss file-->
+		  		<xmltask source="csm_deploy/login-config.xml" clearBuffers="loginBuffer">
+		  			<copy path="//application-policy" buffer="loginBufer" append="false"/>  			
+		  		</xmltask>	
+				<xmltask source="${jboss.conf.dir}/login-config.xml" dest="${jboss.conf.dir}/login-config.xml">
+				 	<insert path="//application-policy[1]" buffer="loginBufer" position="after" />
+				</xmltask>			
+		</target>
+	
+	<!--appends section to properties-service.xml -->
+		<target name="appendPropertyService">
+				<echo message="Copy and paste needed sections to properties-service in JBOSS"/>					
+				<taskdef name="xmltask" classpath="lib/xmltask-v1.13.jar" classname="com.oopsconsultancy.xmltask.ant.XmlTask"/>		
+					<!--copy and insert new property to jboss file-->
+					<xmltask source="csm_deploy/properties-service.xml" clearBuffers="psBuffer">
+					  			<copy path="//attribute" buffer="psBuffer" append="false"/>  			
+					</xmltask>
+					<xmltask source="${jboss.deploy.dir}/properties-service.xml" dest="${jboss.deploy.dir}/properties-service.xml">
+							 	<insert path="//mbean[2]" buffer="psBuffer"/>
+					</xmltask>
+		</target>
+	
+	<!--addAppSecurityConfig,addOracleDS,addLoginConfig-->
+	<target name="configure_CSM" depends="config_common_security_module,addOracleDS,addAppSecurityConfig,addLoginConfig">
+		<!-- Copy new csm.hibernate.cfg.file to Jboss Conf folder -->
+		<echo message="Copy new csm.hibernate.cfg.file into JBOSS"/>
+		<copy file="csm_deploy/${project_name}.hibernate.cfg.xml" todir="${jboss.conf.dir}"/>
+				
+	</target>
+	
+</project>
