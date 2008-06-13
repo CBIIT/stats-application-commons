@@ -92,10 +92,11 @@ public class CaIntegratorRunVisualizerApplet extends Applet {
     // the static string for gene pattern server url ------- CaIntegrator
     public static final String SUPPORT_FILE_URL = "supportFileURL";
     public static final String TICKET_STRING = "ticketString";
+    public static final String MODULE_NAME = "moduleName";
     // end of CaIntegrator variable.
     
     //wellKnownNames also includes a specific string GP_SERVER ------ CaIntegrator
-    String[] wellKnownNames = { SUPPORT_FILE_URL, TICKET_STRING, RunVisualizerConstants.NAME, RunVisualizerConstants.COMMAND_LINE,
+    String[] wellKnownNames = { SUPPORT_FILE_URL, TICKET_STRING, MODULE_NAME, RunVisualizerConstants.NAME, RunVisualizerConstants.COMMAND_LINE,
             RunVisualizerConstants.DEBUG, RunVisualizerConstants.OS, RunVisualizerConstants.CPU_TYPE,
             RunVisualizerConstants.LIBDIR, RunVisualizerConstants.DOWNLOAD_FILES, RunVisualizerConstants.LSID };
 
