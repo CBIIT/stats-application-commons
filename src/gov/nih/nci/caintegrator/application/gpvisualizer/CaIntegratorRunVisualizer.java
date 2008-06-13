@@ -121,6 +121,7 @@ public class CaIntegratorRunVisualizer {
     // the static string for gene pattern server url ------- CaIntegrator
     public static final String SUPPORT_FILE_URL = "supportFileURL";
     public static final String TICKET_STRING = "ticketString";
+    public static final String MODULE_NAME = "moduleName";
     
     /**
      * @param params
@@ -296,15 +297,17 @@ public class CaIntegratorRunVisualizer {
     //  There are changes in this method for CaIntegrator
     protected String downloadSupportFiles() throws IOException {
 
-        String name = (String) params.get(RunVisualizerConstants.NAME);
+        String name = (String) params.get(MODULE_NAME);
         String lsid = (String) params.get(RunVisualizerConstants.LSID);
-
+        //System.out.println("Name = " + name);
         // don't even bother using the local files since downloading is so fast
         // and the caching is conservative
         Date startDLTime = new Date();
         File fLibdir = new File(getTempDir(), name + ".libdir");
         fLibdir.mkdirs();
 
+        //System.out.println("temp file path = " + fLibdir.getAbsolutePath());
+        
         File[] currentFiles = fLibdir.listFiles();
 
         int supf;
@@ -351,7 +354,9 @@ public class CaIntegratorRunVisualizer {
                 }
                 Date startTime = new Date();
                 String urlString = replace(serverLibdir, "<supportFileName>", encode(supportFileNames[supf]));
-                
+                String ticketString = (String) params.get(TICKET_STRING);
+                urlString = urlString + "&" + ticketString.substring(1);
+                //System.out.println("Support file URL = " + urlString);
                 URL urlFile = new URL(urlString);
                 //URL urlFile = new URL(serverLibdir + "/gp/getFile.jsp?task=" + encode(lsid) + "&file="
                  //       + encode(supportFileNames[supf]));
@@ -390,6 +395,9 @@ public class CaIntegratorRunVisualizer {
     
     //  No change in this method for CaIntegrator
     protected File downloadFile(URL url, File dir, String filename) throws IOException {
+    	System.out.println("downloadFile: filename = " + filename);
+    	System.out.println("downloadFile: dir = " + dir.getAbsolutePath());
+    	System.out.println("downloadFile: url = " + url.toString());
         InputStream is = null;
         FileOutputStream fos = null;
         File file = null;
