@@ -306,7 +306,7 @@ public class CaIntegratorRunVisualizer {
         File fLibdir = new File(getTempDir(), name + ".libdir");
         fLibdir.mkdirs();
 
-        //System.out.println("temp file path = " + fLibdir.getAbsolutePath());
+        //System.out.println("temp file path for support files = " + fLibdir.getAbsolutePath());
         
         File[] currentFiles = fLibdir.listFiles();
 
@@ -395,9 +395,9 @@ public class CaIntegratorRunVisualizer {
     
     //  No change in this method for CaIntegrator
     protected File downloadFile(URL url, File dir, String filename) throws IOException {
-    	System.out.println("downloadFile: filename = " + filename);
-    	System.out.println("downloadFile: dir = " + dir.getAbsolutePath());
-    	System.out.println("downloadFile: url = " + url.toString());
+    	//System.out.println("downloadFile: filename = " + filename);
+    	//System.out.println("downloadFile: dir = " + dir.getAbsolutePath());
+    	//System.out.println("downloadFile: url = " + url.toString());
         InputStream is = null;
         FileOutputStream fos = null;
         File file = null;
@@ -579,7 +579,7 @@ public class CaIntegratorRunVisualizer {
         HashMap hmDownloadables = new HashMap();
         StringTokenizer stDownloadables = new StringTokenizer((String) params
                 .get(RunVisualizerConstants.DOWNLOAD_FILES), ",");
-        String name = (String) params.get(RunVisualizerConstants.NAME);
+        String name = (String) params.get(MODULE_NAME);
         String c = (String) params.get(RunVisualizerConstants.COMMAND_LINE);
 
         String prefix = (name.length() < 3 ? "dl" + name : name);
@@ -587,6 +587,8 @@ public class CaIntegratorRunVisualizer {
         File tempdir = new File(getTempDir(), name + ".gctdir");
         tempdir.mkdirs();
 
+        //System.out.println("temp file path for input files = " + tempdir.getAbsolutePath());
+        
         File[] currentFiles = tempdir.listFiles();
         
     	for (int i = 0; i < currentFiles.length; i++){
