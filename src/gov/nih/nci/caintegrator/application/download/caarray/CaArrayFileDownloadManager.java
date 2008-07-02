@@ -347,5 +347,21 @@ public abstract class CaArrayFileDownloadManager {
 		}
 		return flag;
 	}
+
+	public BusinessTierCache getBusinessCacheManager() {
+		return businessCacheManager;
+	}
+
+	public void setBusinessCacheManager(BusinessTierCache businessCacheManager) {
+		this.businessCacheManager = businessCacheManager;
+	}
+
+	public TaskExecutor getTaskExecutor() {
+		return taskExecutor;
+	}
+
+	public void setTaskExecutor(TaskExecutor taskExecutor) {
+		this.taskExecutor = taskExecutor;
+	}
 	
 }
