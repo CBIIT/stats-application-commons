@@ -21,9 +21,9 @@ import org.apache.log4j.Logger;
 public class DownloadTask implements Serializable{
 	private static final long serialVersionUID = 1L;
 	private static Logger logger = Logger.getLogger(DownloadTask.class);
-	private long startTime;
-	private long endTime;
-	private long elapsedTime;
+	private long startTime = -1;
+	private long endTime = 0-1;
+	private double elapsedTime = -1;
 	private String cacheId;
 	private String taskId;
 	private DownloadStatus downloadStatus;
@@ -76,13 +76,17 @@ public class DownloadTask implements Serializable{
 	/**
 	 * @return the elapsedTime
 	 */
-	public long getElapsedTime() {
+	public double getElapsedTime() {
+		if (startTime > 0){
+			long currentTime = System.currentTimeMillis(); 
+			elapsedTime = (currentTime - startTime)/ 1000.0;
+		}
 		return elapsedTime;
 	}
 	/**
 	 * @param elapsedTime the elapsedTime to set
 	 */
-	public void setElapsedTime(long elapsedTime) {
+	public void setElapsedTime(double elapsedTime) {
 		this.elapsedTime = elapsedTime;
 	}
 
@@ -174,10 +178,14 @@ public class DownloadTask implements Serializable{
 		List<String> validatedSpecimenList = new ArrayList<String>();
 		// Parses specimens to match sample names in caaaray
 		for(String specimen: specimenList){
+			specimen = specimen.trim();
 			if(specimen.endsWith("_T") ){
 				validatedSpecimenList.add(specimen.substring(0,specimen.lastIndexOf("_T")));
 			}else if(specimen.endsWith("_B") ){
 				validatedSpecimenList.add(specimen.substring(0,specimen.lastIndexOf("_B")));
+			}
+			else{
+				validatedSpecimenList.add(specimen);
 			}
 		}
 		return validatedSpecimenList;

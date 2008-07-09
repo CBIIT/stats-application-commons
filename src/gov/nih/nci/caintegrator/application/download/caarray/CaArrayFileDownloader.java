@@ -45,10 +45,6 @@ public class CaArrayFileDownloader  {
 	 */
 	private String extension;
 
-	/**
-	 * Name of the zip file to create.
-	 */
-	private String zipFilename;
 
 	/**
 	 * Constructor
@@ -137,12 +133,12 @@ public class CaArrayFileDownloader  {
 	// totalProcessTime + " second(s) or "+ totalProcessTime/60+" minute(s).");
 	// logger.debug("zip file completed");
 	// }
-	public void writeZipFile(Set<File> tempFiles) throws IOException {
+	public void writeZipFile(Set<File> tempFiles, String zipFileName) throws IOException {
 		ZipOutputStream zos = null;
 		byte[] buffer = new byte[1024];
 		int bytesRead;
 		try {
-			zos = new ZipOutputStream(new FileOutputStream(getZipFilename()));
+			zos = new ZipOutputStream(new FileOutputStream(zipFileName));
 			int i = 1;
 			for (File file : tempFiles) {
 				ZipEntry entry = new ZipEntry(file.getName());
@@ -165,10 +161,10 @@ public class CaArrayFileDownloader  {
 
 			}
 		} catch (FileNotFoundException e) {
-			reportError("Error creating zip file: " + getZipFilename(), e);
+			reportError("Error creating zip file: " + zipFileName, e);
 			throw e;
 		} catch (IOException e) {
-			reportError("Error writing entry to zip file: " + getZipFilename(),
+			reportError("Error writing entry to zip file: " + zipFileName,
 					e);
 			throw e;
 		} finally {
@@ -281,9 +277,6 @@ public class CaArrayFileDownloader  {
 		return experimentList.get(0);
 	}
 
-	public String getZipFilename() {
-		return zipFilename;
-	}
 
 	public String getExtension() {
 		return extension;

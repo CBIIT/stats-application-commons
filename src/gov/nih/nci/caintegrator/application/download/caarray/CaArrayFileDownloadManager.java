@@ -101,9 +101,14 @@ public abstract class CaArrayFileDownloadManager {
      */
     public void executeDownloadStrategy(final String session, final String taskId,String zipFileName, List<String> specimenList, FileType type) {   
     	DownloadTask downloadTask = createTask(session,  taskId, zipFileName,  specimenList,  type);
+    	
         if(downloadTask == null){
         	throw new IllegalStateException("Please call createDownloadTask first to init");
         }
+        
+        //set start time
+		long startTime = System.currentTimeMillis();
+		downloadTask.setStartTime(startTime);
     	 businessCacheManager.addToSessionCache(downloadTask.getCacheId(),
     			 downloadTask.getTaskId(), downloadTask);
          logger.info("Task has been set to 'InitiatDownload' and placed in cache");
@@ -156,8 +161,8 @@ public abstract class CaArrayFileDownloadManager {
 	
 		CaArraySearchService searchService = server.getSearchService();
 		FileRetrievalService fileService = server.getFileRetrievalService();
-		businessCacheManager.addToSessionCache(downloadTask.getCacheId(),
-   			 downloadTask.getTaskId(), downloadTask);
+//		businessCacheManager.addToSessionCache(downloadTask.getCacheId(),
+//   			 downloadTask.getTaskId(), downloadTask);
 		logger.debug("searching for experiment");
         //find Experiment
         startTime = System.currentTimeMillis();
@@ -165,7 +170,7 @@ public abstract class CaArrayFileDownloadManager {
 		Experiment experiment = importer.findExperiment(searchService, getExperimentName());
         endTime = System.currentTimeMillis();
         totalTime = (endTime - startTime) / 1000.0;
-        System.out.println("Search for experiment took " + totalTime + " second(s).");
+        logger.debug("Search for experiment took " + totalTime + " second(s).");
         
          //get Data Files 
         startTime = System.currentTimeMillis();
@@ -174,7 +179,7 @@ public abstract class CaArrayFileDownloadManager {
 		Set<CaArrayFile> files = importer.getAllDataFiles(searchService, experiment, downloadTask.getSpecimenList(), downloadTask.getType());
         endTime = System.currentTimeMillis();
         totalTime = (endTime - startTime) / 1000.0;
-        System.out.println("getDataFile for all files took " + totalTime + " second(s).");
+        logger.debug("getDataFile for all files took " + totalTime + " second(s).");
         
         //get Data Files 
         startTime = System.currentTimeMillis();    
@@ -183,18 +188,20 @@ public abstract class CaArrayFileDownloadManager {
 		Set<File> tempFiles = importer.downloadFiles(fileService, files);
         endTime = System.currentTimeMillis();
         totalTime = (endTime - startTime) / 1000.0;
-        System.out.println("downloadFiles for all files took " + totalTime + " second(s).");
+        logger.debug("downloadFiles for all files took " + totalTime + " second(s).");
         
         //Zip Data Files 
         startTime = System.currentTimeMillis();    
 		logger.debug("writing zip files");
         setStatusInCache(downloadTask.getCacheId(),downloadTask.getTaskId(),DownloadStatus.ZippingFiles);
-		importer.writeZipFile(tempFiles);
+		importer.writeZipFile(tempFiles, downloadTask.getZipFileName());
         endTime = System.currentTimeMillis();
         totalTime = (endTime - startTime) / 1000.0;
-        System.out.println("writeZipFile for all files took " + totalTime + " second(s).");
+        logger.debug("writeZipFile for all files took " + totalTime + " second(s).");
+        downloadTask.setEndTime(endTime);
+        setStatusInCache(downloadTask.getCacheId(),downloadTask.getTaskId(),DownloadStatus.Completed);
         double totalProcessTime = (endTime - totalStartTime)/1000.0;
-        System.out.println("Total processing time for all files took " + totalProcessTime + " second(s) or "+ totalProcessTime/60+" minute(s).");
+        logger.debug("Total processing time for all files took " + totalProcessTime + " second(s) or "+ totalProcessTime/60+" minute(s).");
 		logger.debug("zip file completed");
 	}
 	protected static void reportError(String message, Throwable e) {
@@ -336,7 +343,7 @@ public abstract class CaArrayFileDownloadManager {
 	 */
 	public Boolean setStatusInCache(String sessionId, String taskId, DownloadStatus status){
 		Boolean flag = false;
-		if(sessionId == null  && taskId != null && status != null){
+		if(sessionId != null  && taskId != null && status != null){
 			DownloadTask downloadTask = getSessionDownload(sessionId, taskId);
 			if(downloadTask != null){
 				downloadTask.setDownloadStatus(status);
