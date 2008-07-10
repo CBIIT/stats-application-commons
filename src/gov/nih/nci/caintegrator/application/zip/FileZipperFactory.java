@@ -22,16 +22,26 @@ public class FileZipperFactory {
     public static synchronized AbstractFileZipper getInstance(String zipPropertyFilename)
             throws Exception {
 
-        AbstractFileZipper zipper;
+        AbstractFileZipper zipper = null;
+        if(zipPropertyFilename == null ){
+        	//Default is JAVA_ZIPPER
+        	 zipper = new ZipFiles();
+             return zipper;
+        }
         ZipConfig zipConfig = ZipConfig.getInstance(zipPropertyFilename);
+        if(zipConfig == null){
+        	//Default is JAVA_ZIPPER
+        	 zipper = new ZipFiles();
+             return zipper;
+        }
+
         switch (zipConfig.getZipperType()) {
             case JAVA_ZIPPER:
+            default:
                 zipper = new ZipFiles();
                 break;
             case PASSWORD_ENCRYPT_ZIPPER:
             	 // Not supported at this time
-            default:
-            	throw new Exception("Unknown zipper type");
         }
         return zipper;
     }

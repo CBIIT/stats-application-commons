@@ -9,6 +9,7 @@ import gov.nih.nci.caarray.services.search.CaArraySearchService;
 import gov.nih.nci.caintegrator.application.cache.BusinessTierCache;
 import gov.nih.nci.caintegrator.application.download.DownloadStatus;
 import gov.nih.nci.caintegrator.application.download.DownloadTask;
+import gov.nih.nci.caintegrator.application.zip.ZipItem;
 
 import java.io.File;
 import java.io.IOException;
@@ -60,13 +61,19 @@ public abstract class CaArrayFileDownloadManager {
 	/**
 	 * CaArrayServer caArrayServer.
 	 */
-    protected TaskExecutor taskExecutor;
 	protected CaArrayServer server = null;
+    protected TaskExecutor taskExecutor;
+	private String inputDirectory;
+	private String outputZipDirectory;
+	private URL zipFileUrl;
+
 	protected CaArrayFileDownloadManager(String caarrayUrl,
-			String experimentName, String username, String password)
+			String experimentName, String username, String password,
+			String inputDirectory, String outputZipDirectory, String directoryInZip, String zipFileUrl) 
 			throws MalformedURLException {
 		try {
 			this.caarrayUrl = new URL(caarrayUrl);
+			this.zipFileUrl = new URL(zipFileUrl);
 		} catch (MalformedURLException e) {
 			reportError("URL was invalid: " + caarrayUrl, e);
 			throw e;
@@ -77,9 +84,13 @@ public abstract class CaArrayFileDownloadManager {
 			this.username = username.trim();
 		if (null != password)
 			this.password = password.trim();
+		if (null != inputDirectory)
+			this.inputDirectory = inputDirectory.trim();
+		if (null != outputZipDirectory)
+			this.outputZipDirectory = outputZipDirectory.trim();
 		try {
 			connectToCaArrayServer();
-			importer = new CaArrayFileDownloader();
+			importer = new CaArrayFileDownloader(inputDirectory,outputZipDirectory,directoryInZip);
 		} catch (Exception e) {
 			reportError(e.getMessage(), null);
 			e.printStackTrace(System.err);
@@ -187,7 +198,7 @@ public abstract class CaArrayFileDownloadManager {
         startTime = System.currentTimeMillis();    
 		logger.debug("downloading files");
         setStatusInCache(downloadTask.getCacheId(),downloadTask.getTaskId(),DownloadStatus.DownloadingFiles);
-		Set<File> tempFiles = importer.downloadFiles(fileService, files);
+		Set<ZipItem> zipItems = importer.downloadFiles(fileService, files, inputDirectory);
         endTime = System.currentTimeMillis();
         totalTime = (endTime - startTime) / 1000.0;
         logger.debug("downloadFiles for all files took " + totalTime + " second(s).");
@@ -196,7 +207,7 @@ public abstract class CaArrayFileDownloadManager {
         startTime = System.currentTimeMillis();    
 		logger.debug("writing zip files");
         setStatusInCache(downloadTask.getCacheId(),downloadTask.getTaskId(),DownloadStatus.ZippingFiles);
-		importer.writeZipFile(tempFiles, downloadTask.getZipFileName());
+		importer.writeZipFile(zipItems, downloadTask.getZipFileName());
         endTime = System.currentTimeMillis();
         totalTime = (endTime - startTime) / 1000.0;
         logger.debug("writeZipFile for all files took " + totalTime + " second(s).");

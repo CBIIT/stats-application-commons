@@ -11,6 +11,8 @@ import gov.nih.nci.caarray.domain.sample.Sample;
 import gov.nih.nci.caarray.services.ServerConnectionException;
 import gov.nih.nci.caarray.services.file.FileRetrievalService;
 import gov.nih.nci.caarray.services.search.CaArraySearchService;
+import gov.nih.nci.caintegrator.application.download.DownloadZipHelper;
+import gov.nih.nci.caintegrator.application.zip.ZipItem;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
@@ -19,6 +21,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -43,15 +46,17 @@ public class CaArrayFileDownloader  {
 	/**
 	 * Extension of data files requested. Default is CEL.
 	 */
-	private String extension;
-
-
-	/**
-	 * Constructor
-	 * 
-	 */
-	public CaArrayFileDownloader() {
+	private String inputDirectory;
+	private String outputZipDirectory;
+	private String directoryInZip;
+	public CaArrayFileDownloader(String inputDirectory,
+			String outputZipDirectory, String directoryInZip) {
+		super();
+		this.inputDirectory = inputDirectory;
+		this.outputZipDirectory = outputZipDirectory;
+		this.directoryInZip = directoryInZip;
 	}
+
 
 	/**
 	 * Tries to find an experiment with a publicIdentifier equal to the
@@ -66,47 +71,8 @@ public class CaArrayFileDownloader  {
 	 * @throws LoginException
 	 */
 
-	public void writeZipFile(Set<File> tempFiles, String zipFileName) throws IOException {
-		ZipOutputStream zos = null;
-		byte[] buffer = new byte[1024];
-		int bytesRead;
-		try {
-			zos = new ZipOutputStream(new FileOutputStream(zipFileName));
-			int i = 1;
-			for (File file : tempFiles) {
-				ZipEntry entry = new ZipEntry(file.getName());
-				zos.putNextEntry(entry);
-				BufferedInputStream bis = null;
-				logger.debug("writing zip entry for: " + i + " out of "
-						+ tempFiles.size());
-				logger.debug("writing zip entry for: " + file.getName());
-				i++;
-				try {
-					bis = new BufferedInputStream(new FileInputStream(file));
-					while ((bytesRead = bis.read(buffer)) != -1) {
-						zos.write(buffer, 0, bytesRead);
-					}
-				} finally {
-					if (null != bis)
-						bis.close();
-				}
-				logger.debug("wrote zip entry for: " + file.getName());
-
-			}
-		} catch (FileNotFoundException e) {
-			reportError("Error creating zip file: " + zipFileName, e);
-			throw e;
-		} catch (IOException e) {
-			reportError("Error writing entry to zip file: " + zipFileName,
-					e);
-			throw e;
-		} finally {
-			if (null != zos)
-				try {
-					zos.close();
-				} catch (IOException e) {
-				}
-		}
+	public void writeZipFile(Set<ZipItem> zipItems, String zipFileName) throws IOException {
+		DownloadZipHelper.zipFile(new ArrayList<ZipItem>(zipItems), zipFileName, outputZipDirectory, true);
 	}
 
 	/**
@@ -117,13 +83,13 @@ public class CaArrayFileDownloader  {
 	 * @return
 	 * @throws IOException
 	 */
-	public Set<File> downloadFiles(FileRetrievalService fileService,
-			Set<CaArrayFile> files) throws IOException {
-		Set<File> tempFiles = new HashSet<File>();
+	public Set<ZipItem> downloadFiles(FileRetrievalService fileService,
+		Set<CaArrayFile> files, String zipFileName) throws IOException {
+		Set<ZipItem> zipItems = new HashSet<ZipItem>();
 		logger.debug("downloading " + files.size() + " files");
 		int i = 1;
 		for (CaArrayFile file : files) {
-			File tempFile = tempFile(file);
+			File tempFile = DownloadZipHelper.createFile(file.getName(), inputDirectory);
 			logger.debug("downloading file: " + i + " out of " + files.size());
 			logger.debug("downloading file: " + file.getName());
 			byte[] byteArray = fileService.readFile(file);
@@ -132,10 +98,13 @@ public class CaArrayFileDownloader  {
 
 			BufferedOutputStream bos = null;
 			try {
-				bos = new BufferedOutputStream(new FileOutputStream(tempFile));
-				logger.debug("writing file: " + tempFile.getName());
-				bos.write(byteArray);
-				logger.debug("wrote file: " + tempFile.getName());
+				// if the file does not already exists than write it
+				if(!DownloadZipHelper.checkIfFileExists(tempFile.getName(), byteArray, inputDirectory)){
+					bos = new BufferedOutputStream(new FileOutputStream(tempFile));
+					logger.debug("writing file: " + tempFile.getName());
+					bos.write(byteArray);
+					logger.debug("wrote file: " + tempFile.getName());
+				}
 			} catch (IOException e) {
 				reportError("Error writing temporary file: "
 						+ tempFile.getName(), e);
@@ -144,10 +113,11 @@ public class CaArrayFileDownloader  {
 				if (null != bos)
 					bos.close();
 			}
-			tempFiles.add(tempFile);
+			ZipItem zipItem = DownloadZipHelper.fileToZip(tempFile.getName(), zipFileName, directoryInZip, inputDirectory);
+			zipItems.add(zipItem);
 		}
 
-		return tempFiles;
+		return zipItems;
 	}
 
 	/**
@@ -211,9 +181,6 @@ public class CaArrayFileDownloader  {
 	}
 
 
-	public String getExtension() {
-		return extension;
-	}
 
 	/**
 	 * Application is called as: java CaArrayFileDownloader -u <url to carray>
@@ -236,7 +203,7 @@ public class CaArrayFileDownloader  {
 	public static void main(String[] args) {
 		CaArrayFileDownloader importer = null;
 		try {
-			importer = new CaArrayFileDownloader();
+			importer = new CaArrayFileDownloader(args[0],args[1],args[3]);
 
 		} catch (Exception e) {
 			reportError(e.getMessage(), null);
@@ -348,25 +315,6 @@ public class CaArrayFileDownloader  {
 		return files;
 	}
 
-	/**
-	 * Returns a Java temporary file with the CaArrayFile name as a prefix
-	 * 
-	 * @param file
-	 * @return
-	 * @throws IOException
-	 */
-	protected static File tempFile(CaArrayFile file) throws IOException {
-		try {
-			String suffix = "_" + file.getName();
-			return File.createTempFile("tmp", suffix);
-		} catch (IOException e) {
-			System.out
-					.println("Error creating temporary file while downloading: "
-							+ file.getName());
-			e.printStackTrace();
-			throw e;
-		}
-	}
 
 	private Set<CaArrayFile> getDerivedDataFile(CaArraySearchService service,
 			Hybridization hybridization) {
