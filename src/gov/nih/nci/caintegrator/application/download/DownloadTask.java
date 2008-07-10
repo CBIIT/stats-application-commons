@@ -6,7 +6,9 @@ import gov.nih.nci.caarray.domain.file.FileType;
 import java.io.File;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.apache.log4j.Logger;
 
@@ -175,19 +177,19 @@ public class DownloadTask implements Serializable{
 		this.type = type;
 	}
 	private List<String> validateSpecimenList(List<String> specimenList) {
-		List<String> validatedSpecimenList = new ArrayList<String>();
+		Set<String> validatedSpecimenSet = new HashSet<String>();
 		// Parses specimens to match sample names in caaaray
 		for(String specimen: specimenList){
 			specimen = specimen.trim();
 			if(specimen.endsWith("_T") ){
-				validatedSpecimenList.add(specimen.substring(0,specimen.lastIndexOf("_T")));
+				validatedSpecimenSet.add(specimen.substring(0,specimen.lastIndexOf("_T")));
 			}else if(specimen.endsWith("_B") ){
-				validatedSpecimenList.add(specimen.substring(0,specimen.lastIndexOf("_B")));
+				validatedSpecimenSet.add(specimen.substring(0,specimen.lastIndexOf("_B")));
 			}
 			else{
-				validatedSpecimenList.add(specimen);
+				validatedSpecimenSet.add(specimen);
 			}
 		}
-		return validatedSpecimenList;
+		return  new ArrayList<String>(validatedSpecimenSet);
 	}
 }

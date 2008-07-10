@@ -65,74 +65,7 @@ public class CaArrayFileDownloader  {
 	 * @throws IOException
 	 * @throws LoginException
 	 */
-	// public void downloadExperiment() throws ServerConnectionException,
-	// IllegalArgumentException, IOException, LoginException {
-	// CaArrayServer server = null;
-	// long startTime = 0;
-	// long endTime = 0;
-	// double totalTime = 0;
-	// // Connect to server.
-	// startTime = System.currentTimeMillis();
-	// long totalStartTime = startTime;
-	// //server = connectToCaArrayServer();
-	// endTime = System.currentTimeMillis();
-	// totalTime = (endTime - startTime) / 1000.0;
-	// System.out.println("Connected to server in " + totalTime + "
-	// second(s).");
-	//		
-	// CaArraySearchService searchService = server.getSearchService();
-	// FileRetrievalService fileService = server.getFileRetrievalService();
-	//		
-	// logger.debug("searching for experiment");
-	// //find Experiment
-	// startTime = System.currentTimeMillis();
-	// Experiment experiment = findExperiment(searchService,
-	// DEFAULT_EXPERIMENT_NAME);
-	// endTime = System.currentTimeMillis();
-	// totalTime = (endTime - startTime) / 1000.0;
-	// System.out.println("Search for experiment took " + totalTime + "
-	// second(s).");
-	//        
-	// //populate hybridizations
-	// startTime = System.currentTimeMillis();
-	// Set<Hybridization>populatedHybridizations =
-	// populateHybridizations(searchService, experiment);
-	// endTime = System.currentTimeMillis();
-	// totalTime = (endTime - startTime) / 1000.0;
-	// System.out.println("Populate hybridizations took " + totalTime + "
-	// second(s).");
-	//        
-	// //get Data Files
-	// startTime = System.currentTimeMillis();
-	// logger.debug("getting file info");
-	// //Set<CaArrayFile> files = getDataFiles(searchService, experiment, );
-	// endTime = System.currentTimeMillis();
-	// totalTime = (endTime - startTime) / 1000.0;
-	// System.out.println("getDataFile for all files took " + totalTime + "
-	// second(s).");
-	//        
-	// //get Data Files
-	// startTime = System.currentTimeMillis();
-	// logger.debug("downloading files");
-	// Set<File> tempFiles = downloadFiles(fileService, files);
-	// endTime = System.currentTimeMillis();
-	// totalTime = (endTime - startTime) / 1000.0;
-	// System.out.println("downloadFiles for all files took " + totalTime + "
-	// second(s).");
-	//        
-	// //Zip Data Files
-	// startTime = System.currentTimeMillis();
-	// logger.debug("writing zip files");
-	// writeZipFile(tempFiles);
-	// endTime = System.currentTimeMillis();
-	// totalTime = (endTime - startTime) / 1000.0;
-	// System.out.println("writeZipFile for all files took " + totalTime + "
-	// second(s).");
-	// double totalProcessTime = (endTime - totalStartTime)/1000.0;
-	// System.out.println("Total processing time for all files took " +
-	// totalProcessTime + " second(s) or "+ totalProcessTime/60+" minute(s).");
-	// logger.debug("zip file completed");
-	// }
+
 	public void writeZipFile(Set<File> tempFiles, String zipFileName) throws IOException {
 		ZipOutputStream zos = null;
 		byte[] buffer = new byte[1024];

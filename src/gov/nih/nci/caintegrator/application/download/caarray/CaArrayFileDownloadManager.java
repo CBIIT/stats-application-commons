@@ -102,10 +102,12 @@ public abstract class CaArrayFileDownloadManager {
     public void executeDownloadStrategy(final String session, final String taskId,String zipFileName, List<String> specimenList, FileType type) {   
     	DownloadTask downloadTask = createTask(session,  taskId, zipFileName,  specimenList,  type);
     	
-        if(downloadTask == null){
+        if(downloadTask == null ){
         	throw new IllegalStateException("Please call createDownloadTask first to init");
         }
-        
+        if(importer == null ){
+        	throw new NullPointerException("CaArrayFileDownloader cannot be null");
+        }
         //set start time
 		long startTime = System.currentTimeMillis();
 		downloadTask.setStartTime(startTime);
@@ -245,7 +247,10 @@ public abstract class CaArrayFileDownloadManager {
 	 * @return
 	 */
 	protected boolean isUserSpecified() {
-		return (null != username);
+		if(username != null && username.length()>0 && password != null && password.length()>0){
+			return true;
+		}
+		return false;
 	}
 	/**
 	 * @return the experimentName
