@@ -3,7 +3,6 @@ package gov.nih.nci.caintegrator.application.download;
 
 import gov.nih.nci.caarray.domain.file.FileType;
 
-import java.io.File;
 import java.io.Serializable;
 import java.net.URL;
 import java.util.ArrayList;

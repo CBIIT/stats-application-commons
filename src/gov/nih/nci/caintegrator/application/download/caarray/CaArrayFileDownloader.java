@@ -235,28 +235,6 @@ public class CaArrayFileDownloader  {
 		System.err.println(message + ": " + e_message);
 	}
 
-	/**
-	 * Returns a name suitable for using as a filename. Replaces " " with "-".
-	 * 
-	 * @param experimentName
-	 * @return
-	 */
-	protected static String createZipfilename(String experimentName) {
-		StringBuffer buf = new StringBuffer(removeSpaces(experimentName));
-		buf.append(".zip");
-		return new String(buf);
-	}
-
-	protected static String removeSpaces(String name) {
-		StringBuffer buf = new StringBuffer(name.length());
-		for (Character c : name.toCharArray()) {
-			if (' ' == c || '\'' == c || '\"' == c)
-				buf.append('_');
-			else
-				buf.append(c);
-		}
-		return new String(buf);
-	}
 	// Get all raw data file (CaArrayFile) objects.
 	private Set<Hybridization> getAllHybridizationsForSamples(CaArraySearchService service,
 			Experiment experiment, List<String> specimenList) {
