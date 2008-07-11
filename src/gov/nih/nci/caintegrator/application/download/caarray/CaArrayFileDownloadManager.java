@@ -65,15 +65,13 @@ public abstract class CaArrayFileDownloadManager {
     protected TaskExecutor taskExecutor;
 	private String inputDirectory;
 	private String outputZipDirectory;
-	private URL zipFileUrl;
 
 	protected CaArrayFileDownloadManager(String caarrayUrl,
 			String experimentName, String username, String password,
-			String inputDirectory, String outputZipDirectory, String directoryInZip, String zipFileUrl) 
+			String inputDirectory, String outputZipDirectory, String directoryInZip) 
 			throws MalformedURLException, LoginException, ServerConnectionException {
 		try {
 			this.caarrayUrl = new URL(caarrayUrl);
-			this.zipFileUrl = new URL(zipFileUrl);
 		} catch (MalformedURLException e) {
 			reportError("URL was invalid: " + caarrayUrl, e);
 			throw e;
@@ -216,8 +214,6 @@ public abstract class CaArrayFileDownloadManager {
         File zipfile= new File(outputZipDirectory+File.separator+downloadTask.getZipFileName());
         if(zipfile.exists()  && zipfile.length()> 0){
             downloadTask.setEndTime(endTime); 
-        	URL zipUrl = new URL(zipFileUrl.toString()+"/"+downloadTask.getZipFileName());
-        	downloadTask.setZipFileURL(zipUrl);
         	downloadTask.setZipFileSize(zipfile.length());
         	downloadTask.setDownloadStatus(DownloadStatus.Completed);
     		updateDownloadTaskInCache(downloadTask.getCacheId(),

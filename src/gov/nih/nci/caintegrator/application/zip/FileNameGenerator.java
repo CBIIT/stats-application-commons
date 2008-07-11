@@ -65,7 +65,7 @@ public class FileNameGenerator {
 	protected static String removeSpaces(String name) {
 		StringBuffer buf = new StringBuffer(name.length());
 		for (Character c : name.toCharArray()) {
-			if (' ' == c || '\'' == c || '\"' == c)
+			if (' ' == c || '\'' == c || '\"' == c || '?'  == c || ',' ==c || '&' == c ||'“' == c ||'‘' == c || '#' == c )
 				buf.append('_');
 			else
 				buf.append(c);
