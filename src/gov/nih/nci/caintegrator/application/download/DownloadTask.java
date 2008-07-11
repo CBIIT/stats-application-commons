@@ -5,6 +5,7 @@ import gov.nih.nci.caarray.domain.file.FileType;
 
 import java.io.File;
 import java.io.Serializable;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -24,7 +25,7 @@ public class DownloadTask implements Serializable{
 	private static final long serialVersionUID = 1L;
 	private static Logger logger = Logger.getLogger(DownloadTask.class);
 	private long startTime = -1;
-	private long endTime = 0-1;
+	private long endTime = -1;
 	private double elapsedTime = -1;
 	private String cacheId;
 	private String taskId;
@@ -32,7 +33,7 @@ public class DownloadTask implements Serializable{
 	private List<String> specimenList;
 	private FileType type;
 	private String zipFileName;
-	private File zipFile;
+	private URL zipFileURL;
 	public DownloadTask(String cacheId, String taskId, String zipFileName, FileType type, List<String> specimenList) {
 		 setTaskId(taskId);
 		 setCacheId(cacheId);
@@ -141,18 +142,6 @@ public class DownloadTask implements Serializable{
 		this.zipFileName = zipFileName;
 	}
 	/**
-	 * @return the zipFile
-	 */
-	public File getZipFile() {
-		return zipFile;
-	}
-	/**
-	 * @param zipFile the zipFile to set
-	 */
-	public void setZipFile(File zipFile) {
-		this.zipFile = zipFile;
-	}
-	/**
 	 * @return the specimenList
 	 */
 	public List<String> getSpecimenList() {
@@ -191,5 +180,11 @@ public class DownloadTask implements Serializable{
 			}
 		}
 		return  new ArrayList<String>(validatedSpecimenSet);
+	}
+	public URL getZipFileURL() {
+		return zipFileURL;
+	}
+	public void setZipFileURL(URL zipFileURL) {
+		this.zipFileURL = zipFileURL;
 	}
 }
