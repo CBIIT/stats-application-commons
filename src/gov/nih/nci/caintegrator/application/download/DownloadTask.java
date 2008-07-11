@@ -34,6 +34,7 @@ public class DownloadTask implements Serializable{
 	private FileType type;
 	private String zipFileName;
 	private URL zipFileURL;
+	private Long zipFileSize;
 	public DownloadTask(String cacheId, String taskId, String zipFileName, FileType type, List<String> specimenList) {
 		 setTaskId(taskId);
 		 setCacheId(cacheId);
@@ -186,5 +187,11 @@ public class DownloadTask implements Serializable{
 	}
 	public void setZipFileURL(URL zipFileURL) {
 		this.zipFileURL = zipFileURL;
+	}
+	public Long getZipFileSize() {
+		return zipFileSize;
+	}
+	public void setZipFileSize(Long zipFileSize) {
+		this.zipFileSize = zipFileSize;
 	}
 }

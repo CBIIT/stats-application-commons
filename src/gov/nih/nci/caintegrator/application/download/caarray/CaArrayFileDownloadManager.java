@@ -218,6 +218,7 @@ public abstract class CaArrayFileDownloadManager {
             downloadTask.setEndTime(endTime); 
         	URL zipUrl = new URL(zipFileUrl.toString()+"/"+downloadTask.getZipFileName());
         	downloadTask.setZipFileURL(zipUrl);
+        	downloadTask.setZipFileSize(zipfile.length());
         	downloadTask.setDownloadStatus(DownloadStatus.Completed);
     		updateDownloadTaskInCache(downloadTask.getCacheId(),
        			 downloadTask.getTaskId(), downloadTask);
