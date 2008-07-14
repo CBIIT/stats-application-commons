@@ -1,8 +1,11 @@
 package gov.nih.nci.caintegrator.application.cache;
 
-import gov.nih.nci.caintegrator.service.task.Task;
+import gov.nih.nci.caintegrator.application.download.DownloadTask;
+import gov.nih.nci.caintegrator.application.download.caarray.CaArrayFileDownloadManager;
 import gov.nih.nci.caintegrator.security.PublicUserPool;
+import gov.nih.nci.caintegrator.service.task.Task;
 
+import java.io.File;
 import java.util.Collection;
 
 import javax.servlet.http.HttpSessionEvent;
@@ -108,6 +111,28 @@ public class SessionTracker implements HttpSessionListener {
 	}
 
 	public void sessionDestroyed(HttpSessionEvent evt) {
+    	//delete caArray dowloads
+		String dir = (String)evt.getSession().getAttribute(CaArrayFileDownloadManager.ZIP_FILE_PATH);
+		if(dir != null){
+			Collection<DownloadTask> downloadTasks;
+			try {
+				downloadTasks = CaArrayFileDownloadManager.getAllSessionDownloads(BusinessCacheManager.getInstance(),evt.getSession().getId());
+		    	for(DownloadTask downloadTask: downloadTasks){
+		    		String taskId = downloadTask.getTaskId();
+		    		String zipFileName = downloadTask.getZipFileName();
+		    		if(taskId != null){
+		    			String filePath = dir + "/"+ zipFileName;
+		    			File file = new File(filePath);
+		    			if( file.exists()){
+		    				file.delete();
+		    			}
+		    		}
+		    	}
+			} catch (Exception e) {
+				e.printStackTrace();
+			} 
+		}
+		
 		activeSessions.remove(evt.getSession().getId());
 		logger.debug("Session Destroyed: " + evt.getSession().getId());
 		logger.debug("Removing reference to session: " + evt.getSession().getId());
@@ -121,6 +146,7 @@ public class SessionTracker implements HttpSessionListener {
         PresentationCacheManager.getInstance().removeSessionCache(evt.getSession().getId());
     	String gpUser = (String)evt.getSession().getAttribute(PublicUserPool.PUBLIC_USER_NAME);
     	PublicUserPool pool = (PublicUserPool)evt.getSession().getAttribute(PublicUserPool.PUBLIC_USER_POOL);
+    	
     	if (gpUser != null && pool != null){
 			pool.returnPublicUser(gpUser);
     	}

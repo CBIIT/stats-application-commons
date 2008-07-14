@@ -34,6 +34,7 @@ public abstract class CaArrayFileDownloadManager {
 	public static Logger logger = Logger
 			.getLogger(CaArrayFileDownloadManager.class);
 	protected static CaArrayFileDownloadManager instance = null;
+	public static String ZIP_FILE_PATH = "ZipFilePath";
     /**
      * Cache manager which the ApplicationFinding result will be put into
      */ 
@@ -339,23 +340,33 @@ public abstract class CaArrayFileDownloadManager {
 	 */
 	@SuppressWarnings("unchecked")
 	public Collection<DownloadTask> getAllSessionDownloads(String sessionId){
+		
+		return getAllSessionDownloads(getBusinessCacheManager(), sessionId);
+	}
+	/* 
+	 * return all DownloadTasks for a sessionId 
+	 */
+	@SuppressWarnings("unchecked")
+	public static Collection<DownloadTask> getAllSessionDownloads(BusinessTierCache _businessCacheManager, String _sessionId){
 		Collection<DownloadTask> beans = new ArrayList<DownloadTask>();
-		Cache sessionCache = businessCacheManager.getSessionCache(sessionId);
-		try {
-			List keys = sessionCache.getKeys();
-			for(Iterator i = keys.iterator();i.hasNext();) {
-				Element element = sessionCache.get((String)i.next());
-				Object object = element.getValue();
-				if(object instanceof DownloadTask) {
-					beans.add((DownloadTask)object);
+		if(_businessCacheManager != null  && _sessionId != null 
+				&& _businessCacheManager.getSessionCache(_sessionId) != null){
+			Cache sessionCache = _businessCacheManager.getSessionCache(_sessionId);
+			try {
+				List keys = sessionCache.getKeys();
+				for(Iterator i = keys.iterator();i.hasNext();) {
+					Element element = sessionCache.get((String)i.next());
+					Object object = element.getValue();
+					if(object instanceof DownloadTask) {
+						beans.add((DownloadTask)object);
+					}
 				}
+			}catch(CacheException ce) {
+				logger.error(ce);
 			}
-		}catch(CacheException ce) {
-			logger.error(ce);
 		}
 		return beans;
 	}
-	
 	/**
 	 *  return a DownloadTask for a sessionId & taskId
 	 */
@@ -406,6 +417,22 @@ public abstract class CaArrayFileDownloadManager {
 
 	public void setTaskExecutor(TaskExecutor taskExecutor) {
 		this.taskExecutor = taskExecutor;
+	}
+
+	public String getInputDirectory() {
+		return inputDirectory;
+	}
+
+	public void setInputDirectory(String inputDirectory) {
+		this.inputDirectory = inputDirectory;
+	}
+
+	public String getOutputZipDirectory() {
+		return outputZipDirectory;
+	}
+
+	public void setOutputZipDirectory(String outputZipDirectory) {
+		this.outputZipDirectory = outputZipDirectory;
 	}
 	
 }
