@@ -61,7 +61,7 @@
 	<target name="jar-smart-applet" >
         <jar jarfile="HMVApplet.jar" excludes="**/MANIFEST.MF, *.jar, *.xml" >
         	<fileset dir="${basedir}/bin">
-				<include name="gov/nih/nci/caintegrator/application/gpvisualizer/heatmapviewer/*.class"/>
+				<include name="gov/nih/nci/caintegrator/application/gpvisualizer/*.class"/>
 			</fileset>
         </jar>
 	</target>
