@@ -283,10 +283,7 @@ public class CaArrayFileDownloader  {
 			Hybridization hybridization, FileType type) {
 		Set<CaArrayFile> files = new HashSet<CaArrayFile>();
 		if (type == FileType.AFFYMETRIX_CEL) {
-			CaArrayFile file = getRawDataFile(service, hybridization);
-			if (null != file)
-				files.add(file);
-
+			files.addAll(getRawDataFiles(service, hybridization));
 		} else if (type == FileType.AFFYMETRIX_CHP) {
 			files.addAll(getDerivedDataFile(service, hybridization));
 		}
@@ -310,14 +307,20 @@ public class CaArrayFileDownloader  {
 		return files;
 	}
 
-	private CaArrayFile getRawDataFile(CaArraySearchService service,
+	private Set<CaArrayFile> getRawDataFiles(CaArraySearchService service,
 			Hybridization hybridization) {
-		CaArrayFile file = null;
-		RawArrayData rawArrayData = hybridization.getArrayData();
-		// Return the file associated with the first raw data.
-		RawArrayData populatedArrayData = service.search(rawArrayData).get(0);
-		file = populatedArrayData.getDataFile();
-		return file;
+		Set<CaArrayFile> files = new HashSet<CaArrayFile>();
+		Set<RawArrayData> rawArrayDataSet = hybridization.getRawDataCollection() ;
+		for (RawArrayData rawArrayData : rawArrayDataSet) {
+			// Return the file associated with the first raw data.
+			RawArrayData populatedArrayData = service.search(rawArrayData).get(0);
+			CaArrayFile file = populatedArrayData.getDataFile();
+			if (null != file){
+				files.add(file);
+			}
+		}
+	return files;
+	
 	}
 
 
