@@ -52,6 +52,10 @@ public class UserListBeanHelper{
         this.userListBean = (UserListBean)presentationTierCache.getNonPersistableObjectFromSessionCache(presentationCacheId,CacheConstants.USER_LISTS);
     }
     
+    public UserListBeanHelper(String presentationCacheId, String cacheKey){
+        this.userListBean = (UserListBean)presentationTierCache.getNonPersistableObjectFromSessionCache(presentationCacheId, cacheKey);
+    }
+    
     public void addBean(String presntationCacheId, String key, UserListBean userListBean){
         presentationTierCache.addNonPersistableToSessionCache(presntationCacheId, CacheConstants.USER_LISTS, userListBean);        
     }
