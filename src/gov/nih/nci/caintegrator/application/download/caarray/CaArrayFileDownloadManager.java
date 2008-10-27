@@ -40,10 +40,6 @@ public abstract class CaArrayFileDownloadManager {
      */ 
     protected BusinessTierCache businessCacheManager;
 	/**
-	 * Name of the experiment.
-	 */
-	private String experimentName;
-	/**
 	 * URL to caArray server.
 	 */
 	private URL caarrayUrl;
@@ -68,7 +64,7 @@ public abstract class CaArrayFileDownloadManager {
 	private String outputZipDirectory;
 
 	protected CaArrayFileDownloadManager(String caarrayUrl,
-			String experimentName, String username, String password,
+			String username, String password,
 			String inputDirectory, String outputZipDirectory, String directoryInZip) 
 			throws MalformedURLException, LoginException, ServerConnectionException {
 		try {
@@ -77,15 +73,13 @@ public abstract class CaArrayFileDownloadManager {
 			reportError("URL was invalid: " + caarrayUrl, e);
 			throw e;
 		}
-		if (null != experimentName)
-			this.experimentName = experimentName.trim();
-		if (null != username)
+		if (username != null)
 			this.username = username.trim();
-		if (null != password)
+		if (password != null)
 			this.password = password.trim();
-		if (null != inputDirectory)
+		if (inputDirectory != null)
 			this.inputDirectory = inputDirectory.trim();
-		if (null != outputZipDirectory)
+		if (outputZipDirectory != null)
 			this.outputZipDirectory = outputZipDirectory.trim();
 		//try {
 			try {
@@ -115,7 +109,7 @@ public abstract class CaArrayFileDownloadManager {
      * It then places the taskResult finding into the cache. Runs the
      * execute method in a separate thread for asynchronous operations.     *
      */
-    public void executeDownloadStrategy(final String session, final String taskId,String zipFileName, List<String> specimenList, FileType type) {   
+    public void executeDownloadStrategy(final String session, final String taskId,String zipFileName, List<String> specimenList, FileType type, final String experimentName) {   
     	DownloadTask downloadTask = createTask(session,  taskId, zipFileName,  specimenList,  type);
     	
         if(downloadTask == null ){
@@ -134,7 +128,7 @@ public abstract class CaArrayFileDownloadManager {
         Runnable task = new Runnable() {
             public void run() {
             	try {
-					downloadFiles(session,  taskId);
+					downloadFiles(session,  taskId, experimentName);
 				} catch (IllegalArgumentException e) {
 					logger.error(e.getMessage());
 				} catch (IOException e) {
@@ -158,7 +152,7 @@ public abstract class CaArrayFileDownloadManager {
 	 * @throws IOException
 	 * @throws LoginException
 	 */
-	private void downloadFiles(String sessionId, String taskId) throws IOException {
+	private void downloadFiles(String sessionId, String taskId, String experimentName) throws IOException {
 		long startTime = 0;
         long endTime = 0;
         double totalTime = 0;
@@ -179,7 +173,7 @@ public abstract class CaArrayFileDownloadManager {
         //find Experiment
         startTime = System.currentTimeMillis();
         setStatusInCache(downloadTask.getCacheId(),downloadTask.getTaskId(),DownloadStatus.SearchingForExperiment);
-		Experiment experiment = importer.findExperiment(searchService, getExperimentName());
+		Experiment experiment = importer.findExperiment(searchService, experimentName);
         endTime = System.currentTimeMillis();
         totalTime = (endTime - startTime) / 1000.0;
         logger.debug("Search for experiment took " + totalTime + " second(s).");
@@ -278,19 +272,6 @@ public abstract class CaArrayFileDownloadManager {
 			return true;
 		}
 		return false;
-	}
-	/**
-	 * @return the experimentName
-	 */
-	public String getExperimentName() {
-		return experimentName;
-	}
-
-	/**
-	 * @param experimentName the experimentName to set
-	 */
-	public void setExperimentName(String experimentName) {
-		this.experimentName = experimentName;
 	}
 
 	/**

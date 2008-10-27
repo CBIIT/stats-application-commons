@@ -3,6 +3,7 @@
  */
 package gov.nih.nci.caintegrator.application.zip;
 
+import gov.nih.nci.caintegrator.dto.critieria.Constants;
 import gov.nih.nci.caintegrator.exceptions.ValidationException;
 
 import org.apache.commons.validator.EmailValidator;
@@ -34,9 +35,17 @@ public class FileNameGenerator {
     	}
         return fileName;
     }
-    public static String generateUniqueFileName(String fileName){
+    public static String generateUniqueFileName(String fileName, String type, String platform){
     	String uniqueZipFileName = null;
-    	if(fileName != null ){
+    	String platformID = null;
+
+    	if(fileName != null && type != null && platform != null){
+    		if (platform.equals(Constants.AFFY_OLIGO_PLATFORM)){
+    			platformID = "AFFY-U133P2";
+    		}
+    		else if (platform.equals(Constants.AFFY_100K_SNP_ARRAY)){
+    			platformID = "AFFY-100K-SNP";
+    		}
     		uniqueZipFileName = createFilename(fileName);
 	    	// Get a random number of up to 7 digits   	
 	    	int sevenDigitRandom = new Double(Math.random() * 10000000).intValue();
@@ -47,7 +56,7 @@ public class FileNameGenerator {
 	    	
 	
 	    	// Put it all together
-	    	uniqueZipFileName = fileName + "_" + sevenDigitRandom + lastSevenOfTimeStamp;
+	    	uniqueZipFileName = fileName +"_"+platformID+"_"+type+ "_" + sevenDigitRandom + lastSevenOfTimeStamp;
     	}
         return uniqueZipFileName;
     }
