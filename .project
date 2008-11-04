@@ -1,8 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <projectDescription>
-	<name>caintegrator-analysis-commons</name>
+	<name>caintegrator-application-commons</name>
 	<comment></comment>
 	<projects>
+		<project>caintegrator-analysis-commons</project>
+		<project>caintegrator-spec</project>
 	</projects>
 	<buildSpec>
 		<buildCommand>
