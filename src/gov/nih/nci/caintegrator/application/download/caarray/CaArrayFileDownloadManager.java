@@ -195,16 +195,23 @@ public abstract class CaArrayFileDownloadManager {
         endTime = System.currentTimeMillis();
         totalTime = (endTime - startTime) / 1000.0;
         logger.debug("downloadFiles for all files took " + totalTime + " second(s).");
-        
+        //If no files are found
+        if(zipItems != null && zipItems.size() == 0){
+        	DownloadStatus status = DownloadStatus.NoFilesFoundToDownload;
+	    	status.setComment("No files found to Download");
+	    	downloadTask.setDownloadStatus(status);
+	        setStatusInCache(downloadTask.getCacheId(),downloadTask.getTaskId(),status);
+        }
         //Zip Data Files 
-        startTime = System.currentTimeMillis();    
-		logger.debug("writing zip files");
-        setStatusInCache(downloadTask.getCacheId(),downloadTask.getTaskId(),DownloadStatus.ZippingFiles);
-		importer.writeZipFile(zipItems, downloadTask.getZipFileName());
-        endTime = System.currentTimeMillis();
-        totalTime = (endTime - startTime) / 1000.0;
-        logger.debug("writeZipFile for all files took " + totalTime + " second(s).");
-        
+        if(zipItems != null && zipItems.size() > 0){
+	        startTime = System.currentTimeMillis();    
+			logger.debug("writing zip files");
+	        setStatusInCache(downloadTask.getCacheId(),downloadTask.getTaskId(),DownloadStatus.ZippingFiles);
+			importer.writeZipFile(zipItems, downloadTask.getZipFileName());
+	        endTime = System.currentTimeMillis();
+	        totalTime = (endTime - startTime) / 1000.0;
+	        logger.debug("writeZipFile for all files took " + totalTime + " second(s).");
+        }
         
         File zipfile= new File(outputZipDirectory+File.separator+downloadTask.getZipFileName());
         if(zipfile.exists()  && zipfile.length()> 0){

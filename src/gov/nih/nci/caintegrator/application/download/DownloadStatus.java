@@ -70,7 +70,8 @@ public enum DownloadStatus {
 	DownloadingFiles, // reading File from caArray and writing it to drive
 	ZippingFiles,	// zipping the download bundle
     Error,  // error or exception encountered
-    Completed; //download completed
+    Completed, //download completed
+	NoFilesFoundToDownload;  //If no files are found to download
 	
 	//Describe any error or exception message
 	String comment;
