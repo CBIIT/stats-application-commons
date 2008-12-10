@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+
+<!DOCTYPE hibernate-mapping PUBLIC 
+	"-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+	"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping
+	package="gov.nih.nci.caintegrator.application.lists" >
+	
+	<typedef name="ListType" class="gov.nih.nci.caintegrator.util.EnumUserType">
+              <param name="enumClassName">gov.nih.nci.caintegrator.application.lists.ListType</param>
+     </typedef>
+     
+     <typedef name="ListSubType" class="gov.nih.nci.caintegrator.util.EnumUserType">
+              <param name="enumClassName">gov.nih.nci.caintegrator.application.lists.ListSubType</param>
+     </typedef>
+     
+     <typedef name="ListOrigin" class="gov.nih.nci.caintegrator.util.EnumUserType">
+              <param name="enumClassName">gov.nih.nci.caintegrator.application.lists.ListOrigin</param>
+     </typedef>
+     
+    	
+	<class name="UserList" table="LIST" >
+
+		<id name="id" column="LIST_ID" >
+			<generator class="assigned" />
+		</id>
+		
+		<property name="name"
+                 type="java.lang.String"
+                 column="NAME"
+                 insert="false"
+                 update="false" />
+        
+       <property name='listType' column="TYPE" type="ListType" />
+       
+       <property name='listSubType' column="SUBTYPE" type="ListSubType" />
+       
+       <property name='listOrigin' column="ORIGIN" type="ListOrigin" />       
+               
+        <property name="author"
+                 type="java.lang.String"
+                 column="AUTHOR"
+                 insert="false"
+                 update="false" /> 
+        
+        <property name="institute"
+                 type="java.lang.String"
+                 column="INSTITUTION"
+                 insert="false"
+                 update="false" />   
+        
+        <property name="dateCreated"
+                 type="java.util.Date"
+                 column="CREATION_DATE"
+                 insert="false"
+                 update="false" /> 
+                 
+         <property name="category"
+                 type="java.lang.String"
+                 column="CATEGORY"
+                 insert="false"
+                 update="false" />  
+                 
+         <property name="notes"
+                 type="java.lang.String"
+                 column="DESCRIPTION"
+                 insert="false"
+                 update="false" />                  
+                
+         
+		
+		<bag name="listItems" lazy="false">			
+			<key column="LIST_ID"/>
+			<one-to-many class="gov.nih.nci.caintegrator.application.lists.ListItem"/>		
+		</bag>
+		
+		
+                 
+		</class>
+</hibernate-mapping>
