@@ -141,12 +141,13 @@ public class P53FindingReportBean {
 		 * patient dids are not related to time points
 		 */
 		 public ArrayList<String> getNonTimepointHeaders(){
-		        String[] myHeaders = {"PatientDID"};        
+		        String[] myHeaders = {"PatientDID","LabTrak ID"};        
 		        ArrayList<String> headers = new ArrayList<String>(Arrays.asList(myHeaders));
 		        return headers;
 		    }
 		 
-		 
+		
+			 
 		 public ArrayList<String> getTimepointHeaders(P53FindingCriteria criteria){
 		        Set<String> myTimepoints = criteria.getSpecimenCriteria().getTimeCourseCollection();
 		        ArrayList<String> timepoints = new ArrayList<String>();
