@@ -205,11 +205,14 @@ public class P53Report {
                 Element headerRow = report.addElement("Row").addAttribute("name", "headerRow");
                 ArrayList<String> ntpHeaders = results.get(0).getNonTimepointHeaders();
                 for(String ntpHeader : ntpHeaders){
-                    
-                    cell = headerRow.addElement("Cell").addAttribute("type", "header").addAttribute("class", "header").addAttribute("group", "ntpHeader");
-                    data = cell.addElement("Data").addAttribute("type", "header").addText(ntpHeader);
-                    data = null;
-                    cell = null;    
+                	
+                	// on the report page, should not display labtrak id
+                    if(!ntpHeader.equalsIgnoreCase("LabTrak ID")){
+                      cell = headerRow.addElement("Cell").addAttribute("type", "header").addAttribute("class", "header").addAttribute("group", "ntpHeader");
+                      data = cell.addElement("Data").addAttribute("type", "header").addText(ntpHeader);
+                      data = null;
+                      cell = null;    
+                    }
                 }
                 
                 //ADD HEADERS THAT ARE TIMEPOINT DEPENDENT
@@ -230,8 +233,20 @@ public class P53Report {
                 Collections.sort(tpHeaders,ts);   
                 Element tpHeaderRow = report.addElement("Row").addAttribute("name", "tpHeaderRow");
                // for(String tpHeader : tpHeaders){  
-                for(int i=0; i<tpHeaders.size();i++){                    
-                    cell = tpHeaderRow.addElement("Cell").addAttribute("type", "header").addAttribute("class", "firstTP").addAttribute("group", "tpHeader");                        
+                
+                                
+               	 // this is leave the first space empty
+                    cell = tpHeaderRow.addElement("Cell").addAttribute("type", "header").addAttribute("class", "firstTP").addAttribute("group", "tpHeader");   
+                    data = cell.addElement("Data").addAttribute("type", "header").addText("");                                      
+                    data = null;
+                    cell = null;
+                
+                
+               
+                for(int i=0; i<tpHeaders.size();i++){                   
+                	 
+                    cell = tpHeaderRow.addElement("Cell").addAttribute("type", "header").addAttribute("class", "firstTP").addAttribute("group", "tpHeader");   
+                   // data = cell.addElement("Data").addAttribute("type", "header").addText("");        
                     data = cell.addElement("Data").addAttribute("type", "header").addText(tpHeaders.get(i));                    
                     data = null;
                     cell = null;
