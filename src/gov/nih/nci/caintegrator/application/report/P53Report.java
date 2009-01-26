@@ -224,7 +224,7 @@ public class P53Report {
                         data = null;
                         cell = null;                
                 }
-                
+               
                 
                 //ADD TIMEPOINT SUBHEADERS
                 ArrayList<String> tpHeaders = results.get(0).getTimepointHeaders(criteria);
@@ -232,26 +232,25 @@ public class P53Report {
                 TimepointStringComparator ts = new TimepointStringComparator();
                 Collections.sort(tpHeaders,ts);   
                 Element tpHeaderRow = report.addElement("Row").addAttribute("name", "tpHeaderRow");
-               // for(String tpHeader : tpHeaders){  
-                
-                                
+             
                	 // this is leave the first space empty
-                    cell = tpHeaderRow.addElement("Cell").addAttribute("type", "header").addAttribute("class", "firstTP").addAttribute("group", "tpHeader");   
-                    data = cell.addElement("Data").addAttribute("type", "header").addText("");                                      
+                   
+                    cell = headerRow.addElement("Cell").addAttribute("type", "header").addAttribute("class", "header").addAttribute("group", "ntpHeader");
+                    data = cell.addElement("Data").addAttribute("type", "header").addText("");
+                    System.out.println(")))"+data.toString());
                     data = null;
-                    cell = null;
-                
-                
-               
-                for(int i=0; i<tpHeaders.size();i++){                   
-                	 
-                    cell = tpHeaderRow.addElement("Cell").addAttribute("type", "header").addAttribute("class", "firstTP").addAttribute("group", "tpHeader");   
-                   // data = cell.addElement("Data").addAttribute("type", "header").addText("");        
+                    cell = null;    
+                    
+             
+                for(int i=0; i<tpHeaders.size();i++){                	
+                	
+                	
+                    cell = tpHeaderRow.addElement("Cell").addAttribute("type", "header").addAttribute("class", "firstTP").addAttribute("group", "tpHeader");                       
                     data = cell.addElement("Data").addAttribute("type", "header").addText(tpHeaders.get(i));                    
                     data = null;
                     cell = null;
                 }
-                
+              
                   Set<String> keys = reportBeanMap.keySet();   
                   
                  
