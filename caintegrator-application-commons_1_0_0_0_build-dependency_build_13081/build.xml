@@ -1,0 +1,79 @@
+<project name="caintegrator-application-commons" default="build_dependency" basedir=".">
+	<property file="basic_build.properties"/>
+	<!--
+	TARGET: COMPILE
+		Compiles the source directory
+	-->
+	<target name="build_dependency" if="anthill.artifacts.dir" depends="build_jar">
+		<echo>
+			Artifacts copied to ${anthill.artifacts.dir}
+		</echo>
+		<copy file="caintegrator-application-commons.jar" todir="${anthill.artifacts.dir}"/>
+	</target>
+	<target name="build_jar" >
+		<delete dir="${build.classes.dir}" failonerror="false"/>
+		<delete file="caintegrator-application-commons.jar" failonerror="false"/>
+		<mkdir dir="${build.classes.dir}"/>
+		<javac srcdir="${build.source.dir}" destdir="${build.classes.dir}" source="1.5" debug="true" debuglevel="lines,vars,source">
+			<classpath>
+				<fileset dir="${build.deploy.lib.dir}">
+					<include name="*.jar"/>
+				</fileset>
+				<fileset dir="${anthill.dependency.artifacts.dir}">
+					<include name="caintegrator-analysis-commons.jar"/>
+					<include name="caintegrator-spec.jar"/>
+				</fileset>
+			</classpath>
+		</javac>
+		<jar jarfile="caintegrator-application-commons.jar">
+			<fileset dir="${build.classes.dir}"/>
+			<fileset dir="${build.source.dir}">
+	            <exclude name="hibernate.cfg.xml"/>
+	            <exclude name="hibernate.properties"/>
+	            <exclude name="*.java"/>
+        	</fileset>
+		</jar>
+		<antcall target="retrieve_deployment_artifacts"></antcall>
+	</target>
+	<target name="retrieve_deployment_artifacts">
+		<copy file="conf/caintegrator-jbossmq-destinations-service.xml" todir="${anthill.artifacts.dir}"/>
+		<copy file="conf/csm/oracle-ds.xml.template" tofile="${anthill.artifacts.dir}/oracle-ds.xml"/>
+	</target>
+	
+	<!-- ************************************************************************************************-->
+	<!--                                  Applet Compile/Signing                                          -->
+	<!-- ************************************************************************************************-->
+	<!-- make sure the keystore file path is correct for the computer where this build file is run -->	
+   <property name="keystore.alias" value="tomcat" /> 
+   <property name="keystore.keypass" value="changeit" /> 
+   <property name="keystore.storepass" value="changeit" /> 
+   <property name="keystore.location" value="C:/Documents and Settings/chenhang/.keystore"  />
+   <!-- property name="keystore.location" value="C:/temp/server.keystore"  / --> 
+
+<!--  create the applet jar file first  
+	<target name="jar-hmv-applet">
+        <jar jarfile="HMVApplet.jar" excludes="**/MANIFEST.MF, *.jar, *.xml" >
+        	<basedir="${basedir}/applet"/>
+        </jar>
+	</target>
+--> 
+
+	<target name="jar-smart-applet" >
+        <jar jarfile="HMVApplet.jar" excludes="**/MANIFEST.MF, *.jar, *.xml" >
+        	<fileset dir="${basedir}/bin">
+				<include name="gov/nih/nci/caintegrator/application/gpvisualizer/*.class"/>
+			</fileset>
+        </jar>
+	</target>
+	
+    <!-- target name="sign-hmv-applet" depends="jar-hmv-applet" -->
+    <target name="sign-hmv-applet" depends="jar-smart-applet">
+        <signjar jar="HMVApplet.jar" 
+                  alias="${keystore.alias}" 
+                  keypass="${keystore.keypass}" 
+                  storepass="${keystore.storepass}" 
+                  keystore="${keystore.location}" 
+                  signedjar="SignedHMVApplet.jar" /> 
+    </target>
+	
+</project>
