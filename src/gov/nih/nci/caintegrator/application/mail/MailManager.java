@@ -49,11 +49,18 @@ public class MailManager {
 		    	message += MailConfig.getInstance(mailProperties).getFtpUnformattedBody2();	
 		    }
 		    	
+		    String ftpHostnameAndPort = MailConfig.getInstance(mailProperties).getFtpHostnameAndPort();
+		    if(ftpHostnameAndPort != null && ftpHostnameAndPort.endsWith("/")){
+		    	ftpHostnameAndPort = ftpHostnameAndPort + "downloadZipFile.do?zipFile=";
+		    }else if(ftpHostnameAndPort != null && !ftpHostnameAndPort.endsWith("/")){
+		    	ftpHostnameAndPort = ftpHostnameAndPort + "/downloadZipFile.do?zipFile=";
+		    }
+		    
 		    // Part 3 appears once for each file
 		    for(String fileName : fileNames)
 		    {    	
 		    	message += new MessageFormat(MailConfig.getInstance(mailProperties).getFtpUnformattedBody3()).format(
-		    		new String[] {cleanFileName(fileName), MailConfig.getInstance(mailProperties).getFtpHostnameAndPort()});	
+		    		new String[] {cleanFileName(fileName), ftpHostnameAndPort});	
 		    }
 		    
 		    // Part 4 always appears  
