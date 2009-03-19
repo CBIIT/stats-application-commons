@@ -7,7 +7,7 @@ public class SafeHTMLUtil {
 
 	public static String clean(String s) {
 		String clean = Translate.decode(s).replace("<", "").replace(">", "");
-		if(!clean.contains("description")){
+		if(!clean.contains("description") && !clean.contains("Description") ){
 		clean = StringUtils.replace(clean, "script", "");
 		}
 		clean = StringUtils.replace(clean, "%", "");
