@@ -86,6 +86,7 @@ import java.util.Collection;
 
 public class UserCredentials implements Serializable{
 
+	private Long userId;
 	private String userName;
 	private UserRole role;
 	private String emailAddress;
@@ -122,7 +123,8 @@ public class UserCredentials implements Serializable{
 	 * @param role
 	 * @param userName
 	 */
-	protected UserCredentials(String emailAddress, String firstName, Collection<ProtectionElement> protectionElements, String lastName, UserRole role, String userName) {
+	protected UserCredentials(Long userId, String emailAddress, String firstName, Collection<ProtectionElement> protectionElements, String lastName, UserRole role, String userName) {
+		this.userId = userId;
 		this.emailAddress = emailAddress;
 		this.firstName = firstName;
 		this.protectionElements = protectionElements;
@@ -215,6 +217,18 @@ public class UserCredentials implements Serializable{
 	
 	public String getLastName() {
 		return lastName;
+	}
+	/**
+	 * @return the userId
+	 */
+	public Long getUserId() {
+		return userId;
+	}
+	/**
+	 * @param userId the userId to set
+	 */
+	public void setUserId(Long userId) {
+		this.userId = userId;
 	}
 	
 

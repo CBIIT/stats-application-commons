@@ -188,8 +188,10 @@ public class SecurityManager {
 		String emailAddress = null;
 		String firstName = null;
 		String lastName = null;
+		Long userId = null;
 		Set<Group> groups;
 		try {
+			userId = user.getUserId();
 			emailAddress = user.getEmailId();
 			firstName = user.getFirstName();
 			lastName = user.getLastName();
@@ -227,7 +229,7 @@ public class SecurityManager {
 				 * snap judgments about the user after they are logged in
 				 */
 				UserRole role = getUserRole(groups);
-				credentials = new UserCredentials(emailAddress,firstName,protectionElements,lastName,role,userName);
+				credentials = new UserCredentials(userId, emailAddress,firstName,protectionElements,lastName,role,userName);
 			}catch(NullPointerException npe) {
 				logger.error("Security Objects are null.") ;
 				throw new AuthenticationException("Some SecurityObjects are null");
