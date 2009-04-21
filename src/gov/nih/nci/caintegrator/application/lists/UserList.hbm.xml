@@ -24,14 +24,13 @@
 	<class name="UserList" table="LIST" >
 
 		<id name="id" column="LIST_ID" >
-			<generator class="assigned" />
+			<generator class="increment" />
 		</id>
 		
 		<property name="name"
                  type="java.lang.String"
                  column="NAME"
-                 insert="false"
-                 update="false" />
+		 />
         
        <property name='listType' column="TYPE" type="ListType" />
        
@@ -42,40 +41,35 @@
         <property name="author"
                  type="java.lang.String"
                  column="AUTHOR"
-                 insert="false"
-                 update="false" /> 
+                 /> 
         
         <property name="institute"
                  type="java.lang.String"
                  column="INSTITUTION"
-                 insert="false"
-                 update="false" />   
+				/>   
         
         <property name="dateCreated"
                  type="java.util.Date"
                  column="CREATION_DATE"
-                 insert="false"
-                 update="false" /> 
+				 /> 
                  
          <property name="category"
                  type="java.lang.String"
                  column="CATEGORY"
-                 insert="false"
-                 update="false" />  
+				/>  
                  
          <property name="notes"
                  type="java.lang.String"
                  column="DESCRIPTION"
-                 insert="false"
-                 update="false" />                  
+				 />                  
                 
          
 		
-		<bag name="listItems" lazy="false">			
+		<bag name="listItems" lazy="false" cascade="all-delete-orphan">			
 			<key column="LIST_ID"/>
 			<one-to-many class="gov.nih.nci.caintegrator.application.lists.ListItem"/>		
 		</bag>
-		
+
 		
                  
 		</class>

@@ -318,6 +318,19 @@ public class UserListBeanHelper{
         return allList;
     }
     
+    public List<UserList> getAllDeletedCustomLists(){
+        List<UserList> removedLists = new ArrayList<UserList>();
+        if (userListBean == null || userListBean.getRemovedLists().isEmpty())
+            return removedLists;
+        
+        for (UserList list : userListBean.getRemovedLists()){
+            ListOrigin origin = list.getListOrigin();
+            if(origin!=null && origin.equals(ListOrigin.Custom)){
+                removedLists.add(list);
+            }
+        }
+        return removedLists;
+    }
     public List<String> getItemsFromList(String listName){
         UserList userList = userListBean.getList(listName);
         List<String> items = userList.getList();        

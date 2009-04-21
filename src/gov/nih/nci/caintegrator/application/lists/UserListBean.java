@@ -15,7 +15,7 @@ import java.util.List;
 public class UserListBean implements Serializable {
 
     List<UserList> userLists = new ArrayList<UserList>();
-    
+    List<UserList> removedLists = new ArrayList<UserList>();
     public void addList(UserList userList){
     	userList.setName(this.checkListName(userList.getName()));
     	/*
@@ -66,6 +66,7 @@ public class UserListBean implements Serializable {
         for(UserList list: userLists){        
            if(list.getName().equals(listName)){
            userLists.remove(list);
+           removedLists.add(list);
            break;
           }
         }
@@ -76,6 +77,9 @@ public class UserListBean implements Serializable {
         return userLists;
     }
     
+    public List<UserList> getRemovedLists(){
+        return removedLists;
+    }
     public UserList getList(String listName){
         for(UserList list : userLists){
             if(list.getName().equals(listName)){
