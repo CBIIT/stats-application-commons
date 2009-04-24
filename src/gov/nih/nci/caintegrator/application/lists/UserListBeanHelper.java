@@ -501,6 +501,10 @@ public class UserListBeanHelper{
         }
        return intersection;
     }
-    
+
+	public UserListBean getUserListBean() {
+		return userListBean;
+	}
+
 
 }
