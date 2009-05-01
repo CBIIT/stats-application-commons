@@ -62,6 +62,16 @@ public class UserListBean implements Serializable {
     	return cleanName;
     }
     
+    public boolean listExists(String listName){       
+        for(UserList list: userLists){        
+           if(list.getName().equals(listName)){
+        	   return true;
+           }
+        }
+        
+        return false;
+    }    
+    
     public void removeList(String listName){       
         for(UserList list: userLists){        
            if(list.getName().equals(listName)){

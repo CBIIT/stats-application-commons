@@ -98,6 +98,10 @@ public class UserListBeanHelper{
         userListBean.removeList(listName); 
     }
     
+    public boolean listExists(String listName){       
+    	return userListBean.listExists(listName);
+    }    
+    
     public String removeListFromAjax(String listName)   {
         removeList(listName);
         return listName;
