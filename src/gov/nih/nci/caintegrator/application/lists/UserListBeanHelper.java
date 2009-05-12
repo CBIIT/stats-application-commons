@@ -335,6 +335,9 @@ public class UserListBeanHelper{
         }
         return removedLists;
     }
+    public void clearAllDeletedCustomLists(){
+    	 userListBean.clearRemovedLists();
+    }
     public List<String> getItemsFromList(String listName){
         UserList userList = userListBean.getList(listName);
         List<String> items = userList.getList();        

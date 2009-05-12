@@ -90,6 +90,9 @@ public class UserListBean implements Serializable {
     public List<UserList> getRemovedLists(){
         return removedLists;
     }
+    public void clearRemovedLists(){
+        removedLists.clear();
+    }
     public UserList getList(String listName){
         for(UserList list : userLists){
             if(list.getName().equals(listName)){
