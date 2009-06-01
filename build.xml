@@ -75,5 +75,24 @@
                   keystore="${keystore.location}" 
                   signedjar="SignedHMVApplet.jar" /> 
     </target>
-	
+	   <target name="build_gp_jar">
+			<delete dir="${build.classes.dir}" failonerror="false"/>
+			<delete file="caIntegratorGenePatternAuthenticationFilter.jar" failonerror="false"/>
+			<mkdir dir="${build.classes.dir}"/>
+			<javac srcdir="${build.source.dir}/gov/nih/nci/caintegrator/security/genepattern/" destdir="${build.classes.dir}" source="1.5" debug="true" debuglevel="lines,vars,source">
+				<classpath>
+					<fileset dir="${build.deploy.lib.dir}">
+						<include name="*.jar"/>
+					</fileset>
+				</classpath>
+			</javac>
+			<jar jarfile="caIntegratorGenePatternAuthenticationFilter.jar">
+
+
+	            <fileset dir="${build.classes.dir}" includes="/gov/nih/nci/caintegrator/security/genepattern/*">
+	            </fileset>
+
+			</jar>
+	        <copy file="caIntegratorGenePatternAuthenticationFilter.jar" todir="${anthill.artifacts.dir}"/>
+		</target>
 </project>

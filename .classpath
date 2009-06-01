@@ -49,5 +49,8 @@
 	<classpathentry kind="lib" path="lib/jfreechart-1.0.6.jar"/>
 	<classpathentry kind="lib" path="lib/log4j-1.2.13.jar"/>
 	<classpathentry kind="lib" path="lib/nci-commons-core-1.0.9.jar"/>
+	<classpathentry kind="con" path="melibrary.com.genuitec.eclipse.hibernate.MYECLIPSE_HIBERNATE3_1_CORE"/>
+	<classpathentry kind="lib" path="oracle.jar"/>
+	<classpathentry kind="lib" path="lib/gp-311.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
