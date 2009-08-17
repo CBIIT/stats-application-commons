@@ -71,7 +71,7 @@ public class ZipFiles extends AbstractFileZipper {
 
         try {
         
-        	if(sequenceNumber == 0)
+        	if(sequenceNumber == 1)
         	 {
         	   // This is the first zip file for this data. 
         	   // Just use the name passed in
@@ -83,7 +83,7 @@ public class ZipFiles extends AbstractFileZipper {
         		// Append a number (e.g. _1 _2) to the file name
         		int dotIndex = fileName.lastIndexOf('.');
         		String beforeDot = fileName.substring(0, dotIndex);
-        		outputFileName=beforeDot+"_"+sequenceNumber+".zip";
+        		outputFileName=beforeDot+"_part-"+sequenceNumber+".zip";
         	 }
         		
         	// Add file to the list to be returned

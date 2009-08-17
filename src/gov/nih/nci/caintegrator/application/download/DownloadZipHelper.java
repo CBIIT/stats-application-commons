@@ -3,7 +3,6 @@
  */
 package gov.nih.nci.caintegrator.application.download;
 
-import gov.nih.nci.caarray.domain.file.CaArrayFile;
 import gov.nih.nci.caintegrator.application.zip.ZipItem;
 import gov.nih.nci.caintegrator.application.zip.ZipManager;
 
@@ -33,6 +32,7 @@ public class DownloadZipHelper {
 	        zipItem.setFileName(zipFileName);
 	        zipItem.setFilePath(filePath);
 	        zipItem.setDirectoryInZip(directoryInZip);
+	        zipItem.setFileSize(f.length());
 
 	    }
 		return zipItem;
@@ -52,7 +52,7 @@ public class DownloadZipHelper {
 		}
 		return zipItems;
 	}
-	public static void zipFile(List<ZipItem> zipItemCollection, String zipFileName,String outputZipDirectory, boolean breakIntoMultipleFileIfLarge){
+	public static List<String> zipFile(List<ZipItem> zipItemCollection, String zipFileName,String outputZipDirectory, boolean breakIntoMultipleFileIfLarge){
 		if(zipItemCollection != null){
 			// start zipping and wait for it to finish
 			ZipManager zipper = new ZipManager();
@@ -60,7 +60,9 @@ public class DownloadZipHelper {
 	        zipper.setTarget(outputZipDirectory+File.separator+zipFileName);
 	        zipper.setBreakIntoMultipleFileIfLarge(breakIntoMultipleFileIfLarge);
 	        zipper.run();
+	        return zipper.getListofZipFiles();
 		}
+		return null;
 	}
 
 	/**
@@ -97,12 +99,12 @@ public class DownloadZipHelper {
 	 * delete zipped file
 	 * @return true is delete is successful.
 	 */
-	public static boolean checkIfFileExists(String file, byte[] byteArray,String inputDirectory){
+	public static boolean checkIfFileExists(String file, long fileSize ,String inputDirectory){
 		// Now delete the old zip file since it is no longer needed
 		boolean success = false;
 		//Verify Zip File Exsists before sending email
 		File newFile = new File(inputDirectory+File.separator+file);
-        if(newFile.exists()  && newFile.isFile() && byteArray != null && newFile.length() == byteArray.length)
+        if(newFile.exists()  && newFile.isFile() && newFile.length() == fileSize)
         {
         	success = true;
         }

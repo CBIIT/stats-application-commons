@@ -35,11 +35,13 @@ public class ZipManager extends Thread {
     private long bytesZippedInCurrentZipFile = 0;
     
     // Name of first zip file created for the data
-    private String destinationFile;
-    
+    private String destinationFile;    
+ 
+    // list of zipped files
+    private List<String> listofZipFiles = null;
     // For a large data set, this number keeps track of which zip file is 
-    // being zipped.  0 is the first file
-    private int sequenceNumber = 0;
+    // being zipped.  1 is the first file
+    private int sequenceNumber = 1;
     
     // Set to true if resulting zip files should be broken up
     // so that they don't become too large
@@ -47,7 +49,7 @@ public class ZipManager extends Thread {
     
     // Maximum size for a single zip file (4GB) 
     // Only applies if breakIntoMultipleFileIfLarge is true
-    private static final long MAX_ZIP_FILE_SIZE = 4000000000L;
+    private static final long MAX_ZIP_FILE_SIZE = 200000000L ; //4000000000L;
 
     private String zipPropertyFilename;
 
@@ -110,7 +112,8 @@ public class ZipManager extends Thread {
 	        // Loop through zip items
 	        for(ZipItem zipItem : items)
 	        {
-	        	  zipit.zip(zipItem.getDirectoryInZip(), zipItem.getFilePath());
+	        		zipFile(zipit, zipItem.getDirectoryInZip(), zipItem.getFilePath(), zipItem.getFileSize());
+	        	  //zipit.zip(zipItem.getDirectoryInZip(), zipItem.getFilePath());
 	              
 	        }      
 	        zipit.closeFile();   
@@ -135,7 +138,7 @@ public class ZipManager extends Thread {
      {
     	try
     	 {
-          zip();
+    		listofZipFiles = zip();
     	 }
     	catch(Exception e)
     	{
@@ -148,12 +151,8 @@ public class ZipManager extends Thread {
 	 * Process a file for zipping.   
 	 * 
 	 */
-	private void zipFile(AbstractFileZipper zipit, String projectName,  String taskName, String fileName,String filePath, Long fileSize) throws Exception
+	private void zipFile(AbstractFileZipper zipit, String directory, String fileName, Long fileSize) throws Exception
 	{
-        // Build the path inside of the zip file based on values passed in		
-		String path = projectName + File.separator +
-		              taskName + File.separator +
-		              fileName;
 		       
 	   // Possibly start a new zip file instead of 
 	   // adding to the current one
@@ -184,7 +183,7 @@ public class ZipManager extends Thread {
 		   }
 	   }
 
-		zipit.zip(path, filePath);
+		zipit.zip(directory, fileName);
 		bytesZippedSoFar += fileSize;
 		bytesZippedInCurrentZipFile  += fileSize;
 	}
@@ -204,6 +203,13 @@ public class ZipManager extends Thread {
 
 	public void setZipPropertyFilename(String zipPropertyFileName) {
 		this.zipPropertyFilename = zipPropertyFileName;
+	}
+
+	/**
+	 * @return the listofZipFiles
+	 */
+	public List<String> getListofZipFiles() {
+		return listofZipFiles;
 	}
 	
 	 

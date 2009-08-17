@@ -2,6 +2,7 @@ package gov.nih.nci.caintegrator.application.download;
 
 
 import gov.nih.nci.caarray.domain.file.FileType;
+import gov.nih.nci.caintegrator.application.zip.ZipItem;
 
 import java.io.Serializable;
 import java.net.URL;
@@ -32,6 +33,7 @@ public class DownloadTask implements Serializable{
 	private List<String> specimenList;
 	private FileType type;
 	private String zipFileName;
+	private List<ZipItem> listOfZipFileLists = null;
 	private URL zipFileURL;
 	private Long zipFileSize;
 	public DownloadTask(String cacheId, String taskId, String zipFileName, FileType type, List<String> specimenList) {
@@ -192,5 +194,25 @@ public class DownloadTask implements Serializable{
 	}
 	public void setZipFileSize(Long zipFileSize) {
 		this.zipFileSize = zipFileSize;
+	}
+	public void addZipFileItem(ZipItem zipFile){
+		if(zipFileName != null ){
+			if(listOfZipFileLists == null){
+				listOfZipFileLists = new ArrayList<ZipItem>();
+			}
+			listOfZipFileLists.add(zipFile);
+		}
+	}
+	/**
+	 * @return the listOfZipFileLists
+	 */
+	public List<ZipItem> getListOfZipFileLists() {
+		return listOfZipFileLists;
+	}
+	/**
+	 * @param listOfZipFileLists the listOfZipFileLists to set
+	 */
+	public void setListOfZipFileLists(List<ZipItem> listOfZipFileLists) {
+		this.listOfZipFileLists = listOfZipFileLists;
 	}
 }

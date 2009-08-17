@@ -2,11 +2,13 @@ package gov.nih.nci.caintegrator.application.cache;
 
 import gov.nih.nci.caintegrator.application.download.DownloadTask;
 import gov.nih.nci.caintegrator.application.download.caarray.CaArrayFileDownloadManager;
+import gov.nih.nci.caintegrator.application.zip.ZipItem;
 import gov.nih.nci.caintegrator.security.PublicUserPool;
 import gov.nih.nci.caintegrator.service.task.Task;
 
 import java.io.File;
 import java.util.Collection;
+import java.util.List;
 
 import javax.servlet.http.HttpSessionEvent;
 import javax.servlet.http.HttpSessionListener;
@@ -119,13 +121,24 @@ public class SessionTracker implements HttpSessionListener {
 				downloadTasks = CaArrayFileDownloadManager.getAllSessionDownloads(BusinessCacheManager.getInstance(),evt.getSession().getId());
 		    	for(DownloadTask downloadTask: downloadTasks){
 		    		String taskId = downloadTask.getTaskId();
-		    		String zipFileName = downloadTask.getZipFileName();
-		    		if(taskId != null){
-		    			String filePath = dir + "/"+ zipFileName;
-		    			File file = new File(filePath);
-		    			if( file.exists()){
-		    				file.delete();
-		    			}
+			    		String zipFileName = downloadTask.getZipFileName();
+			    		if(taskId != null){
+			    			String filePath = dir + "/"+ zipFileName;
+			    			File file = new File(filePath);
+			    			if( file.exists()){
+			    				file.delete();
+			    			}
+					    	if(downloadTask.getListOfZipFileLists() != null){
+					    		List<ZipItem> zipItems = downloadTask.getListOfZipFileLists();
+								for(ZipItem zi : zipItems){
+									zipFileName = zi.getFileName();
+									filePath = dir + "/"+ zi.getFileName();
+					    			file = new File(filePath);
+					    			if( file.exists()){
+					    				file.delete();
+					    			}
+								}
+					    	}
 		    		}
 		    	}
 			} catch (Exception e) {

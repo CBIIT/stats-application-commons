@@ -1,19 +1,23 @@
-package gov.nih.nci.caintegrator.application.download.caarray;
-import gov.nih.nci.caarray.domain.file.CaArrayFile;
+package gov.nih.nci.caintegrator.application.download.carray23;
 import gov.nih.nci.caarray.domain.file.FileType;
-import gov.nih.nci.caarray.domain.project.Experiment;
-import gov.nih.nci.caarray.services.CaArrayServer;
+import gov.nih.nci.caarray.external.v1_0.CaArrayEntityReference;
 import gov.nih.nci.caarray.services.ServerConnectionException;
-import gov.nih.nci.caarray.services.file.FileRetrievalService;
-import gov.nih.nci.caarray.services.search.CaArraySearchService;
+import gov.nih.nci.caarray.services.external.v1_0.CaArrayServer;
+import gov.nih.nci.caarray.services.external.v1_0.data.DataApiUtils;
+import gov.nih.nci.caarray.services.external.v1_0.data.DataService;
+import gov.nih.nci.caarray.services.external.v1_0.data.JavaDataApiUtils;
+import gov.nih.nci.caarray.services.external.v1_0.search.JavaSearchApiUtils;
+import gov.nih.nci.caarray.services.external.v1_0.search.SearchApiUtils;
+import gov.nih.nci.caarray.services.external.v1_0.search.SearchService;
 import gov.nih.nci.caintegrator.application.cache.BusinessTierCache;
 import gov.nih.nci.caintegrator.application.download.DownloadStatus;
 import gov.nih.nci.caintegrator.application.download.DownloadTask;
 import gov.nih.nci.caintegrator.application.download.DownloadZipItemImpl;
+import gov.nih.nci.caintegrator.application.download.caarray.CaArrayFileDownloadManagerInterface;
 import gov.nih.nci.caintegrator.application.zip.ZipItem;
 
+
 import java.io.File;
-import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -31,7 +35,7 @@ import net.sf.ehcache.Element;
 import org.apache.log4j.Logger;
 import org.springframework.core.task.TaskExecutor;
 
-public abstract class CaArrayFileDownloadManager implements CaArrayFileDownloadManagerInterface {
+public abstract class CaArrayFileDownloadManager implements CaArrayFileDownloadManagerInterface{
 	public static Logger logger = Logger
 			.getLogger(CaArrayFileDownloadManager.class);
 	protected static CaArrayFileDownloadManager instance = null;
@@ -103,9 +107,13 @@ public abstract class CaArrayFileDownloadManager implements CaArrayFileDownloadM
 		DownloadTask downloadTask = new DownloadTask(session, task, zipFileName, type, specimenList);
        	return downloadTask;
 	}
-	   /* (non-Javadoc)
-	 * @see gov.nih.nci.caintegrator.application.download.caarray.CaArrayFileDownloadManagerInterface#executeDownloadStrategy(java.lang.String, java.lang.String, java.lang.String, java.util.List, gov.nih.nci.caarray.domain.file.FileType, java.lang.String)
-	 */
+	   /**
+     * The executeStrategy method is what performs the heavy lifting in the
+     * strategy.  It will get the results from the QueryHandler back, 
+     * and place the "domain findings" into a taskResult.  
+     * It then places the taskResult finding into the cache. Runs the
+     * execute method in a separate thread for asynchronous operations.     *
+     */
     public void executeDownloadStrategy(final String session, final String taskId,String zipFileName, List<String> specimenList, FileType type, final String experimentName) {   
     	DownloadTask downloadTask = createTask(session,  taskId, zipFileName,  specimenList,  type);
     	
@@ -126,11 +134,10 @@ public abstract class CaArrayFileDownloadManager implements CaArrayFileDownloadM
             public void run() {
             	try {
 					downloadFiles(session,  taskId, experimentName);
-				} catch (IllegalArgumentException e) {
+				} catch (Exception e) {
 					logger.error(e.getMessage());
-				} catch (IOException e) {
-					logger.error(e.getMessage());					
 				}
+				
             }
         };
         taskExecutor.execute(task);
@@ -142,17 +149,14 @@ public abstract class CaArrayFileDownloadManager implements CaArrayFileDownloadM
 	 * identifier, then it tries to find one with title equal to the experimentName.
 	 * If it doesn't find one, throws exception.  Otherwise, tries to download
 	 * data files from the experiment that it found.
-	 * @throws IOException 
-	 *  
-	 * @throws ServerConnectionException
-	 * @throws IllegalArgumentException
-	 * @throws IOException
+	 * @throws Exception 
 	 * @throws LoginException
 	 */
-	private void downloadFiles(String sessionId, String taskId, String experimentName) throws IOException {
+	private void downloadFiles(String sessionId, String taskId, String experimentName) throws Exception {
 		long startTime = 0;
         long endTime = 0;
         double totalTime = 0;
+        List<String> listOfZipFiles = null;
         DownloadTask downloadTask = getSessionDownload(sessionId, taskId);
         if(downloadTask == null){
         	throw new IllegalStateException();
@@ -161,34 +165,55 @@ public abstract class CaArrayFileDownloadManager implements CaArrayFileDownloadM
         // Connect to server.
         startTime = System.currentTimeMillis();
         long totalStartTime = startTime;
-        List<String> listOfZipFiles = null;
-		CaArraySearchService searchService = server.getSearchService();
-		FileRetrievalService fileService = server.getFileRetrievalService();
+	
+        SearchService searchService = server.getSearchService();
+        DataService dataService = server.getDataService();
+        SearchApiUtils searchServiceHelper = new JavaSearchApiUtils(searchService);
+        DataApiUtils dataServiceHelper = new JavaDataApiUtils(dataService);
+        
 //		businessCacheManager.addToSessionCache(downloadTask.getCacheId(),
 //   			 downloadTask.getTaskId(), downloadTask);
 		logger.debug("searching for experiment");
         //find Experiment
         startTime = System.currentTimeMillis();
         setStatusInCache(downloadTask.getCacheId(),downloadTask.getTaskId(),DownloadStatus.SearchingForExperiment);
-		Experiment experiment = importer.findExperiment(searchService, experimentName);
+		CaArrayEntityReference expRef = (CaArrayEntityReference) importer.findExperiment(searchService, experimentName);
         endTime = System.currentTimeMillis();
         totalTime = (endTime - startTime) / 1000.0;
         logger.debug("Search for experiment took " + totalTime + " second(s).");
         
          //get Data Files 
         startTime = System.currentTimeMillis();
-		logger.debug("getting file info");
+		logger.debug("getting Data files");
         setStatusInCache(downloadTask.getCacheId(),downloadTask.getTaskId(),DownloadStatus.GettingDataFiles);
-		Set<CaArrayFile> files = importer.getAllDataFiles(searchService, experiment, downloadTask.getSpecimenList(), downloadTask.getType());
+		List<CaArrayEntityReference> fileRefs = importer.selectFilesFromSamples(searchServiceHelper, expRef, downloadTask.getSpecimenList(), downloadTask.getType());
         endTime = System.currentTimeMillis();
         totalTime = (endTime - startTime) / 1000.0;
         logger.debug("getDataFile for all files took " + totalTime + " second(s).");
+        //If no files are found
+        if(fileRefs == null ){
+        	DownloadStatus status = DownloadStatus.NoFilesFoundToDownload;
+	    	status.setComment("No files found to Download");
+	    	downloadTask.setDownloadStatus(status);
+	        setStatusInCache(downloadTask.getCacheId(),downloadTask.getTaskId(),status);
+        }
+        
+        /* else{
+        //get Data Files 
+        startTime = System.currentTimeMillis();    
+		logger.debug("downloading files");
+        setStatusInCache(downloadTask.getCacheId(),downloadTask.getTaskId(),DownloadStatus.DownloadingFiles);
+        zipfile= importer.downloadZipOfFiles(dataServiceHelper, fileRefs, downloadTask.getZipFileName());
+        endTime = System.currentTimeMillis();
+        totalTime = (endTime - startTime) / 1000.0;
+        logger.debug("downloadFiles for all files took " + totalTime + " second(s).");
+        }*/
         
         //get Data Files 
         startTime = System.currentTimeMillis();    
 		logger.debug("downloading files");
         setStatusInCache(downloadTask.getCacheId(),downloadTask.getTaskId(),DownloadStatus.DownloadingFiles);
-		Set<ZipItem> zipItems = importer.downloadFiles(fileService, files, inputDirectory);
+		Set<ZipItem> zipItems = importer.downloadFiles(searchService, dataServiceHelper, fileRefs, downloadTask.getZipFileName());
         endTime = System.currentTimeMillis();
         totalTime = (endTime - startTime) / 1000.0;
         logger.debug("downloadFiles for all files took " + totalTime + " second(s).");
@@ -223,12 +248,15 @@ public abstract class CaArrayFileDownloadManager implements CaArrayFileDownloadM
 	    		logger.debug("zip file completed");
 	        }
         }else if(listOfZipFiles != null  && listOfZipFiles.size() > 1){
+        	downloadTask.setEndTime(endTime);         	
+        	downloadTask.setDownloadStatus(DownloadStatus.Completed);
+    		updateDownloadTaskInCache(downloadTask.getCacheId(),
+       			 downloadTask.getTaskId(), downloadTask);
         	for(String filename : listOfZipFiles){
-        		File zipfile= new File(filename);
+        		File zipfile= new File(outputZipDirectory+File.separator+filename);
     	        if(zipfile.exists()  && zipfile.length()> 0){
     	        	ZipItem zipItem = new DownloadZipItemImpl();
-    	        	String name = filename.substring(filename.lastIndexOf(File.separator)+1);
-    		        zipItem.setFileName(name);
+    		        zipItem.setFileName(filename);
     		        zipItem.setFilePath(outputZipDirectory+File.separator);
     		        zipItem.setFileSize(zipfile.length());    	           	
     	           	downloadTask.addZipFileItem(zipItem);
@@ -238,13 +266,8 @@ public abstract class CaArrayFileDownloadManager implements CaArrayFileDownloadM
     	    		logger.debug("zip file completed");
     	        
         	}
-        	downloadTask.setEndTime(endTime);         	
-        	downloadTask.setDownloadStatus(DownloadStatus.Completed);
-    		updateDownloadTaskInCache(downloadTask.getCacheId(),
-          			 downloadTask.getTaskId(), downloadTask);
-        	
         }
-		} catch (IOException e) {
+		} catch (Exception e) {
 			logger.error(e.getMessage());
 	    	DownloadStatus status = DownloadStatus.Error;
 	    	status.setComment(e.getMessage());
@@ -264,7 +287,7 @@ public abstract class CaArrayFileDownloadManager implements CaArrayFileDownloadM
 	}
 
 	protected CaArrayServer connectToCaArrayServer()
-			throws ServerConnectionException, LoginException {
+			throws  LoginException, ServerConnectionException {
 
 		logger.debug("connecting to CaArrayServer");
 		try {
@@ -300,8 +323,8 @@ public abstract class CaArrayFileDownloadManager implements CaArrayFileDownloadM
 		return false;
 	}
 
-	/* (non-Javadoc)
-	 * @see gov.nih.nci.caintegrator.application.download.caarray.CaArrayFileDownloadManagerInterface#getCaarrayUrl()
+	/**
+	 * @return the caarrayUrl
 	 */
 	public URL getCaarrayUrl() {
 		return caarrayUrl;
@@ -314,8 +337,8 @@ public abstract class CaArrayFileDownloadManager implements CaArrayFileDownloadM
 		this.caarrayUrl = caarrayUrl;
 	}
 
-	/* (non-Javadoc)
-	 * @see gov.nih.nci.caintegrator.application.download.caarray.CaArrayFileDownloadManagerInterface#getUsername()
+	/**
+	 * @return the username
 	 */
 	public String getUsername() {
 		return username;
@@ -328,8 +351,8 @@ public abstract class CaArrayFileDownloadManager implements CaArrayFileDownloadM
 		this.username = username;
 	}
 
-	/* (non-Javadoc)
-	 * @see gov.nih.nci.caintegrator.application.download.caarray.CaArrayFileDownloadManagerInterface#getPassword()
+	/**
+	 * @return the password
 	 */
 	public String getPassword() {
 		return password;
@@ -344,9 +367,6 @@ public abstract class CaArrayFileDownloadManager implements CaArrayFileDownloadM
 
 	/* 
 	 * return all DownloadTasks for a sessionId 
-	 */
-	/* (non-Javadoc)
-	 * @see gov.nih.nci.caintegrator.application.download.caarray.CaArrayFileDownloadManagerInterface#getAllSessionDownloads(java.lang.String)
 	 */
 	@SuppressWarnings("unchecked")
 	public Collection<DownloadTask> getAllSessionDownloads(String sessionId){
@@ -406,9 +426,6 @@ public abstract class CaArrayFileDownloadManager implements CaArrayFileDownloadM
 		}
 		return flag;
 	}
-	/* (non-Javadoc)
-	 * @see gov.nih.nci.caintegrator.application.download.caarray.CaArrayFileDownloadManagerInterface#updateDownloadTaskInCache(java.lang.String, java.lang.String, gov.nih.nci.caintegrator.application.download.DownloadTask)
-	 */
 	public void updateDownloadTaskInCache(String sessionId, String taskId, DownloadTask downloadTask){
 		if(sessionId != null  && taskId != null && downloadTask != null){
 	    	 businessCacheManager.addToSessionCache(downloadTask.getCacheId(),
@@ -416,9 +433,6 @@ public abstract class CaArrayFileDownloadManager implements CaArrayFileDownloadM
 		}
 	}
 
-	/* (non-Javadoc)
-	 * @see gov.nih.nci.caintegrator.application.download.caarray.CaArrayFileDownloadManagerInterface#getBusinessCacheManager()
-	 */
 	public BusinessTierCache getBusinessCacheManager() {
 		return businessCacheManager;
 	}
@@ -427,9 +441,6 @@ public abstract class CaArrayFileDownloadManager implements CaArrayFileDownloadM
 		this.businessCacheManager = businessCacheManager;
 	}
 
-	/* (non-Javadoc)
-	 * @see gov.nih.nci.caintegrator.application.download.caarray.CaArrayFileDownloadManagerInterface#getTaskExecutor()
-	 */
 	public TaskExecutor getTaskExecutor() {
 		return taskExecutor;
 	}
@@ -439,16 +450,13 @@ public abstract class CaArrayFileDownloadManager implements CaArrayFileDownloadM
 	}
 
 	public String getInputDirectory() {
-		return inputDirectory;
+		return outputZipDirectory;
 	}
 
 	public void setInputDirectory(String inputDirectory) {
-		this.inputDirectory = inputDirectory;
+		this.outputZipDirectory = inputDirectory;
 	}
 
-	/* (non-Javadoc)
-	 * @see gov.nih.nci.caintegrator.application.download.caarray.CaArrayFileDownloadManagerInterface#getOutputZipDirectory()
-	 */
 	public String getOutputZipDirectory() {
 		return outputZipDirectory;
 	}

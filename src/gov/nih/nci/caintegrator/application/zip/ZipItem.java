@@ -29,4 +29,12 @@ public String getDirectoryInZip();
  * @param directoryInZip The directoryInZip to set.
  */
 public void setDirectoryInZip(String directoryInZip);
+/**
+ * @return the fileSize
+ */
+public Long getFileSize();
+/**
+ * @param fileSize the fileSize to set
+ */
+public void setFileSize(Long fileSize);
 }

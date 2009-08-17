@@ -71,8 +71,8 @@ public class CaArrayFileDownloader  {
 	 * @throws LoginException
 	 */
 
-	public void writeZipFile(Set<ZipItem> zipItems, String zipFileName) throws IOException {
-		DownloadZipHelper.zipFile(new ArrayList<ZipItem>(zipItems), zipFileName, outputZipDirectory, true);
+	public List<String> writeZipFile(Set<ZipItem> zipItems, String zipFileName) throws IOException {
+		return DownloadZipHelper.zipFile(new ArrayList<ZipItem>(zipItems), zipFileName, outputZipDirectory, true);
 	}
 
 	/**
@@ -99,7 +99,7 @@ public class CaArrayFileDownloader  {
 			BufferedOutputStream bos = null;
 			try {
 				// if the file does not already exists than write it
-				if(!DownloadZipHelper.checkIfFileExists(tempFile.getName(), byteArray, inputDirectory)){
+				if(!DownloadZipHelper.checkIfFileExists(tempFile.getName(), byteArray.length, inputDirectory)){
 					bos = new BufferedOutputStream(new FileOutputStream(tempFile));
 					logger.debug("writing file: " + tempFile.getName());
 					bos.write(byteArray);

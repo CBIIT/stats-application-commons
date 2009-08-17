@@ -13,6 +13,7 @@ public class TestZipItemImpl implements ZipItem{
 	private String filePath;
 	private String fileName;
 	private String directoryInZip;
+	private Long fileSize;
 	/**
 	 * @return Returns the directoryInZip.
 	 */
@@ -48,6 +49,18 @@ public class TestZipItemImpl implements ZipItem{
 	 */
 	public void setFilePath(String filePath) {
 		this.filePath = filePath;
+	}
+	/**
+	 * @return the fileSize
+	 */
+	public Long getFileSize() {
+		return fileSize;
+	}
+	/**
+	 * @param fileSize the fileSize to set
+	 */
+	public void setFileSize(Long fileSize) {
+		this.fileSize = fileSize;
 	}
 
 
