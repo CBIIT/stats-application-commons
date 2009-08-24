@@ -14,6 +14,7 @@ package gov.nih.nci.caintegrator.application.zip;
 import java.io.File;
 import java.util.List;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
 
 
@@ -49,7 +50,7 @@ public class ZipManager extends Thread {
     
     // Maximum size for a single zip file (4GB) 
     // Only applies if breakIntoMultipleFileIfLarge is true
-    private static final long MAX_ZIP_FILE_SIZE = 200000000L ; //4000000000L;
+    private static final long MAX_ZIP_FILE_SIZE = FileUtils.ONE_GB * 2 ; //200000000L ; //4000000000L;
 
     private String zipPropertyFilename;
 
