@@ -1,8 +1,7 @@
 package gov.nih.nci.caintegrator.application.download.carray23;
 import gov.nih.nci.caarray.domain.file.FileType;
 import gov.nih.nci.caarray.external.v1_0.CaArrayEntityReference;
-import gov.nih.nci.caarray.external.v1_0.data.DataFile;
-import gov.nih.nci.caarray.external.v1_0.data.FileTypeCategory;
+import gov.nih.nci.caarray.external.v1_0.data.FileCategory;
 import gov.nih.nci.caarray.external.v1_0.experiment.Experiment;
 import gov.nih.nci.caarray.external.v1_0.query.BiomaterialSearchCriteria;
 import gov.nih.nci.caarray.external.v1_0.query.ExperimentSearchCriteria;
@@ -31,6 +30,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
 
 import com.sun.org.apache.xerces.internal.util.URI.MalformedURIException;
@@ -43,6 +43,9 @@ import com.sun.org.apache.xerces.internal.util.URI.MalformedURIException;
  * 
  */
 public class CaArrayFileDownloader  {
+    // Maximum size for a single zip file (2GB) 
+    // Only applies if breakIntoMultipleFileIfLarge is true
+    private static final long MAX_ZIP_FILE_SIZE = FileUtils.ONE_GB * 2;
 
 	public static Logger logger = Logger.getLogger(CaArrayFileDownloader.class);
 
@@ -80,23 +83,23 @@ public class CaArrayFileDownloader  {
 	 * @throws InvalidReferenceException 
 	 */
 	public Set<ZipItem> downloadFiles(SearchService searchService,DataApiUtils dataServiceHelper,
-			 List<CaArrayEntityReference> fileRefs, String zipFileName ) throws IOException, InvalidReferenceException, DataTransferException {
+			 List<gov.nih.nci.caarray.external.v1_0.data.File> files, String zipFileName ) throws IOException, InvalidReferenceException, DataTransferException {
 		Set<ZipItem> zipItems = new HashSet<ZipItem>();
-		logger.debug("downloading " + fileRefs.size() + " files");
+		logger.debug("downloading " + files.size() + " files");
 		boolean compressFile = false;
-		for (CaArrayEntityReference fileRef : fileRefs) {
-			DataFile file = (DataFile) searchService.getByReference(fileRef);
+		for (gov.nih.nci.caarray.external.v1_0.data.File file : files) {
+
 			BufferedOutputStream bos = null;
 			try {
 				// if the file does not already exists than write it
-				if(!DownloadZipHelper.checkIfFileExists(file.getName(), file.getUncompressedSize(), inputDirectory)){
-					File tempFile = DownloadZipHelper.createFile(file.getName(), inputDirectory);
+				if(!DownloadZipHelper.checkIfFileExists(file.getMetadata().getName(), file.getMetadata().getUncompressedSize(), inputDirectory)){
+					File tempFile = DownloadZipHelper.createFile(file.getMetadata().getName(), inputDirectory);
 					ByteArrayOutputStream outStream = new ByteArrayOutputStream();
 			        long startTime = System.currentTimeMillis();
-			        dataServiceHelper.copyFileContentsToOutputStream(fileRef, compressFile, outStream);
+			        dataServiceHelper.copyFileContentsToOutputStream(file.getReference(), compressFile, outStream);
 			        long totalTime = System.currentTimeMillis() - startTime;
 			        byte[] byteArray = outStream.toByteArray();
-					logger.debug("downloaded file: " + file.getName());					
+					logger.debug("downloaded file: " + file.getMetadata().getName());					
 					bos = new BufferedOutputStream(new FileOutputStream(tempFile));
 					logger.debug("writing file: " + tempFile.getName());
 					bos.write(byteArray);
@@ -109,13 +112,13 @@ public class CaArrayFileDownloader  {
 				}
 			} catch (IOException e) {
 				reportError("Error writing temporary file: "
-						+ file.getName(), e);
+						+ file.getMetadata().getName(), e);
 				throw e;
 			} finally {
 				if (null != bos)
 					bos.close();
 			}
-			ZipItem zipItem = DownloadZipHelper.fileToZip(file.getName(), zipFileName, directoryInZip, inputDirectory);
+			ZipItem zipItem = DownloadZipHelper.fileToZip(file.getMetadata().getName(), zipFileName, directoryInZip, inputDirectory);
 			zipItems.add(zipItem);
 		}
 
@@ -252,94 +255,119 @@ public class CaArrayFileDownloader  {
         }
         return sampleRefs;
     }
-    public List<CaArrayEntityReference> selectFilesFromSamples(SearchApiUtils searchServiceHelper,CaArrayEntityReference experimentRef,List<String> specimenList, FileType type) throws RemoteException, InvalidReferenceException, UnsupportedCategoryException {
+    public List<gov.nih.nci.caarray.external.v1_0.data.File> selectFilesFromSamples(SearchApiUtils searchServiceHelper,CaArrayEntityReference experimentRef,List<String> specimenList, FileType type) throws RemoteException, InvalidReferenceException, UnsupportedCategoryException {
         Set<CaArrayEntityReference> sampleRefs = searchForSamples(searchServiceHelper, experimentRef, specimenList);
         if (sampleRefs == null || sampleRefs.size() <= 0) {
             String message = "Could not find the requested samples.";
 			reportError(message, null);
             return null;
         }
-        List<CaArrayEntityReference> fileRefs = null;
+        List<gov.nih.nci.caarray.external.v1_0.data.File> files = null;
         if (type == FileType.AFFYMETRIX_CEL) {
-        	fileRefs = selectCelFilesFromSamples(searchServiceHelper, experimentRef, sampleRefs);
+        	files = selectCelFilesFromSamples(searchServiceHelper, experimentRef, sampleRefs);
 		} else if (type == FileType.AFFYMETRIX_CHP) {
-			fileRefs = selectChpFilesFromSamples(searchServiceHelper, experimentRef, sampleRefs);
+			files = selectChpFilesFromSamples(searchServiceHelper, experimentRef, sampleRefs);
 		}
-        if (fileRefs == null) {
+        if (files == null) {
             String message = "Could not find any raw files associated with the given samples.";
 			reportError(message, null);
             return null;
         } else {
-            return fileRefs;
+            return files;
         }
     }
     /**
      * Select all raw data files associated with the given samples.
      */
-    private List<CaArrayEntityReference> selectCelFilesFromSamples(SearchApiUtils searchServiceHelper, CaArrayEntityReference experimentRef,
+    private List<gov.nih.nci.caarray.external.v1_0.data.File> selectCelFilesFromSamples(SearchApiUtils searchServiceHelper, CaArrayEntityReference experimentRef,
             Set<CaArrayEntityReference> sampleRefs) throws RemoteException, InvalidReferenceException {
     	FileSearchCriteria fileSearchCriteria = new FileSearchCriteria();
         fileSearchCriteria.setExperiment(experimentRef);
         fileSearchCriteria.setExperimentGraphNodes(sampleRefs);
-        fileSearchCriteria.getCategories().add(FileTypeCategory.RAW);
+        fileSearchCriteria.getCategories().add(FileCategory.RAW_DATA);
         fileSearchCriteria.setExtension("CEL");
-        
-        List<DataFile> files = (searchServiceHelper.filesByCriteria(fileSearchCriteria)).list();
+
+        List<gov.nih.nci.caarray.external.v1_0.data.File> files = searchServiceHelper.filesByCriteria(fileSearchCriteria).list();
+
         if (files.size() <= 0) {
             return null;
         }
 
-        // Return references to the files.
-        List<CaArrayEntityReference> fileRefs = new ArrayList<CaArrayEntityReference>();
-        for (DataFile file : files) {
-            System.out.print(file.getName() + "  ");
-            fileRefs.add(file.getReference());
-        }
-        return fileRefs;
+        return files;
     }
     /**
      * Select all chp data files associated with the given samples.
      */
-    private List<CaArrayEntityReference> selectChpFilesFromSamples(SearchApiUtils searchServiceHelper, CaArrayEntityReference experimentRef,
+    private List<gov.nih.nci.caarray.external.v1_0.data.File> selectChpFilesFromSamples(SearchApiUtils searchServiceHelper, CaArrayEntityReference experimentRef,
             Set<CaArrayEntityReference> sampleRefs) throws RemoteException, InvalidReferenceException {
         FileSearchCriteria fileSearchCriteria = new FileSearchCriteria();
         fileSearchCriteria.setExperiment(experimentRef);
         fileSearchCriteria.setExperimentGraphNodes(sampleRefs);
-        fileSearchCriteria.getCategories().add(FileTypeCategory.DERIVED);
+        fileSearchCriteria.getCategories().add(FileCategory.DERIVED_DATA);
         fileSearchCriteria.setExtension("CHP");
         
-        List<DataFile> files = (searchServiceHelper.filesByCriteria(fileSearchCriteria)).list();
+        List<gov.nih.nci.caarray.external.v1_0.data.File> files = searchServiceHelper.filesByCriteria(fileSearchCriteria).list();
         if (files.size() <= 0) {
             return null;
         }
 
-        // Return references to the files.
-        List<CaArrayEntityReference> fileRefs = new ArrayList<CaArrayEntityReference>();
-        for (DataFile file : files) {
-            System.out.print(file.getName() + "  ");
-            fileRefs.add(file.getReference());
-        }
-        return fileRefs;
+        return files;
     }
 
 	 /**
      * Download a zip of the given files.
      */
-    public File downloadZipOfFiles(DataApiUtils dataServiceHelper, List<CaArrayEntityReference> fileRefs, String zipFileName ) throws RemoteException,
+    public  List<String> downloadZipOfFiles(DataApiUtils dataServiceHelper, List<gov.nih.nci.caarray.external.v1_0.data.File> files, String zipFileName ) throws RemoteException,
             MalformedURIException, IOException, Exception {
         FileDownloadRequest downloadRequest = new FileDownloadRequest();
-        downloadRequest.setFiles(fileRefs);
+        List<String> listOfZipFiles = new ArrayList<String>();
+        List<CaArrayEntityReference> fileRefs = new ArrayList<CaArrayEntityReference>();   
+        List<gov.nih.nci.caarray.external.v1_0.data.File> removeFiles = new ArrayList<gov.nih.nci.caarray.external.v1_0.data.File>();   
+        long bytesInCurrentZipFile = 0;        
+        long numberOfFiles = 0;
         boolean compressEachIndividualFile = false;
         File zipFile = new File(outputZipDirectory+File.separator+zipFileName);
-        long startTime = System.currentTimeMillis();
-        dataServiceHelper.downloadFileContentsZipToFile(downloadRequest, compressEachIndividualFile, zipFile);
-        long totalTime = System.currentTimeMillis() - startTime;
-        if (zipFile != null  && zipFile.exists()  && zipFile.length() > 0) {
-            System.out.println("Retrieved " + zipFile.length() + " bytes in " + totalTime + " ms.");
-        } else {
-            System.err.println("Error: Retrieved null byte array.");
+        long sequenceNumber = 1;
+        while (!files.isEmpty()){
+	        for (gov.nih.nci.caarray.external.v1_0.data.File file : files) {
+	            System.out.print(file.getMetadata().getName() + "  ");
+			   if(numberOfFiles < 100 &&  bytesInCurrentZipFile < MAX_ZIP_FILE_SIZE) {
+				   fileRefs.add(file.getReference());
+				   removeFiles.add(file);
+				   numberOfFiles++;
+				   bytesInCurrentZipFile = bytesInCurrentZipFile + file.getMetadata().getUncompressedSize();
+				   }
+			   else{
+				   break;
+			   }
+			   
+	        }
+	        downloadRequest.setFiles(fileRefs);
+	        long startTime = System.currentTimeMillis();
+	        dataServiceHelper.downloadFileContentsZipToFile(downloadRequest, compressEachIndividualFile, zipFile);
+	        long totalTime = System.currentTimeMillis() - startTime;
+	        if (zipFile != null  && zipFile.exists()  && zipFile.length() > 0) {
+	            System.out.println("Retrieved " + zipFile.length() + " bytes in " + totalTime + " ms.");
+	            listOfZipFiles.add(zipFile.getName());
+	        } else {
+	            System.err.println("Error: Retrieved null byte array.");
+	        }
+	        //clear counts
+	        bytesInCurrentZipFile = 0;        
+	        numberOfFiles = 0;
+	        files.removeAll(removeFiles);
+	        if(files.size()> 0){
+	        	sequenceNumber++;
+	        	int dotIndex = zipFileName.lastIndexOf('.');
+        		String beforeDot = zipFileName.substring(0, dotIndex);
+        		zipFileName =beforeDot+"_part-"+sequenceNumber+".zip";
+	        	zipFile = new File(outputZipDirectory+File.separator+zipFileName);
+	        	fileRefs = new ArrayList<CaArrayEntityReference>();   
+	        }
         }
-        return zipFile;
+
+        return listOfZipFiles;
     }
+ 
 
 }

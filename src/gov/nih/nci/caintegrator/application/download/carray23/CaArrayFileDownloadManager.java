@@ -186,34 +186,34 @@ public abstract class CaArrayFileDownloadManager implements CaArrayFileDownloadM
         startTime = System.currentTimeMillis();
 		logger.debug("getting Data files");
         setStatusInCache(downloadTask.getCacheId(),downloadTask.getTaskId(),DownloadStatus.GettingDataFiles);
-		List<CaArrayEntityReference> fileRefs = importer.selectFilesFromSamples(searchServiceHelper, expRef, downloadTask.getSpecimenList(), downloadTask.getType());
+		List<gov.nih.nci.caarray.external.v1_0.data.File> files = importer.selectFilesFromSamples(searchServiceHelper, expRef, downloadTask.getSpecimenList(), downloadTask.getType());
         endTime = System.currentTimeMillis();
         totalTime = (endTime - startTime) / 1000.0;
         logger.debug("getDataFile for all files took " + totalTime + " second(s).");
         //If no files are found
-        if(fileRefs == null ){
+        if(files == null ){
         	DownloadStatus status = DownloadStatus.NoFilesFoundToDownload;
 	    	status.setComment("No files found to Download");
 	    	downloadTask.setDownloadStatus(status);
 	        setStatusInCache(downloadTask.getCacheId(),downloadTask.getTaskId(),status);
         }
         
-        /* else{
+        {
         //get Data Files 
         startTime = System.currentTimeMillis();    
 		logger.debug("downloading files");
         setStatusInCache(downloadTask.getCacheId(),downloadTask.getTaskId(),DownloadStatus.DownloadingFiles);
-        zipfile= importer.downloadZipOfFiles(dataServiceHelper, fileRefs, downloadTask.getZipFileName());
+        listOfZipFiles= importer.downloadZipOfFiles(dataServiceHelper, files, downloadTask.getZipFileName());
         endTime = System.currentTimeMillis();
         totalTime = (endTime - startTime) / 1000.0;
         logger.debug("downloadFiles for all files took " + totalTime + " second(s).");
-        }*/
-        
+        }
+       /* 
         //get Data Files 
         startTime = System.currentTimeMillis();    
 		logger.debug("downloading files");
         setStatusInCache(downloadTask.getCacheId(),downloadTask.getTaskId(),DownloadStatus.DownloadingFiles);
-		Set<ZipItem> zipItems = importer.downloadFiles(searchService, dataServiceHelper, fileRefs, downloadTask.getZipFileName());
+		Set<ZipItem> zipItems = importer.downloadFiles(searchService, dataServiceHelper, files, downloadTask.getZipFileName());
         endTime = System.currentTimeMillis();
         totalTime = (endTime - startTime) / 1000.0;
         logger.debug("downloadFiles for all files took " + totalTime + " second(s).");
@@ -234,6 +234,7 @@ public abstract class CaArrayFileDownloadManager implements CaArrayFileDownloadM
 	        totalTime = (endTime - startTime) / 1000.0;
 	        logger.debug("writeZipFile for all files took " + totalTime + " second(s).");
         }
+        */
         if(listOfZipFiles != null  && listOfZipFiles.size() == 1){
         	File zipfile= new File(outputZipDirectory+File.separator+downloadTask.getZipFileName());
 	        if(zipfile.exists()  && zipfile.length()> 0){
