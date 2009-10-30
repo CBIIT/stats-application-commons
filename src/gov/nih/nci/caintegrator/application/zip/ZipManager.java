@@ -109,10 +109,11 @@ public class ZipManager extends Thread {
         try
          {
 	        zipit.startNewFile(destinationFile, sequenceNumber);
-	        
+	        totalBytesToZip = 0; 
 	        // Loop through zip items
 	        for(ZipItem zipItem : items)
 	        {
+	        		totalBytesToZip = totalBytesToZip + zipItem.getFileSize();
 	        		zipFile(zipit, zipItem.getDirectoryInZip(), zipItem.getFilePath(), zipItem.getFileSize());
 	        	  //zipit.zip(zipItem.getDirectoryInZip(), zipItem.getFilePath());
 	              
