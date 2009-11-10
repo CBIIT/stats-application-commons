@@ -16,6 +16,7 @@ import gov.nih.nci.caintegrator.application.zip.ZipItem;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -92,8 +93,15 @@ public class CaArrayFileDownloader  {
 			File tempFile = DownloadZipHelper.createFile(file.getName(), inputDirectory);
 			logger.debug("downloading file: " + i + " out of " + files.size());
 			logger.debug("downloading file: " + file.getName());
+			long startTime = System.currentTimeMillis();
 			byte[] byteArray = fileService.readFile(file);
+			long totalTime = System.currentTimeMillis() - startTime;
 			logger.debug("downloaded file: " + file.getName());
+			if (byteArray != null) {
+	            System.out.println("Retrieved " + byteArray.length + " bytes in " + totalTime + " ms.");
+		     } else {
+		            System.out.println("Error: Retrieved null byte array.");
+		     }
 			i++;
 
 			BufferedOutputStream bos = null;

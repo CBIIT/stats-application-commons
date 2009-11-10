@@ -5,11 +5,11 @@ import gov.nih.nci.caarray.external.v1_0.data.FileCategory;
 import gov.nih.nci.caarray.external.v1_0.experiment.Experiment;
 import gov.nih.nci.caarray.external.v1_0.query.BiomaterialSearchCriteria;
 import gov.nih.nci.caarray.external.v1_0.query.ExperimentSearchCriteria;
-import gov.nih.nci.caarray.external.v1_0.query.FileDownloadRequest;
 import gov.nih.nci.caarray.external.v1_0.query.FileSearchCriteria;
 import gov.nih.nci.caarray.external.v1_0.sample.Biomaterial;
 import gov.nih.nci.caarray.external.v1_0.sample.BiomaterialType;
 import gov.nih.nci.caarray.services.ServerConnectionException;
+import gov.nih.nci.caarray.services.external.v1_0.InvalidInputException;
 import gov.nih.nci.caarray.services.external.v1_0.InvalidReferenceException;
 import gov.nih.nci.caarray.services.external.v1_0.UnsupportedCategoryException;
 import gov.nih.nci.caarray.services.external.v1_0.data.DataApiUtils;
@@ -84,42 +84,44 @@ public class CaArrayFileDownloader  {
 	 */
 	public Set<ZipItem> downloadFiles(SearchService searchService,DataApiUtils dataServiceHelper,
 			 List<gov.nih.nci.caarray.external.v1_0.data.File> files, String zipFileName ) throws IOException, InvalidReferenceException, DataTransferException {
-		Set<ZipItem> zipItems = new HashSet<ZipItem>();
-		logger.debug("downloading " + files.size() + " files");
+		Set<ZipItem> zipItems = new HashSet<ZipItem>();		
 		boolean compressFile = false;
-		for (gov.nih.nci.caarray.external.v1_0.data.File file : files) {
-
-			BufferedOutputStream bos = null;
-			try {
-				// if the file does not already exists than write it
-				if(!DownloadZipHelper.checkIfFileExists(file.getMetadata().getName(), file.getMetadata().getUncompressedSize(), inputDirectory)){
-					File tempFile = DownloadZipHelper.createFile(file.getMetadata().getName(), inputDirectory);
-					ByteArrayOutputStream outStream = new ByteArrayOutputStream();
-			        long startTime = System.currentTimeMillis();
-			        dataServiceHelper.copyFileContentsToOutputStream(file.getReference(), compressFile, outStream);
-			        long totalTime = System.currentTimeMillis() - startTime;
-			        byte[] byteArray = outStream.toByteArray();
-					logger.debug("downloaded file: " + file.getMetadata().getName());					
-					bos = new BufferedOutputStream(new FileOutputStream(tempFile));
-					logger.debug("writing file: " + tempFile.getName());
-					bos.write(byteArray);
-					logger.debug("wrote file: " + tempFile.getName());
-					if (byteArray != null) {
-				            System.out.println("Retrieved " + byteArray.length + " bytes in " + totalTime + " ms.");
-				     } else {
-				            System.out.println("Error: Retrieved null byte array.");
-				     }
+		if(files != null){
+			logger.debug("downloading " + files.size() + " files");
+			for (gov.nih.nci.caarray.external.v1_0.data.File file : files) {
+	
+				BufferedOutputStream bos = null;
+				try {
+					// if the file does not already exists than write it
+					if(!DownloadZipHelper.checkIfFileExists(file.getMetadata().getName(), file.getMetadata().getUncompressedSize(), inputDirectory)){
+						File tempFile = DownloadZipHelper.createFile(file.getMetadata().getName(), inputDirectory);
+						ByteArrayOutputStream outStream = new ByteArrayOutputStream();
+				        long startTime = System.currentTimeMillis();
+				        dataServiceHelper.copyFileContentsToOutputStream(file.getReference(), compressFile, outStream);
+				        long totalTime = System.currentTimeMillis() - startTime;
+				        byte[] byteArray = outStream.toByteArray();
+						logger.debug("downloaded file: " + file.getMetadata().getName());					
+						bos = new BufferedOutputStream(new FileOutputStream(tempFile));
+						logger.debug("writing file: " + tempFile.getName());
+						bos.write(byteArray);
+						logger.debug("wrote file: " + tempFile.getName());
+						if (byteArray != null) {
+					            System.out.println("Retrieved " + byteArray.length + " bytes in " + totalTime + " ms.");
+					     } else {
+					            System.out.println("Error: Retrieved null byte array.");
+					     }
+					}
+				} catch (IOException e) {
+					reportError("Error writing temporary file: "
+							+ file.getMetadata().getName(), e);
+					throw e;
+				} finally {
+					if (null != bos)
+						bos.close();
 				}
-			} catch (IOException e) {
-				reportError("Error writing temporary file: "
-						+ file.getMetadata().getName(), e);
-				throw e;
-			} finally {
-				if (null != bos)
-					bos.close();
+				ZipItem zipItem = DownloadZipHelper.fileToZip(file.getMetadata().getName(), zipFileName, directoryInZip, inputDirectory);
+				zipItems.add(zipItem);
 			}
-			ZipItem zipItem = DownloadZipHelper.fileToZip(file.getMetadata().getName(), zipFileName, directoryInZip, inputDirectory);
-			zipItems.add(zipItem);
 		}
 
 		return zipItems;
@@ -236,9 +238,10 @@ public class CaArrayFileDownloader  {
 	}
     /**
      * Search for samples based on name.
+     * @throws InvalidInputException 
      */
     private Set<CaArrayEntityReference> searchForSamples(SearchApiUtils searchServiceHelper, CaArrayEntityReference experimentRef, List<String> specimenList) throws RemoteException,
-            InvalidReferenceException, UnsupportedCategoryException {
+            InvalidInputException {
         BiomaterialSearchCriteria criteria = new BiomaterialSearchCriteria();
         criteria.setExperiment(experimentRef);
         criteria.getTypes().add(BiomaterialType.SAMPLE);
@@ -255,7 +258,7 @@ public class CaArrayFileDownloader  {
         }
         return sampleRefs;
     }
-    public List<gov.nih.nci.caarray.external.v1_0.data.File> selectFilesFromSamples(SearchApiUtils searchServiceHelper,CaArrayEntityReference experimentRef,List<String> specimenList, FileType type) throws RemoteException, InvalidReferenceException, UnsupportedCategoryException {
+    public List<gov.nih.nci.caarray.external.v1_0.data.File> selectFilesFromSamples(SearchApiUtils searchServiceHelper,CaArrayEntityReference experimentRef,List<String> specimenList, FileType type) throws RemoteException, InvalidInputException {
         Set<CaArrayEntityReference> sampleRefs = searchForSamples(searchServiceHelper, experimentRef, specimenList);
         if (sampleRefs == null || sampleRefs.size() <= 0) {
             String message = "Could not find the requested samples.";
@@ -278,9 +281,10 @@ public class CaArrayFileDownloader  {
     }
     /**
      * Select all raw data files associated with the given samples.
+     * @throws InvalidInputException 
      */
     private List<gov.nih.nci.caarray.external.v1_0.data.File> selectCelFilesFromSamples(SearchApiUtils searchServiceHelper, CaArrayEntityReference experimentRef,
-            Set<CaArrayEntityReference> sampleRefs) throws RemoteException, InvalidReferenceException {
+            Set<CaArrayEntityReference> sampleRefs) throws RemoteException, InvalidInputException {
     	FileSearchCriteria fileSearchCriteria = new FileSearchCriteria();
         fileSearchCriteria.setExperiment(experimentRef);
         fileSearchCriteria.setExperimentGraphNodes(sampleRefs);
@@ -297,9 +301,10 @@ public class CaArrayFileDownloader  {
     }
     /**
      * Select all chp data files associated with the given samples.
+     * @throws InvalidInputException 
      */
     private List<gov.nih.nci.caarray.external.v1_0.data.File> selectChpFilesFromSamples(SearchApiUtils searchServiceHelper, CaArrayEntityReference experimentRef,
-            Set<CaArrayEntityReference> sampleRefs) throws RemoteException, InvalidReferenceException {
+            Set<CaArrayEntityReference> sampleRefs) throws RemoteException, InvalidInputException {
         FileSearchCriteria fileSearchCriteria = new FileSearchCriteria();
         fileSearchCriteria.setExperiment(experimentRef);
         fileSearchCriteria.setExperimentGraphNodes(sampleRefs);
@@ -317,7 +322,9 @@ public class CaArrayFileDownloader  {
 	 /**
      * Download a zip of the given files.
      */
-    public  List<String> downloadZipOfFiles(DataApiUtils dataServiceHelper, List<gov.nih.nci.caarray.external.v1_0.data.File> files, String zipFileName ) throws RemoteException,
+
+    
+ /*   public  List<String> downloadZipOfFiles(DataApiUtils dataServiceHelper, List<gov.nih.nci.caarray.external.v1_0.data.File> files, String zipFileName ) throws RemoteException,
             MalformedURIException, IOException, Exception {
         FileDownloadRequest downloadRequest = new FileDownloadRequest();
         List<String> listOfZipFiles = new ArrayList<String>();
@@ -368,6 +375,6 @@ public class CaArrayFileDownloader  {
 
         return listOfZipFiles;
     }
- 
+ */
 
 }

@@ -197,7 +197,7 @@ public abstract class CaArrayFileDownloadManager implements CaArrayFileDownloadM
 	    	downloadTask.setDownloadStatus(status);
 	        setStatusInCache(downloadTask.getCacheId(),downloadTask.getTaskId(),status);
         }
-        
+        /*
         {
         //get Data Files 
         startTime = System.currentTimeMillis();    
@@ -208,7 +208,7 @@ public abstract class CaArrayFileDownloadManager implements CaArrayFileDownloadM
         totalTime = (endTime - startTime) / 1000.0;
         logger.debug("downloadFiles for all files took " + totalTime + " second(s).");
         }
-       /* 
+       */
         //get Data Files 
         startTime = System.currentTimeMillis();    
 		logger.debug("downloading files");
@@ -234,7 +234,6 @@ public abstract class CaArrayFileDownloadManager implements CaArrayFileDownloadM
 	        totalTime = (endTime - startTime) / 1000.0;
 	        logger.debug("writeZipFile for all files took " + totalTime + " second(s).");
         }
-        */
         if(listOfZipFiles != null  && listOfZipFiles.size() == 1){
         	File zipfile= new File(outputZipDirectory+File.separator+downloadTask.getZipFileName());
 	        if(zipfile.exists()  && zipfile.length()> 0){
