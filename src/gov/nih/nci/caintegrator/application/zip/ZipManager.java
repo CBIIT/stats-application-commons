@@ -166,12 +166,12 @@ public class ZipManager extends Thread {
 		   if(bytesZippedInCurrentZipFile > MAX_ZIP_FILE_SIZE) {
 			   zipFileSize = zipit.getFileSize();
 			   
-			   long sizeWithThisFileIncluded = zipFileSize + fileSize;			   
+			   //Long sizeWithThisFileIncluded = zipFileSize + fileSize;			   
 			   
 			   // See if the zip file would go over the limit if the 
 			   // current file is added
-			   if(sizeWithThisFileIncluded > MAX_ZIP_FILE_SIZE)
-			   {
+			   //if(sizeWithThisFileIncluded > MAX_ZIP_FILE_SIZE)
+			  // {
 				   // Close the streams and finalize the zip file 
 				   zipit.closeFile();
 				   
@@ -180,7 +180,7 @@ public class ZipManager extends Thread {
 				   
 				   // Reset the counter
 				   bytesZippedInCurrentZipFile = 0;
-			   }			   
+			  // }			   
 			   
 		   }
 	   }

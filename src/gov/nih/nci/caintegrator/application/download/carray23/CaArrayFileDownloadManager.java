@@ -18,6 +18,7 @@ import gov.nih.nci.caintegrator.application.zip.ZipItem;
 
 
 import java.io.File;
+import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -248,15 +249,12 @@ public abstract class CaArrayFileDownloadManager implements CaArrayFileDownloadM
 	    		logger.debug("zip file completed");
 	        }
         }else if(listOfZipFiles != null  && listOfZipFiles.size() > 1){
-        	downloadTask.setEndTime(endTime);         	
-        	downloadTask.setDownloadStatus(DownloadStatus.Completed);
-    		updateDownloadTaskInCache(downloadTask.getCacheId(),
-       			 downloadTask.getTaskId(), downloadTask);
         	for(String filename : listOfZipFiles){
-        		File zipfile= new File(outputZipDirectory+File.separator+filename);
+        		File zipfile= new File(filename);
     	        if(zipfile.exists()  && zipfile.length()> 0){
     	        	ZipItem zipItem = new DownloadZipItemImpl();
-    		        zipItem.setFileName(filename);
+    	        	String name = filename.substring(filename.lastIndexOf(File.separator)+1);
+    		        zipItem.setFileName(name);
     		        zipItem.setFilePath(outputZipDirectory+File.separator);
     		        zipItem.setFileSize(zipfile.length());    	           	
     	           	downloadTask.addZipFileItem(zipItem);
@@ -266,8 +264,13 @@ public abstract class CaArrayFileDownloadManager implements CaArrayFileDownloadM
     	    		logger.debug("zip file completed");
     	        
         	}
+        	downloadTask.setEndTime(endTime);         	
+        	downloadTask.setDownloadStatus(DownloadStatus.Completed);
+    		updateDownloadTaskInCache(downloadTask.getCacheId(),
+          			 downloadTask.getTaskId(), downloadTask);
+        	
         }
-		} catch (Exception e) {
+		} catch (IOException e) {
 			logger.error(e.getMessage());
 	    	DownloadStatus status = DownloadStatus.Error;
 	    	status.setComment(e.getMessage());
