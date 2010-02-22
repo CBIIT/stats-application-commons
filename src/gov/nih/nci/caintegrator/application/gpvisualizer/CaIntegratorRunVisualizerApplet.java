@@ -121,11 +121,11 @@ public class CaIntegratorRunVisualizerApplet extends Applet {
             setSupportFileNames(getParameter(RunVisualizerConstants.SUPPORT_FILE_NAMES));
             setSupportFileDates(getParameter(RunVisualizerConstants.SUPPORT_FILE_DATES));
 
-            if (getParameter(RunVisualizerConstants.NO_RUN) == null) {
+            //if (getParameter(RunVisualizerConstants.NO_RUN) == null) {
                 run();
-            } else {
-                showStatus("No run flag set");
-            }
+           // } else {
+           //     showStatus("No run flag set");
+           // }
         } catch (Throwable t) {
             t.printStackTrace();
         }
