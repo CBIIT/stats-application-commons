@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+
+<!DOCTYPE hibernate-mapping PUBLIC 
+	"-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+	"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping
+	package="gov.nih.nci.caintegrator.application.workspace" >
+	<class name="Workspace"
+		table="USER_WORKSPACE" >	
+		
+		<id name="id" column="WORKSPACE_ID" >
+			<generator class="increment" />
+		</id>
+		
+		<property name="userId"
+				column="USER_ID"
+				/>
+		
+		<property name="treeType"
+                 type="string"
+                 column="TREE_TYPE"
+                 />
+                 
+        <property name="treeStructure"
+                 type="org.hibernate.type.StringClobType"
+                 column="TREE_STRUCTURE"
+                 />
+        
+                     
+	</class>
+	        
+</hibernate-mapping>
