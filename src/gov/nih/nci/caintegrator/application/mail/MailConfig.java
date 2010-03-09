@@ -20,6 +20,7 @@ public class MailConfig
     	// Handle exceptions
     	try
     	 {
+    		  System.out.println(MAIL_PROPERTIES);
 			  // Get the application properties from the properties file
 			  String propertiesFileName = System.getProperty(MAIL_PROPERTIES);
 			

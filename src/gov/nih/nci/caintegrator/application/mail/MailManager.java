@@ -43,17 +43,24 @@ public class MailManager {
 		    if (additionalText != null)
 		    	message += additionalText + "\n\n";
 		    
-		    // Part 2 is only included if there are multiple fies
+		    // Part 2 is only included if there are multiple files
 		    if(fileNames.size() > 1)
 		    {
 		    	message += MailConfig.getInstance(mailProperties).getFtpUnformattedBody2();	
 		    }
 		    	
 		    String ftpHostnameAndPort = MailConfig.getInstance(mailProperties).getFtpHostnameAndPort();
-		    if(ftpHostnameAndPort != null && ftpHostnameAndPort.endsWith("/")){
-		    	ftpHostnameAndPort = ftpHostnameAndPort + "downloadZipFile.do?zipFile=";
-		    }else if(ftpHostnameAndPort != null && !ftpHostnameAndPort.endsWith("/")){
-		    	ftpHostnameAndPort = ftpHostnameAndPort + "/downloadZipFile.do?zipFile=";
+		    
+		    if(ftpHostnameAndPort != null){
+			    if((ftpHostnameAndPort.contains("cagwas") || ftpHostnameAndPort.contains("cgems") )&& ftpHostnameAndPort.endsWith("/")){
+			    	ftpHostnameAndPort = ftpHostnameAndPort + "downloadZipFile.do?zipFile=";
+			    }else if((ftpHostnameAndPort.contains("cagwas") || ftpHostnameAndPort.contains("cgems")) && !ftpHostnameAndPort.endsWith("/")){
+			    	ftpHostnameAndPort = ftpHostnameAndPort + "/downloadZipFile.do?zipFile=";
+			    }if(ftpHostnameAndPort.contains("rembrandt") && ftpHostnameAndPort.endsWith("/")){
+			    	ftpHostnameAndPort = ftpHostnameAndPort + "queryResult.do?reportName=";
+			    }else if(ftpHostnameAndPort.contains("rembrandt") && !ftpHostnameAndPort.endsWith("/")){
+			    	ftpHostnameAndPort = ftpHostnameAndPort + "/queryResult.do?reportName=";
+			    }
 		    }
 		    
 		    // Part 3 appears once for each file
