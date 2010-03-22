@@ -52,5 +52,6 @@
 	<classpathentry kind="lib" path="lib/gp-311.jar"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/caIntegrator_spec"/>
 	<classpathentry kind="lib" path="lib/caarray-client-external-v1_0.jar"/>
+	<classpathentry kind="lib" path="lib/quartz-1.5.2.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
