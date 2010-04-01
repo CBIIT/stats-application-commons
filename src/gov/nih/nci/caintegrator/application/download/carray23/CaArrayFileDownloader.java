@@ -245,12 +245,20 @@ public class CaArrayFileDownloader  {
         BiomaterialSearchCriteria criteria = new BiomaterialSearchCriteria();
         criteria.setExperiment(experimentRef);
         criteria.getTypes().add(BiomaterialType.SAMPLE);
-        List<Biomaterial> samples = (searchServiceHelper.biomaterialsByCriteria(criteria)).list();
+        List<Biomaterial> samples = null;
+		try {
+			samples = (searchServiceHelper.biomaterialsByCriteria(criteria)).list();
+		} catch (RuntimeException e) {
+			reportError(e.getMessage(), e);
+			e.printStackTrace();
+			throw e;
+		}
         Set<CaArrayEntityReference> sampleRefs = new HashSet<CaArrayEntityReference>();
         for (Biomaterial sample : samples) {
         	 for (String specimenName : specimenList) {
         		 if (sample != null && sample.getName() != null
  						&& sample.getName().contains(specimenName.trim())) {
+        			 System.out.println(sample.getName());
         			 	sampleRefs.add(sample.getReference());
         		 }
              }
@@ -265,12 +273,14 @@ public class CaArrayFileDownloader  {
 			reportError(message, null);
             return null;
         }
+        System.out.println("searched for "+ sampleRefs.size() +" samples");
         List<gov.nih.nci.caarray.external.v1_0.data.File> files = null;
         if (type == FileType.AFFYMETRIX_CEL) {
         	files = selectCelFilesFromSamples(searchServiceHelper, experimentRef, sampleRefs);
 		} else if (type == FileType.AFFYMETRIX_CHP) {
 			files = selectChpFilesFromSamples(searchServiceHelper, experimentRef, sampleRefs);
 		}
+        System.out.println("Got back "+ files.size() +" files");
         if (files == null) {
             String message = "Could not find any raw files associated with the given samples.";
 			reportError(message, null);
@@ -291,9 +301,16 @@ public class CaArrayFileDownloader  {
         fileSearchCriteria.getCategories().add(FileCategory.RAW_DATA);
         fileSearchCriteria.setExtension("CEL");
 
-        List<gov.nih.nci.caarray.external.v1_0.data.File> files = searchServiceHelper.filesByCriteria(fileSearchCriteria).list();
+        List<gov.nih.nci.caarray.external.v1_0.data.File> files = null;
+		try {
+			files = searchServiceHelper.filesByCriteria(fileSearchCriteria).list();
+		} catch (RuntimeException e) {
+			reportError(e.getMessage(), e);
+			e.printStackTrace();
+			throw e;
+		}
 
-        if (files.size() <= 0) {
+        if (files != null &&  files.size() <= 0) {
             return null;
         }
 
@@ -311,8 +328,15 @@ public class CaArrayFileDownloader  {
         fileSearchCriteria.getCategories().add(FileCategory.DERIVED_DATA);
         fileSearchCriteria.setExtension("CHP");
         
-        List<gov.nih.nci.caarray.external.v1_0.data.File> files = searchServiceHelper.filesByCriteria(fileSearchCriteria).list();
-        if (files.size() <= 0) {
+        List<gov.nih.nci.caarray.external.v1_0.data.File> files = null;
+		try {
+			files = searchServiceHelper.filesByCriteria(fileSearchCriteria).list();
+		} catch (RuntimeException e) {
+			reportError(e.getMessage(), e);
+			e.printStackTrace();
+			throw e;
+		}
+        if (files != null &&  files.size() <= 0) {
             return null;
         }
 

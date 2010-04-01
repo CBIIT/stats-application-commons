@@ -270,7 +270,7 @@ public abstract class CaArrayFileDownloadManager implements CaArrayFileDownloadM
           			 downloadTask.getTaskId(), downloadTask);
         	
         }
-		} catch (IOException e) {
+		} catch (Exception e) {
 			logger.error(e.getMessage());
 	    	DownloadStatus status = DownloadStatus.Error;
 	    	status.setComment(e.getMessage());

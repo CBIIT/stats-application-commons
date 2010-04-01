@@ -134,9 +134,10 @@ public class ZipManager extends Thread {
     }
     
     /**
+     * @throws Exception 
      * 
      */
-    public void run()
+    public void run() 
      {
     	try
     	 {
