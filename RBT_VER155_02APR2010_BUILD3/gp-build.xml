@@ -1,0 +1,36 @@
+<project name="caIntegratorGenePatternAuthenticationFilter.jar" default="build_all" basedir=".">
+	<!--
+	TARGET: COMPILE
+		Compiles the source directory
+	-->
+	<property name="build.classes.dir" value="bin"/>
+	<property name="build.source.dir" value="src"/>
+	<property name="build.lib.dir" value="lib"/>
+	<property name="anthill.artifacts.dir" value="../artifacts"/>
+	<property name="gp-pkg" value="/gov/nih/nci/caintegrator/security/genepattern"/>
+	<target name="build_all" if="anthill.artifacts.dir" depends="build_jar">
+		<echo>
+			Artifacts copied to ${anthill.artifacts.dir}
+		</echo>
+		<copy file="caIntegratorGenePatternAuthenticationFilter.jar" todir="${anthill.artifacts.dir}"/>
+	</target>
+   <target name="build_jar">
+		<delete dir="${build.classes.dir}" failonerror="false"/>
+		<delete file="caIntegratorGenePatternAuthenticationFilter.jar" failonerror="false"/>
+		<mkdir dir="${build.classes.dir}"/>
+		<javac srcdir="${build.source.dir}${gp-pkg}" destdir="${build.classes.dir}" source="1.5" debug="true" debuglevel="lines,vars,source">
+			<classpath>
+				<fileset dir="${build.lib.dir}">
+					<include name="*.jar"/>
+				</fileset>
+			</classpath>
+		</javac>
+		<jar jarfile="caIntegratorGenePatternAuthenticationFilter.jar">
+            <fileset dir="${build.classes.dir}">
+            </fileset>
+
+		</jar>
+	</target>
+
+	
+</project>
