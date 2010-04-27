@@ -1,1 +1,0 @@
-This directory will contain all of the classes related to the application cache.
