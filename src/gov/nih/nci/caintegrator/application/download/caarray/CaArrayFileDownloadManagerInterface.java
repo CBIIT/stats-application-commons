@@ -7,9 +7,10 @@ import gov.nih.nci.caintegrator.application.download.DownloadTask;
 import java.net.URL;
 import java.util.Collection;
 import java.util.List;
+import java.util.concurrent.Future;
+import java.util.concurrent.ThreadPoolExecutor;
 
 import org.springframework.core.task.TaskExecutor;
-import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
 public interface CaArrayFileDownloadManagerInterface {
 
@@ -22,7 +23,7 @@ public interface CaArrayFileDownloadManagerInterface {
 	 * It then places the taskResult finding into the cache. Runs the
 	 * execute method in a separate thread for asynchronous operations.     *
 	 */
-	public abstract void executeDownloadStrategy(final String session,
+	public abstract Future<?> executeDownloadStrategy(final String session,
 			final String taskId, String zipFileName, List<String> specimenList,
 			FileType type, final String experimentName);
 
@@ -53,13 +54,13 @@ public interface CaArrayFileDownloadManagerInterface {
 
 	public abstract BusinessTierCache getBusinessCacheManager();
 
-	public abstract TaskExecutor getTaskExecutor();
+	public abstract ThreadPoolExecutor getTaskExecutor();
 
 	public abstract String getOutputZipDirectory();
 
 	public abstract void setBusinessCacheManager(
 			BusinessTierCache businessTierCache);
 
-	public abstract void setTaskExecutor(ThreadPoolTaskExecutor taskExecutor);
+	public abstract void setTaskExecutor(ThreadPoolExecutor taskExecutor);
 
 }

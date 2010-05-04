@@ -3,6 +3,9 @@ package gov.nih.nci.caintegrator.application.mail;
 import gov.nih.nci.caintegrator.exceptions.ValidationException;
 
 import java.io.File;
+import java.io.UnsupportedEncodingException;
+import java.net.URL;
+import java.net.URLEncoder;
 import java.text.MessageFormat;
 import java.util.List;
 
@@ -223,8 +226,9 @@ public class MailManager {
 	 * 
 	 * @param fileName
 	 * @return
+	 * @throws UnsupportedEncodingException 
 	 */
-	private String cleanFileName(String fileName)
+	private String cleanFileName(String fileName) throws UnsupportedEncodingException
 	{
 		String nameWithoutPath;
 		if(fileName.lastIndexOf(File.separator)>0){
@@ -234,7 +238,10 @@ public class MailManager {
 		else{
 			nameWithoutPath = fileName; 		
 		}
-		return (nameWithoutPath.startsWith(File.separator)) ? nameWithoutPath.substring(1) : nameWithoutPath;
+		nameWithoutPath = (nameWithoutPath.startsWith(File.separator)) ? nameWithoutPath.substring(1) : nameWithoutPath;
+
+			return  URLEncoder.encode(nameWithoutPath, "UTF-8");
+
 	}
 	public String formatFromAddress(){
 		 String from = new MessageFormat(MailConfig.getInstance(mailProperties).getFrom()).format(new String[] {MailConfig.getInstance(mailProperties).getAcronym()});

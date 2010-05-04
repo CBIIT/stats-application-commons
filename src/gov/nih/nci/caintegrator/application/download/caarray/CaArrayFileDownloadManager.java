@@ -21,6 +21,9 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.Callable;
+import java.util.concurrent.Future;
+import java.util.concurrent.ThreadPoolExecutor;
 
 import javax.security.auth.login.LoginException;
 
@@ -60,7 +63,7 @@ public abstract class CaArrayFileDownloadManager implements CaArrayFileDownloadM
 	 * CaArrayServer caArrayServer.
 	 */
 	protected CaArrayServer server = null;
-    protected TaskExecutor taskExecutor;
+    protected ThreadPoolExecutor taskExecutor;
 	private String inputDirectory;
 	private String outputZipDirectory;
 
@@ -106,7 +109,7 @@ public abstract class CaArrayFileDownloadManager implements CaArrayFileDownloadM
 	   /* (non-Javadoc)
 	 * @see gov.nih.nci.caintegrator.application.download.caarray.CaArrayFileDownloadManagerInterface#executeDownloadStrategy(java.lang.String, java.lang.String, java.lang.String, java.util.List, gov.nih.nci.caarray.domain.file.FileType, java.lang.String)
 	 */
-    public void executeDownloadStrategy(final String session, final String taskId,String zipFileName, List<String> specimenList, FileType type, final String experimentName) {   
+    public Future<?> executeDownloadStrategy(final String session, final String taskId,String zipFileName, List<String> specimenList, FileType type, final String experimentName) {   
     	DownloadTask downloadTask = createTask(session,  taskId, zipFileName,  specimenList,  type);
     	
         if(downloadTask == null ){
@@ -122,18 +125,22 @@ public abstract class CaArrayFileDownloadManager implements CaArrayFileDownloadM
     			 downloadTask.getTaskId(), downloadTask);
          logger.info("Task has been set to 'InitiatDownload' and placed in cache");
         
-        Runnable task = new Runnable() {
-            public void run() {
+        Callable task = new Callable() {
+            public DownloadTask call() {
+            	DownloadTask downloadTask = null;
             	try {
-					downloadFiles(session,  taskId, experimentName);
+            		downloadTask = downloadFiles(session,  taskId, experimentName);
 				} catch (IllegalArgumentException e) {
 					logger.error(e.getMessage());
 				} catch (IOException e) {
 					logger.error(e.getMessage());					
 				}
+				return downloadTask;
             }
         };
-        taskExecutor.execute(task);
+        Future<?> future = taskExecutor.submit(task);
+        
+        return future;
     }
     
 	/**
@@ -149,7 +156,7 @@ public abstract class CaArrayFileDownloadManager implements CaArrayFileDownloadM
 	 * @throws IOException
 	 * @throws LoginException
 	 */
-	private void downloadFiles(String sessionId, String taskId, String experimentName) throws IOException {
+	private DownloadTask downloadFiles(String sessionId, String taskId, String experimentName) throws IOException {
 		long startTime = 0;
         long endTime = 0;
         double totalTime = 0;
@@ -252,6 +259,7 @@ public abstract class CaArrayFileDownloadManager implements CaArrayFileDownloadM
 	        setStatusInCache(downloadTask.getCacheId(),downloadTask.getTaskId(),status);
 	        throw e;
 		}
+		return downloadTask;
 	}
 	protected static void reportError(String message, Throwable e) {
 		if (null == message)
@@ -430,11 +438,11 @@ public abstract class CaArrayFileDownloadManager implements CaArrayFileDownloadM
 	/* (non-Javadoc)
 	 * @see gov.nih.nci.caintegrator.application.download.caarray.CaArrayFileDownloadManagerInterface#getTaskExecutor()
 	 */
-	public TaskExecutor getTaskExecutor() {
+	public ThreadPoolExecutor getTaskExecutor() {
 		return taskExecutor;
 	}
 
-	public void setTaskExecutor(TaskExecutor taskExecutor) {
+	public void setTaskExecutor(ThreadPoolExecutor taskExecutor) {
 		this.taskExecutor = taskExecutor;
 	}
 

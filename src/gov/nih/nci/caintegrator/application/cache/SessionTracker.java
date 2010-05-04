@@ -9,6 +9,8 @@ import gov.nih.nci.caintegrator.service.task.Task;
 import java.io.File;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.Future;
 
 import javax.servlet.http.HttpSessionEvent;
 import javax.servlet.http.HttpSessionListener;
@@ -113,6 +115,20 @@ public class SessionTracker implements HttpSessionListener {
 	}
 
 	public void sessionDestroyed(HttpSessionEvent evt) {
+		//cancel incomplete jobs
+		Map<String,Future<?>> futureTaskMap = (Map<String,Future<?>>) evt.getSession().getAttribute("FutureTaskMap");
+        
+	         if(futureTaskMap != null){
+	        	 int i = 1;
+	        	 for(String key: futureTaskMap.keySet()){
+	        		 Future<?> future = futureTaskMap.get(key);
+	        		 if(future != null && !future.isDone()){
+	        			 System.out.println(i + " cancel: "+ key);
+	        			 future.cancel(true);
+	        			 i++;	        			 
+	        		 }
+	        	 }
+	         }
     	//delete caArray dowloads
 		String dir = (String)evt.getSession().getAttribute(CaArrayFileDownloadManager.ZIP_FILE_PATH);
 		if(dir != null){

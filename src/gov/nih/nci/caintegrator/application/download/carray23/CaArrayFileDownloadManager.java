@@ -16,9 +16,7 @@ import gov.nih.nci.caintegrator.application.download.DownloadZipItemImpl;
 import gov.nih.nci.caintegrator.application.download.caarray.CaArrayFileDownloadManagerInterface;
 import gov.nih.nci.caintegrator.application.zip.ZipItem;
 
-
 import java.io.File;
-import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -26,6 +24,9 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.Callable;
+import java.util.concurrent.Future;
+import java.util.concurrent.ThreadPoolExecutor;
 
 import javax.security.auth.login.LoginException;
 
@@ -34,7 +35,6 @@ import net.sf.ehcache.CacheException;
 import net.sf.ehcache.Element;
 
 import org.apache.log4j.Logger;
-import org.springframework.core.task.TaskExecutor;
 
 public abstract class CaArrayFileDownloadManager implements CaArrayFileDownloadManagerInterface{
 	public static Logger logger = Logger
@@ -65,8 +65,7 @@ public abstract class CaArrayFileDownloadManager implements CaArrayFileDownloadM
 	 * CaArrayServer caArrayServer.
 	 */
 	protected CaArrayServer server = null;
-    protected TaskExecutor taskExecutor;
-	private String inputDirectory;
+    protected ThreadPoolExecutor taskExecutor;
 	private String outputZipDirectory;
 
 	protected CaArrayFileDownloadManager(String caarrayUrl,
@@ -84,7 +83,7 @@ public abstract class CaArrayFileDownloadManager implements CaArrayFileDownloadM
 		if (password != null)
 			this.password = password.trim();
 		if (inputDirectory != null)
-			this.inputDirectory = inputDirectory.trim();
+			inputDirectory.trim();
 		if (outputZipDirectory != null)
 			this.outputZipDirectory = outputZipDirectory.trim();
 		//try {
@@ -115,7 +114,7 @@ public abstract class CaArrayFileDownloadManager implements CaArrayFileDownloadM
      * It then places the taskResult finding into the cache. Runs the
      * execute method in a separate thread for asynchronous operations.     *
      */
-    public void executeDownloadStrategy(final String session, final String taskId,String zipFileName, List<String> specimenList, FileType type, final String experimentName) {   
+    public Future<?> executeDownloadStrategy(final String session, final String taskId,String zipFileName, List<String> specimenList, FileType type, final String experimentName) {   
     	DownloadTask downloadTask = createTask(session,  taskId, zipFileName,  specimenList,  type);
     	
         if(downloadTask == null ){
@@ -131,17 +130,19 @@ public abstract class CaArrayFileDownloadManager implements CaArrayFileDownloadM
     			 downloadTask.getTaskId(), downloadTask);
          logger.info("Task has been set to 'InitiatDownload' and placed in cache");
         
-        Runnable task = new Runnable() {
-            public void run() {
+         Callable task = new Callable() {
+            public DownloadTask call() {
+            	DownloadTask downloadTask = null;
             	try {
-					downloadFiles(session,  taskId, experimentName);
+            		downloadTask = downloadFiles(session,  taskId, experimentName);
 				} catch (Exception e) {
 					logger.error(e.getMessage());
 				}
-				
+				return downloadTask;
             }
         };
-        taskExecutor.execute(task);
+        Future<?> future = taskExecutor.submit(task);
+        return future;
     }
     
 	/**
@@ -153,7 +154,7 @@ public abstract class CaArrayFileDownloadManager implements CaArrayFileDownloadM
 	 * @throws Exception 
 	 * @throws LoginException
 	 */
-	private void downloadFiles(String sessionId, String taskId, String experimentName) throws Exception {
+	private DownloadTask downloadFiles(String sessionId, String taskId, String experimentName) throws Exception {
 		long startTime = 0;
         long endTime = 0;
         double totalTime = 0;
@@ -278,6 +279,7 @@ public abstract class CaArrayFileDownloadManager implements CaArrayFileDownloadM
 	        setStatusInCache(downloadTask.getCacheId(),downloadTask.getTaskId(),status);
 	        throw e;
 		}
+		return downloadTask;
 	}
 	protected static void reportError(String message, Throwable e) {
 		if (null == message)
@@ -444,11 +446,11 @@ public abstract class CaArrayFileDownloadManager implements CaArrayFileDownloadM
 		this.businessCacheManager = businessCacheManager;
 	}
 
-	public TaskExecutor getTaskExecutor() {
+	public ThreadPoolExecutor getTaskExecutor() {
 		return taskExecutor;
 	}
 
-	public void setTaskExecutor(TaskExecutor taskExecutor) {
+	public void setTaskExecutor(ThreadPoolExecutor taskExecutor) {
 		this.taskExecutor = taskExecutor;
 	}
 
