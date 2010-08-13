@@ -91,15 +91,19 @@ public class UserListBeanHelper{
     
     
     public void addList(UserList userList) {
-        userListBean.addList(userList);        
+    	if(userListBean != null)
+    		userListBean.addList(userList);        
     }
     
     public void removeList(String listName) {
-        userListBean.removeList(listName); 
+    	if(userListBean != null)
+    		userListBean.removeList(listName); 
     }
     
-    public boolean listExists(String listName){       
-    	return userListBean.listExists(listName);
+    public boolean listExists(String listName){ 
+    	if(userListBean != null)
+    		return userListBean.listExists(listName);
+    	else return false;
     }    
     
     public String removeListFromAjax(String listName)   {
@@ -108,10 +112,12 @@ public class UserListBeanHelper{
     }
     
     public void addItemToList(String listName, String listItem) {
-        UserList userList =  userListBean.getList(listName);
-        ListItem item = new ListItem(listItem,listName);
-        userList.getListItems().add(item);
-        userList.setItemCount(userList.getItemCount()+1); 
+    	if(userListBean != null){
+	        UserList userList =  userListBean.getList(listName);
+	        ListItem item = new ListItem(listItem,listName);
+	        userList.getListItems().add(item);
+	        userList.setItemCount(userList.getItemCount()+1); 
+    	}
     }
     
     public void removeItemFromList(String listName, String listItem) {        
@@ -124,32 +130,42 @@ public class UserListBeanHelper{
             listItemArray = listItem.split(" rank");
             listItem = listItemArray[0];
         }
-        
-        UserList userList =  userListBean.getList(listName);
-        for(ListItem l:userList.getListItems()){
-            if(l.getName().equalsIgnoreCase(listItem)){
-                userList.getListItems().remove(l);
-                break;
-            }
+        if(userListBean != null){
+	        UserList userList =  userListBean.getList(listName);
+	        for(ListItem l:userList.getListItems()){
+	            if(l.getName().equalsIgnoreCase(listItem)){
+	                userList.getListItems().remove(l);
+	                break;
+	            }
+	        }
+	        //userList.getList().remove(listItem);
+	        userList.setItemCount(userList.getItemCount()-1);   
         }
-        //userList.getList().remove(listItem);
-        userList.setItemCount(userList.getItemCount()-1);           
     }
     
     public UserList getUserList(String listName){
-        return userListBean.getList(listName);      
+    	if(userListBean != null)
+    		return userListBean.getList(listName);      
+    	else
+    		return null;
     }
     
     
     public ListType getUserListType(String listName){
+    	if(userListBean != null){
         UserList myList = userListBean.getList(listName); 
         return myList.getListType();
+    	}else {
+    		return null;
+    	}
     }
     
     public String getDetailsFromList(String listName) {
+    	JSONObject listDetails = new JSONObject();
+    	if(userListBean != null){
         UserList userList = userListBean.getList(listName);
         
-        JSONObject listDetails = new JSONObject();
+        
         listDetails.put("listName",userList.getName());
         listDetails.put("listType",userList.getListType().toString());     
         
@@ -216,7 +232,7 @@ public class UserListBeanHelper{
             }
             listDetails.put("invalidItems", item );
         }
-        
+    	}
         return listDetails.toString();
     }
     
