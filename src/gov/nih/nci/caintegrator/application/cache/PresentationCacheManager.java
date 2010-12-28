@@ -455,11 +455,15 @@ public class PresentationCacheManager implements PresentationTierCache{
 	protected void deleteAllFiles(String filePath){
 		if(filePath != null){
 			File dir = new File(filePath);
-			File[] list = dir.listFiles();
-			for(File fileToDelete:list){
-				fileToDelete.delete();
+				if(dir != null){
+				File[] list = dir.listFiles();
+				if(list != null){
+					for(File fileToDelete:list){
+						fileToDelete.delete();
+					}
+				}
+				dir.delete();
 			}
-			dir.delete();
 		}
 	}
 	/**

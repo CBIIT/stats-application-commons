@@ -38,7 +38,7 @@ public class DeleteOldFilesJob implements Job
 	private void deleteFiles(String dirPath,String fileRetentionPeriodInDays){
 
 		int fileRetention = 5;
-		if(fileRetention == 0){
+		if(fileRetentionPeriodInDays!= null){
 			try {
 				fileRetention = Integer.parseInt(fileRetentionPeriodInDays.trim());
 			} catch (NumberFormatException e) {
@@ -46,7 +46,6 @@ public class DeleteOldFilesJob implements Job
 			}
 		}
 		File dataDirecory = new File(dirPath);
-        Date currentDate = new Date();
 		 if (dataDirecory.exists()  && dataDirecory.isDirectory()){
 		    
 		    // Loop thru files and directories in this path
@@ -54,28 +53,31 @@ public class DeleteOldFilesJob implements Job
 		    for (String filename : files) {
 		      File file = new File(dirPath, filename);
 		      if (file.isFile()) {
-		    	 long timestamp = file.lastModified();
-		 		 Date fileDate = new Date(timestamp);
-		 		 int noOfDaysSinceFileCreated = subtractDays(currentDate,fileDate);
-		 		 if(noOfDaysSinceFileCreated > fileRetention){
-		 			 //Delete file
-			 		 SimpleDateFormat sdf = new SimpleDateFormat( "EEEE yyyy/MM/dd hh:mm:ss aa zz : zzzzzz" );
-			 		 sdf.setTimeZone(TimeZone.getDefault()); // local time
-			 		 String display = sdf.format(fileDate);
-			 		 System.out.println("Deleted File:"+file.getName()+" Date:"+ display);
-		 			 file.delete();		 			 
-		 		 }
-		      }
+		    	  deleteFile( file,  fileRetention);
+		      } 
+		      if (file.isDirectory()) {
+		    	  deleteFiles( file.getAbsolutePath(), fileRetentionPeriodInDays);
+		    	  if(file != null && file.list().length == 0){
+		    		  file.delete();
+		    	  }
+
+		    }
 		    }
 		 }
-
-		 
-		 File f = new File( "abc.txt" );
-		 long timestamp = f.lastModified();
-		 Date when = new Date(timestamp);
-		 SimpleDateFormat sdf = new SimpleDateFormat( "EEEE yyyy/MM/dd hh:mm:ss aa zz : zzzzzz" );
-		 sdf.setTimeZone(TimeZone.getDefault()); // local time
-		 String display = sdf.format(when);
+	}
+	private static void deleteFile(File file, int fileRetention){
+        Date currentDate = new Date();
+   	 long timestamp = file.lastModified();
+		 Date fileDate = new Date(timestamp);
+		 int noOfDaysSinceFileCreated = subtractDays(currentDate,fileDate);
+		 if(noOfDaysSinceFileCreated > fileRetention){
+			 //Delete file
+ 		 SimpleDateFormat sdf = new SimpleDateFormat( "EEEE yyyy/MM/dd hh:mm:ss aa zz : zzzzzz" );
+ 		 sdf.setTimeZone(TimeZone.getDefault()); // local time
+ 		 String display = sdf.format(fileDate);
+ 		 System.out.println("Deleted File:"+file.getName()+" Date:"+ display);
+			 file.delete();		 			 
+		 }
 	}
 	private static int subtractDays(Date date1, Date date2)
 	  {
