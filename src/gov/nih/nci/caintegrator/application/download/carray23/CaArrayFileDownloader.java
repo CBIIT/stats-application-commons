@@ -275,9 +275,11 @@ public class CaArrayFileDownloader  {
         }
         System.out.println("searched for "+ sampleRefs.size() +" samples");
         List<gov.nih.nci.caarray.external.v1_0.data.File> files = null;
-        if (type == FileType.AFFYMETRIX_CEL) {
+//        if (type == FileType.AFFYMETRIX_CEL) {
+        if (type.getName().equals("AFFYMETRIX_CEL")) {        
         	files = selectCelFilesFromSamples(searchServiceHelper, experimentRef, sampleRefs);
-		} else if (type == FileType.AFFYMETRIX_CHP) {
+//		} else if (type == FileType.AFFYMETRIX_CHP) {
+		} else if (type.getName().equals("AFFYMETRIX_CHP")) {			
 			files = selectChpFilesFromSamples(searchServiceHelper, experimentRef, sampleRefs);
 		}
         System.out.println("Got back "+ files.size() +" files");

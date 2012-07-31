@@ -290,9 +290,11 @@ public class CaArrayFileDownloader  {
 	private Set<CaArrayFile> getDataFile(CaArraySearchService service,
 			Hybridization hybridization, FileType type) {
 		Set<CaArrayFile> files = new HashSet<CaArrayFile>();
-		if (type == FileType.AFFYMETRIX_CEL) {
+//		if (type == FileType.AFFYMETRIX_CEL) {
+		if (type.getName().equals("AFFYMETRIX_CEL")) {   			
 			files.addAll(getRawDataFiles(service, hybridization));
-		} else if (type == FileType.AFFYMETRIX_CHP) {
+//		} else if (type == FileType.AFFYMETRIX_CHP) {
+		} else if (type.getName().equals("AFFYMETRIX_CHP")) {			
 			files.addAll(getDerivedDataFile(service, hybridization));
 		}
 		return files;
