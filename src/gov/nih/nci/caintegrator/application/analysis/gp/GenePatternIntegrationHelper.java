@@ -36,6 +36,10 @@ public class GenePatternIntegrationHelper {
 		else {
 		  //for backward compatability
 		  user = (String) session.getAttribute("name");
+		  // set the default user if user is null
+		  if ( user == null ) {
+			  user = "RBTuser";
+		  }
 		}
 		
 		String publicUser = System.getProperty("gov.nih.nci.caintegrator.gp.publicuser.name");
