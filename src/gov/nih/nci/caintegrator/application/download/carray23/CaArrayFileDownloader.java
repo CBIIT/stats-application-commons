@@ -1,3 +1,10 @@
+/*L
+ *  Copyright SAIC
+ *
+ *  Distributed under the OSI-approved BSD 3-Clause License.
+ *  See http://ncip.github.com/stats-application-commons/LICENSE.txt for details.
+ */
+
 package gov.nih.nci.caintegrator.application.download.carray23;
 import gov.nih.nci.caarray.domain.file.FileType;
 import gov.nih.nci.caarray.external.v1_0.CaArrayEntityReference;

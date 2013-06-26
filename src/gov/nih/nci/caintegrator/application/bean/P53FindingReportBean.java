@@ -1,3 +1,10 @@
+/*L
+ *  Copyright SAIC
+ *
+ *  Distributed under the OSI-approved BSD 3-Clause License.
+ *  See http://ncip.github.com/stats-application-commons/LICENSE.txt for details.
+ */
+
 package gov.nih.nci.caintegrator.application.bean;
 
 import gov.nih.nci.caintegrator.domain.finding.mutation.p53.bean.P53MutationFinding;

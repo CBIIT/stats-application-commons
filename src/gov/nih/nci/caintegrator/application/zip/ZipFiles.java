@@ -1,3 +1,10 @@
+/*L
+ *  Copyright SAIC
+ *
+ *  Distributed under the OSI-approved BSD 3-Clause License.
+ *  See http://ncip.github.com/stats-application-commons/LICENSE.txt for details.
+ */
+
 /*
  * $Revision: 1.2 $
  * $Date: 2007-06-15 18:36:06 $

@@ -1,3 +1,10 @@
+/*L
+ *  Copyright SAIC
+ *
+ *  Distributed under the OSI-approved BSD 3-Clause License.
+ *  See http://ncip.github.com/stats-application-commons/LICENSE.txt for details.
+ */
+
 /**
  * The UserList will define an uploaded list by name, the type of list and the 
  * contained list itself.

@@ -1,3 +1,10 @@
+/*L
+ *  Copyright SAIC
+ *
+ *  Distributed under the OSI-approved BSD 3-Clause License.
+ *  See http://ncip.github.com/stats-application-commons/LICENSE.txt for details.
+ */
+
 /**
  * The List Generator can be used to create List of strings retrived
  * from the formFile sent to it. The assumed format of the file to be parsed is
