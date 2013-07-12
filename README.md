@@ -1,7 +1,7 @@
 Welcome to the Stats Application Commons Project!
 =====================================
 
-The Stats Application Commons provides various utility functions to support the caIntegrator projects. This provides functions such as Mail server, scheduling, String manipulation, caArray & BRB data download management, caching functions etc.
+The Stats Application Commons provides various utility functions to support [I-SPY] (https://github.com/NCIP/i-spy), [CMA] (https://github.com/NCIP/cma), Remdrandt projects. This provides functions such as Mail server, scheduling, String manipulation, caArray & BRB data download management, caching functions etc.
 
 The Stats Application Commons is an Open Source project and it is written in Java using caCORE CSM, Hibernate, caGrid, Apache Commons, Spring Framework, Log4J Technologies.
 
