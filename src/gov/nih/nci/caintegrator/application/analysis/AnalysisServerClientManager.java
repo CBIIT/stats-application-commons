@@ -149,9 +149,6 @@ public class AnalysisServerClientManager implements ApplicationService, MessageL
 		  throw new IllegalStateException("Attempted to establish queue connection with unset JMS parameters.  Must first call setJMSparameters method.");
 		}
 		
-		//Properties messagingProps = ApplicationContext.getJMSProperties();
-		//String jbossURL = System.getProperty("gov.nih.nci.caintegrator.analysis.jms.jboss_url");
-		
 			while (!connected) {
 		
 			  try {
@@ -162,16 +159,19 @@ public class AnalysisServerClientManager implements ApplicationService, MessageL
 				logger.info("Attempting to establish queue connection with provider: " + jmsProviderURL);
 				
 				// Populate with needed properties
-				Hashtable props = new Hashtable();
-				props.put(Context.INITIAL_CONTEXT_FACTORY,
-						"org.jnp.interfaces.NamingContextFactory");
-				props.put(Context.PROVIDER_URL, jmsProviderURL);
-				props.put("java.naming.rmi.security.manager", "yes");
+//				Hashtable props = new Hashtable();
+//				props.put(Context.INITIAL_CONTEXT_FACTORY,
+//						"org.jnp.interfaces.NamingContextFactory");
+//				props.put(Context.PROVIDER_URL, jmsProviderURL);
+//				props.put("java.naming.rmi.security.manager", "yes");
 				//props.put(Context.URL_PKG_PREFIXES, "org.jboss.naming:org.jnp.interfaces:org.jboss.naming.client");
 			
 				// Get the initial context with given properties
-				Context context = new InitialContext(props);
-			
+				//Context context = new InitialContext(props);
+				
+				//jboss 6 eap doesn't need to set properties for local jndi lookup:
+				//http://stackoverflow.com/questions/18352102/failed-instantiate-initialcontextfactory
+				Context context = new InitialContext();
 				// Get the connection factory
 			
 			    //String factoryJNDI = System.getProperty("gov.nih.nci.caintegrator.analysis.jms.factory_jndi");
